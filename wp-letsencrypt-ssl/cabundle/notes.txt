@@ -1,0 +1,1 @@
+Since v7.3.0 - Please use dynamic cabundle.crt available at your SSL directory
