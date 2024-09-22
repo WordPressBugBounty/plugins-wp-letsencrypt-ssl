@@ -31,6 +31,7 @@ class WPLE_Activator {
         ) : get_option( 'wple_opts' ) );
         update_option( 'wple_opts', $opts );
         update_option( 'wple_version', WPLE_PLUGIN_VER );
+        update_option( 'wple_activate', time() );
         WPLE_Trait::wple_cpanel_identity();
         if ( isset( $opts['expiry'] ) && $opts['expiry'] != '' ) {
             do_action( 'cert_expiry_updated' );

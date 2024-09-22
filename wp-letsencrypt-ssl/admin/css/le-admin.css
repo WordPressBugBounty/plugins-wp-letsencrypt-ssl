@@ -3121,6 +3121,10 @@ span.wple-premium-actions {
   padding-top: 20px;
 }
 
+span.fs-submenu-item.wp-letsencrypt-ssl.addons, a[href="admin.php?page=wp_encryption-addons"] {
+  display: none !important;
+}
+
 @media (max-width: 991px) {
   div#wple-ssl-health > div {
     width: auto !important;

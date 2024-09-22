@@ -841,6 +841,73 @@ class WPLE_Trait {
     }
 
     /**
+     * SSLLabs scan initiated by daily cron
+     * 
+     * @since 7.5.1
+     * @return void
+     */
+    public static function wple_ssllabs_scan_daily( $param = '' ) {
+        if ( function_exists( 'ignore_user_abort' ) ) {
+            ignore_user_abort( true );
+        }
+        //init new scan
+        $API = 'https://api.ssllabs.com/api/v3/analyze';
+        $payload = array(
+            'host'     => SELF::get_root_domain( true ),
+            'startNew' => ( $param == 'recheck_status' ? 'off' : 'on' ),
+            'all'      => 'done',
+        );
+        $laburl = $API . '?' . http_build_query( $payload );
+        $result = wp_remote_get( $laburl );
+        // echo '<pre>';
+        // print_r($result);
+        // exit();
+        if ( is_wp_error( $result ) ) {
+            return false;
+        }
+        $res = wp_remote_retrieve_body( $result );
+        $res = json_decode( $res, true );
+        if ( array_key_exists( 'status', $res ) ) {
+            $status = $res['status'];
+            if ( $status == 'READY' ) {
+                set_transient( 'wple_ssllabs', $res, DAY_IN_SECONDS );
+                $validTo = $res['certs'][0]['notAfter'];
+                $to = date( 'd-m-Y', $validTo / 1000 );
+                $tenDaysToExpiry = strtotime( '-10 day', strtotime( $to ) );
+                if ( strtotime( 'now' ) >= $tenDaysToExpiry ) {
+                    //already in last 10 days to expiry
+                    $wpcron_enabled = 'no';
+                    if ( wp_next_scheduled( 'wple_ssl_renewal' ) ) {
+                        $wpcron_enabled = 'yes';
+                    }
+                    WPLE_Trait::wple_logger( '**LAST 10 DAYS TO SSL EXPIRY** WP CRON - ' . $wpcron_enabled );
+                    if ( $wpcron_enabled == 'no' ) {
+                        //lets enable wp cron & see if it helps
+                        wp_schedule_event( strtotime( '05:00:00' ), 'daily', 'wple_ssl_renewal' );
+                    }
+                    update_option( 'wple_show_reminder', 1 );
+                    update_option( 'wple_renewal_failed_notice', 1 );
+                } else {
+                    //remove notices
+                    delete_option( 'wple_show_reminder' );
+                    delete_option( 'wple_renewal_failed_notice' );
+                    //reset reminder cron
+                    wp_clear_scheduled_hook( 'wple_ssl_reminder_notice' );
+                    wp_schedule_single_event( $tenDaysToExpiry, 'wple_ssl_reminder_notice' );
+                }
+            } else {
+                if ( $status == 'ERROR' ) {
+                    //ignore
+                } else {
+                    //in progress
+                    //re-check status after 15mins
+                    wp_schedule_single_event( time() + 900, 'wple_ssl_expiry_update', array('recheck_status') );
+                }
+            }
+        }
+    }
+
+    /**
      * Returns cert directory with trailing slash
      *
      * #TODO: MU mapped domain test

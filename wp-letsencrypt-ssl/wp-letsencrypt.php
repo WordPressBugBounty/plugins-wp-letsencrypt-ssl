@@ -7,7 +7,7 @@
  * Plugin Name:       WP Encryption - One Click SSL & Force HTTPS
  * Plugin URI:        https://wpencryption.com
  * Description:       Secure your WordPress site with free SSL certificate and force HTTPS. Enable HTTPS padlock. Just activating this plugin won't help! - Please run the SSL install form of WP Encryption found on left panel.
- * Version:           7.5.0
+ * Version:           7.6.0
  * Author:            WP Encryption SSL HTTPS
  * Author URI:        https://wpencryption.com
  * License:           GNU General Public License v3.0
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
  * Definitions
  */
 if ( !defined( 'WPLE_PLUGIN_VER' ) ) {
-    define( 'WPLE_PLUGIN_VER', '7.5.0' );
+    define( 'WPLE_PLUGIN_VER', '7.6.0' );
 }
 if ( !defined( 'WPLE_BASE' ) ) {
     define( 'WPLE_BASE', plugin_basename( __FILE__ ) );
@@ -88,7 +88,7 @@ if ( function_exists( 'wple_fs' ) ) {
                     'type'           => 'plugin',
                     'public_key'     => 'pk_f6a07c106bf4ef064d9ac4b989e02',
                     'is_premium'     => false,
-                    'has_addons'     => false,
+                    'has_addons'     => true,
                     'has_paid_plans' => true,
                     'menu'           => array(
                         'slug'    => 'wp_encryption',

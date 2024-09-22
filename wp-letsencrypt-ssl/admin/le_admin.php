@@ -80,6 +80,7 @@ class WPLE_Admin {
         add_filter( 'fs_uninstall_reasons_wp-letsencrypt-ssl', [$this, 'wple_oneyearprom'], 1 );
         add_action( 'wple_init_ssllabs', [$this, 'wple_initialize_ssllabs'] );
         add_action( 'wple_ssl_expiry_update', [$this, 'wple_update_expiry_ssllabs'] );
+        //daily once cron
     }
 
     // function my_custom_pricing_js_path($default_pricing_js_path)
@@ -872,9 +873,9 @@ class WPLE_Admin {
      * @return void
      */
     public function wple_start_show_reminder() {
-        if ( !WPLE_Trait::wple_ssl_recheck_expiry() ) {
-            return;
-        }
+        // if (!WPLE_Trait::wple_ssl_recheck_expiry()) { //rechecked in daily scan
+        //     return;
+        // }
         update_option( 'wple_show_reminder', 1 );
         update_option( 'wple_renewal_failed_notice', 1 );
         if ( FALSE !== get_option( 'wple_ssl_monitoring' ) ) {
@@ -1233,7 +1234,7 @@ class WPLE_Admin {
     public function wple_oneyearprom( $reasons ) {
         $reasons['long-term'][] = $reasons['short-term'][] = array(
             'id'                => 20,
-            'text'              => '<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=oneyearsslpro" target="_blank"><img src="' . WPLE_URL . 'admin/assets/1-year-ssl.png"/></a>',
+            'text'              => '<a href="' . site_url() . '/wp-admin/plugin-install.php?fs_allow_updater_and_dialog=true&tab=plugin-information&parent_plugin_id=5090&plugin=wpen-certpanel&section=description" target="_blank"><img src="' . WPLE_URL . 'admin/assets/1-year-ssl.png"/></a>',
             'input_type'        => '',
             'input_placeholder' => 'oneyearssl',
         );
@@ -1304,9 +1305,15 @@ class WPLE_Admin {
         WPLE_Trait::wple_ssllabs_scan( true );
     }
 
-    public function wple_update_expiry_ssllabs() {
+    /**
+     * Daily once SSL check cron
+     * 
+     * @param string $param
+     * @return void
+     */
+    public function wple_update_expiry_ssllabs( $param = '' ) {
         //init new scan daily once
-        WPLE_Trait::wple_ssllabs_scan( true, false );
+        WPLE_Trait::wple_ssllabs_scan_daily( $param );
     }
 
 }

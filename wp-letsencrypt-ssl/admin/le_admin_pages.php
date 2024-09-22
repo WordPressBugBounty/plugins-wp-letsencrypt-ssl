@@ -913,6 +913,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             if ( $opt == 'daily_vulnerability_scan' ) {
                 wp_clear_scheduled_hook( 'wple_init_vulnerability_scan' );
             }
+            if ( $opt == 'ssl_monitoring' ) {
+                wp_clear_scheduled_hook( 'wple_ssl_expiry_update' );
+            }
             if ( !in_array( $opt, $score_exclusions ) ) {
                 $out = -10;
             }
@@ -928,6 +931,11 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         } else {
             if ( $opt == 'daily_vulnerability_scan' ) {
                 wp_schedule_event( strtotime( 'now' ), 'daily', 'wple_init_vulnerability_scan' );
+            }
+            if ( $opt == 'ssl_monitoring' ) {
+                if ( !wp_next_scheduled( 'wple_ssl_expiry_update' ) ) {
+                    wp_schedule_event( strtotime( '05:30:00' ), 'daily', 'wple_ssl_expiry_update' );
+                }
             }
             if ( !in_array( $opt, $score_exclusions ) ) {
                 $out = 10;
