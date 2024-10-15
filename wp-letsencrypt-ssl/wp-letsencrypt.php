@@ -113,9 +113,10 @@ function wple_fs_legacy_checkout($template)
 {
     if (false !== strpos($template, '&billing_cycle=annual')) {
         $template = str_replace('&billing_cycle=annual', '&billing_cycle=annual&checkout_style=legacy', $template);
-    } else if (false !== strpos($template, '&billing_cycle=lifetime')) {
-        $template = str_replace('&billing_cycle=lifetime', '&billing_cycle=lifetime&checkout_style=legacy', $template);
     }
+    // else if (false !== strpos($template, '&billing_cycle=lifetime')) {
+    //     $template = str_replace('&billing_cycle=lifetime', '&billing_cycle=lifetime&checkout_style=legacy', $template);
+    // }
     return $template;
 }
 
