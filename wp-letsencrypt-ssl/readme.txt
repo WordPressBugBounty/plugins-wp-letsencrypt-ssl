@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 6.6
 Requires PHP: 7.0
-Stable tag: 7.6.0
+Stable tag: 7.6.1
 
 Lifetime SSL solution & Security - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, SSL details & monitoring.
 
@@ -15,18 +15,11 @@ HTTPS Secure your WordPress site with SSL certificate provided by [Let's Encrypt
 
 [WP Encryption](https://wpencryption.com/?utm_source=wordpress&utm_medium=description&utm_campaign=wpencryption) plugin registers your site, verifies your domain, generates SSL certificate for your site in simple mouse clicks without the need of any technical knowledge. 
 
-A typical SSL installation without WP Encryption would require you to generate CSR, prove domain ownership, provide your bussiness data and deal with many more technical tasks!.
-
-= New Security Features - 1,000+ Reviews Special =
-
-(V7.0) NEW Vulnerability Scanner + Security page - Enable important security protocols to safeguard your site.
-
 ### 5M+ SSL certificates generated - Switch to HTTPS easily ###
 
 https://youtu.be/aKvvVlAlZ14
 
-= REQUIREMENTS =
-Linux hosting, OpenSSL, CURL, allow_url_fopen should be enabled.
+A typical SSL installation without WP Encryption would require you to generate CSR, prove domain ownership, provide your bussiness data and deal with many more technical tasks!.
 
 == PRO FEATURES WORTH UPGRADING ==
 
@@ -37,6 +30,7 @@ https://youtu.be/jrkFwFH7r6o
 * Automatic SSL renewal (Auto renews SSL certificate 30 days prior to expiry date)
 * Wildcard SSL support - Install Wildcard SSL certificate for your primary domain that covers ALL sub-domains. Automatic DNS based domain verification for Wildcard SSL installation (DNS should be managed by cPanel or Godaddy)
 * Multisite + Mapped domains support - Supports SSL installation for mapped domains
+* Automated regular vulnerability scanning & reporting.
 * Automatic Content Delivery Network(CDN) to boost your site performance (Annual Plan Only)
 * Blocks SQL injection, XSS, Shellshock, Remote File Inclusion, Apache Structs Exploits, Local File Inclusion attacks.
 * Blocks common web application vulnerabilities and common WordPress attacks.
@@ -59,10 +53,6 @@ https://youtu.be/jrkFwFH7r6o
 * SSL monitoring & Automatic email notification prior to SSL certificate expiration
 
 (Optional) Running WordPress on a specialized VPS/Dedicated server without cPanel? You can download the generated SSL certificate files easily via "Download SSL Certificates" page and install it on your server by modifying server config file via SSH access as explained in our [DOCS](https://wpencryption.com/docs/). 
-
-== (New) Vulnerability Scanner in v6.0 ==
-
-Navigate to SSL Health & Security page and run the vulnerability scanner to scan your WordPress, Plugins and Themes for known vulnerabilities. Keep everything updated to stay secure.
 
 == ADVANCED HTTP SECURITY HEADERS ==
 
@@ -88,6 +78,13 @@ Safeguard your site from cross-site scripting attacks, clickjacking, MIME sniffi
 3. Trust: Google chrome shows non-SSL sites as 'insecure', bringing a feel of insecurity in website visitors.
 
 4. Authentic: HTTPS green padlock represents symbol of trust, authenticity and security.
+
+== (New) Vulnerability Scanner in v7.0+ ==
+
+Navigate to SSL Health & Security page and run the vulnerability scanner to scan your WordPress, Plugins and Themes for known vulnerabilities. Keep everything updated to stay secure.
+
+= REQUIREMENTS =
+Linux hosting, OpenSSL, CURL, allow_url_fopen should be enabled.
 
 = Translations =
 
@@ -174,6 +171,12 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 6. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.6.1 =
+* fixed php conflict btw free & pro version
+* improved http challenge check
+* PRO - plesk api error handling
+* PRO - CA bundle fix for multisite mapped domain
 
 = 7.6.0 =
 * Improved daily SSL scan

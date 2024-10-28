@@ -7,7 +7,7 @@
  * Plugin Name:       WP Encryption - One Click SSL & Force HTTPS
  * Plugin URI:        https://wpencryption.com
  * Description:       Secure your WordPress site with free SSL certificate and force HTTPS. Enable HTTPS padlock. Just activating this plugin won't help! - Please run the SSL install form of WP Encryption found on left panel.
- * Version:           7.6.0
+ * Version:           7.6.1
  * Author:            WP Encryption SSL HTTPS
  * Author URI:        https://wpencryption.com
  * License:           GNU General Public License v3.0
@@ -27,62 +27,61 @@
 /**
  * Die on direct access
  */
-if (!defined('ABSPATH')) {
-    die('Access Denied');
+if ( !defined( 'ABSPATH' ) ) {
+    die( 'Access Denied' );
 }
 /**
  * Definitions
  */
-if (!defined('WPLE_PLUGIN_VER')) {
-    define('WPLE_PLUGIN_VER', '7.6.0');
+if ( !defined( 'WPLE_PLUGIN_VER' ) ) {
+    define( 'WPLE_PLUGIN_VER', '7.6.1' );
 }
-if (!defined('WPLE_BASE')) {
-    define('WPLE_BASE', plugin_basename(__FILE__));
+if ( !defined( 'WPLE_BASE' ) ) {
+    define( 'WPLE_BASE', plugin_basename( __FILE__ ) );
 }
-if (!defined('WPLE_DIR')) {
-    define('WPLE_DIR', plugin_dir_path(__FILE__));
+if ( !defined( 'WPLE_DIR' ) ) {
+    define( 'WPLE_DIR', plugin_dir_path( __FILE__ ) );
 }
-if (!defined('WPLE_URL')) {
-    define('WPLE_URL', plugin_dir_url(__FILE__));
+if ( !defined( 'WPLE_URL' ) ) {
+    define( 'WPLE_URL', plugin_dir_url( __FILE__ ) );
 }
-if (!defined('WPLE_NAME')) {
-    define('WPLE_NAME', 'WP Encryption');
+if ( !defined( 'WPLE_NAME' ) ) {
+    define( 'WPLE_NAME', 'WP Encryption' );
 }
-if (!defined('WPLE_SLUG')) {
-    define('WPLE_SLUG', 'wp_encryption');
+if ( !defined( 'WPLE_SLUG' ) ) {
+    define( 'WPLE_SLUG', 'wp_encryption' );
 }
 $wple_updir = wp_upload_dir();
 $uploadpath = $wple_updir['basedir'] . '/';
-if (!file_exists($uploadpath)) {
+if ( !file_exists( $uploadpath ) ) {
     $uploadpath = ABSPATH . 'wp-content/uploads/wp_encryption/';
 }
-if (!defined('WPLE_UPLOADS')) {
-    define('WPLE_UPLOADS', $uploadpath);
+if ( !defined( 'WPLE_UPLOADS' ) ) {
+    define( 'WPLE_UPLOADS', $uploadpath );
 }
-if (!defined('WPLE_DEBUGGER')) {
-    define('WPLE_DEBUGGER', WPLE_UPLOADS . 'wp_encryption/');
+if ( !defined( 'WPLE_DEBUGGER' ) ) {
+    define( 'WPLE_DEBUGGER', WPLE_UPLOADS . 'wp_encryption/' );
 }
 /**
  * Freemius
  */
-if (function_exists('wple_fs')) {
-    wple_fs()->set_basename(false, __FILE__);
+if ( function_exists( 'wple_fs' ) ) {
+    wple_fs()->set_basename( false, __FILE__ );
 } else {
-    if (!function_exists('wple_fs')) {
+    if ( !function_exists( 'wple_fs' ) ) {
         // Activate multisite network integration.
-        if (!defined('WP_FS__PRODUCT_5090_MULTISITE')) {
-            define('WP_FS__PRODUCT_5090_MULTISITE', true);
+        if ( !defined( 'WP_FS__PRODUCT_5090_MULTISITE' ) ) {
+            define( 'WP_FS__PRODUCT_5090_MULTISITE', true );
         }
         // Create a helper function for easy SDK access.
-        function wple_fs()
-        {
+        function wple_fs() {
             global $wple_fs;
             ///$showpricing = (FALSE !== get_option('wple_no_pricing')) ? false : true;
             $showpricing = true;
-            if (!isset($wple_fs)) {
+            if ( !isset( $wple_fs ) ) {
                 // Include Freemius SDK.
-                require_once dirname(__FILE__) . '/freemius/start.php';
-                $wple_fs = fs_dynamic_init(array(
+                require_once dirname( __FILE__ ) . '/freemius/start.php';
+                $wple_fs = fs_dynamic_init( array(
                     'id'             => '5090',
                     'slug'           => 'wp-letsencrypt-ssl',
                     'premium_slug'   => 'wp-letsencrypt-ssl-pro',
@@ -98,7 +97,7 @@ if (function_exists('wple_fs')) {
                         'pricing' => $showpricing,
                     ),
                     'is_live'        => true,
-                ));
+                ) );
             }
             return $wple_fs;
         }
@@ -106,43 +105,46 @@ if (function_exists('wple_fs')) {
         // Init Freemius.
         wple_fs();
         // Signal that SDK was initiated.
-        do_action('wple_fs_loaded');
+        do_action( 'wple_fs_loaded' );
     }
 }
-function wple_fs_legacy_checkout($template)
-{
-    if (false !== strpos($template, '&billing_cycle=annual')) {
-        $template = str_replace('&billing_cycle=annual', '&billing_cycle=annual&checkout_style=legacy', $template);
-    }
-    // else if (false !== strpos($template, '&billing_cycle=lifetime')) {
-    //     $template = str_replace('&billing_cycle=lifetime', '&billing_cycle=lifetime&checkout_style=legacy', $template);
-    // }
-    return $template;
-}
+if ( !wple_fs()->is_premium() ) {
+    wple_fs()->add_filter( 'templates/checkout.php', 'wple_fs_legacy_checkout' );
+    if ( !function_exists( 'wple_fs_legacy_checkout' ) ) {
+        function wple_fs_legacy_checkout(  $template  ) {
+            if ( false !== strpos( $template, '&billing_cycle=annual' ) ) {
+                $template = str_replace( '&billing_cycle=annual', '&billing_cycle=annual&checkout_style=legacy', $template );
+            }
+            // else if (false !== strpos($template, '&billing_cycle=lifetime')) {
+            //     $template = str_replace('&billing_cycle=lifetime', '&billing_cycle=lifetime&checkout_style=legacy', $template);
+            // }
+            return $template;
+        }
 
-wple_fs()->add_filter('templates/checkout.php', 'wple_fs_legacy_checkout');
+    }
+}
 require_once WPLE_DIR . 'classes/le-trait.php';
 /**
  * Plugin Activator hook
  */
-register_activation_hook(__FILE__, 'wple_activate');
-if (!function_exists('wple_activate')) {
-    function wple_activate($networkwide)
-    {
+register_activation_hook( __FILE__, 'wple_activate' );
+if ( !function_exists( 'wple_activate' ) ) {
+    function wple_activate(  $networkwide  ) {
         require_once WPLE_DIR . 'classes/le-activator.php';
-        WPLE_Activator::activate($networkwide);
+        WPLE_Activator::activate( $networkwide );
     }
+
 }
 /**
  * Plugin Deactivator hook
  */
-register_deactivation_hook(__FILE__, 'wple_deactivate');
-if (!function_exists('wple_deactivate')) {
-    function wple_deactivate()
-    {
+register_deactivation_hook( __FILE__, 'wple_deactivate' );
+if ( !function_exists( 'wple_deactivate' ) ) {
+    function wple_deactivate() {
         require_once WPLE_DIR . 'classes/le-deactivator.php';
         WPLE_Deactivator::deactivate();
     }
+
 }
 /**
  * Class to handle all aspects of plugin page
@@ -167,34 +169,32 @@ new WPLE_ForceSSL();
  */
 require_once WPLE_DIR . 'classes/le-scanner.php';
 new WPLE_Scanner();
-if (function_exists('wple_fs') && !function_exists('wple_fs_custom_connect_message')) {
-    function wple_fs_custom_connect_message($message)
-    {
+if ( function_exists( 'wple_fs' ) && !function_exists( 'wple_fs_custom_connect_message' ) ) {
+    function wple_fs_custom_connect_message(  $message  ) {
         $current_user = wp_get_current_user();
-        return sprintf(esc_html__('Howdy %1$s') . ',<br>' . __('Due to security nature of this plugin, We <b>HIGHLY</b> recommend you opt-in to our security & feature updates notifications, and <a href="https://freemius.com/wordpress/usage-tracking/5090/wp-letsencrypt-ssl/" target="_blank">non-sensitive diagnostic tracking</a> to get BEST support. If you skip this, that\'s okay! <b>WP Encryption</b> will still work just fine.', 'wp-letsencrypt-ssl'), ucfirst($current_user->user_nicename));
+        return sprintf( esc_html__( 'Howdy %1$s' ) . ',<br>' . __( 'Due to security nature of this plugin, We <b>HIGHLY</b> recommend you opt-in to our security & feature updates notifications, and <a href="https://freemius.com/wordpress/usage-tracking/5090/wp-letsencrypt-ssl/" target="_blank">non-sensitive diagnostic tracking</a> to get BEST support. If you skip this, that\'s okay! <b>WP Encryption</b> will still work just fine.', 'wp-letsencrypt-ssl' ), ucfirst( $current_user->user_nicename ) );
     }
 
-    wple_fs()->add_filter('connect_message', 'wple_fs_custom_connect_message');
+    wple_fs()->add_filter( 'connect_message', 'wple_fs_custom_connect_message' );
 }
 /**
  * Support forum URL for Premium
  * 
  * @since 5.3.2
  */
-if (wple_fs()->is_premium() && !function_exists('wple_premium_forum')) {
-    function wple_premium_forum($wp_org_support_forum_url)
-    {
+if ( wple_fs()->is_premium() && !function_exists( 'wple_premium_forum' ) ) {
+    function wple_premium_forum(  $wp_org_support_forum_url  ) {
         return 'https://gowebsmarty.in/';
     }
 
-    wple_fs()->add_filter('support_forum_url', 'wple_premium_forum');
+    wple_fs()->add_filter( 'support_forum_url', 'wple_premium_forum' );
 }
 /**
  * Dont show cancel subscription popup
  * 
  * @since 5.3.2
  */
-wple_fs()->add_filter('show_deactivation_subscription_cancellation', '__return_false');
+wple_fs()->add_filter( 'show_deactivation_subscription_cancellation', '__return_false' );
 /**
  * Security Init
  * 
