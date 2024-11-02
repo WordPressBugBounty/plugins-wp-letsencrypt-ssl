@@ -44,6 +44,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         add_filter( 'site_status_tests', [$this, 'wple_vulnerable_components'] );
         //since 6.7.0
         add_filter( 'wp_headers', [$this, 'wple_enforce_security_headers'] );
+        //since 7.7.0
+        add_action( 'wp_ajax_wple_global_ignore', [$this, 'wple_global_ignore'] );
+        add_action( 'wp_ajax_wple_global_dontshow', [$this, 'wple_global_dontshow'] );
     }
 
     /**
@@ -1482,6 +1485,34 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         }
         update_option( 'wple_security_settings', $save );
         echo 1;
+        exit;
+    }
+
+    /**
+     * remind later notice
+     * 
+     * @since 7.7.0
+     * @return void
+     */
+    public function wple_global_ignore() {
+        if ( current_user_can( 'manage_options' ) ) {
+            $context = sanitize_text_field( $_POST['context'] );
+            delete_option( 'wple_notice_' . $context );
+            if ( !wp_next_scheduled( 'wple_remindlater_' . $context ) ) {
+                wp_schedule_single_event( strtotime( '+1 day', time() ), 'wple_remindlater_' . $context );
+            }
+            echo "success";
+        }
+        exit;
+    }
+
+    public function wple_global_dontshow() {
+        if ( current_user_can( 'manage_options' ) ) {
+            $context = sanitize_text_field( $_POST['context'] );
+            delete_option( 'wple_notice_' . $context );
+            update_option( 'wple_notice_disabled_' . $context, true );
+            echo "success";
+        }
         exit;
     }
 

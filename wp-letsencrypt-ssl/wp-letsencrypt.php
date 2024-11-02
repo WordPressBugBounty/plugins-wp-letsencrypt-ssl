@@ -7,7 +7,7 @@
  * Plugin Name:       WP Encryption - One Click SSL & Force HTTPS
  * Plugin URI:        https://wpencryption.com
  * Description:       Secure your WordPress site with free SSL certificate and force HTTPS. Enable HTTPS padlock. Just activating this plugin won't help! - Please run the SSL install form of WP Encryption found on left panel.
- * Version:           7.6.1
+ * Version:           7.7.0
  * Author:            WP Encryption SSL HTTPS
  * Author URI:        https://wpencryption.com
  * License:           GNU General Public License v3.0
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
  * Definitions
  */
 if ( !defined( 'WPLE_PLUGIN_VER' ) ) {
-    define( 'WPLE_PLUGIN_VER', '7.6.1' );
+    define( 'WPLE_PLUGIN_VER', '7.7.0' );
 }
 if ( !defined( 'WPLE_BASE' ) ) {
     define( 'WPLE_BASE', plugin_basename( __FILE__ ) );
@@ -108,20 +108,13 @@ if ( function_exists( 'wple_fs' ) ) {
         do_action( 'wple_fs_loaded' );
     }
 }
-if ( !wple_fs()->is_premium() ) {
-    wple_fs()->add_filter( 'templates/checkout.php', 'wple_fs_legacy_checkout' );
-    if ( !function_exists( 'wple_fs_legacy_checkout' ) ) {
-        function wple_fs_legacy_checkout(  $template  ) {
-            if ( false !== strpos( $template, '&billing_cycle=annual' ) ) {
-                $template = str_replace( '&billing_cycle=annual', '&billing_cycle=annual&checkout_style=legacy', $template );
-            }
-            // else if (false !== strpos($template, '&billing_cycle=lifetime')) {
-            //     $template = str_replace('&billing_cycle=lifetime', '&billing_cycle=lifetime&checkout_style=legacy', $template);
-            // }
-            return $template;
-        }
-
+wple_fs()->add_filter( 'templates/pricing.php', 'wple_pricing_reactstyle' );
+if ( !function_exists( 'wple_pricing_reactstyle' ) ) {
+    function wple_pricing_reactstyle(  $template  ) {
+        $style = "\r\n            <style>\r\n            header.fs-app-header .fs-page-title {\r\n                display: none !important;\r\n            }\r\n\r\n            section.fs-plugin-title-and-logo {\r\n                margin: 0 !important;\r\n            }\r\n\r\n            section.fs-plugin-title-and-logo h1 {\r\n                font-size: 2em !important;\r\n            }\r\n            img.fs-limited-offer {\r\n                max-width: 600px;\r\n            }\r\n            li.fs-selected-billing-cycle {\r\n                background: linear-gradient(180deg, black, #555) !important;!i;!;\r\n                color:#fff !important;\r\n            }\r\n\r\n            .fs-billing-cycles li {\r\n                padding: 7px 35px !important;\r\n            }\r\n            button.fs-button.fs-button--size-large {\r\n                background: linear-gradient(180deg, #6cc703, #139104) !important;\r\n                border: none !important;\r\n                color: #fff !important;\r\n                padding-top: 12px !important;\r\n                padding-bottom: 12px !important;\r\n                font-weight: 400 !important;\r\n            }\r\n            h2.fs-plan-title {\r\n                padding-top: 15px !important;\r\n                padding-bottom: 15px !important;\r\n            }\r\n\r\n            span.fs-feature-title strong {\r\n                padding-right: 3px;\r\n            }\r\n\r\n            ul.fs-plan-features-with-value li {\r\n                padding: 5px 0;\r\n                background: #f6f6f6;\r\n            }\r\n\r\n            ul.fs-plan-features-with-value li:nth-of-type(even) {\r\n                background: none;\r\n            }\r\n\r\n            .fs-plan-support strong {\r\n                font-weight: 500 !important;!i;!;\r\n                color: #666;\r\n            }\r\n\r\n            section.fs-section.fs-section--plans-and-pricing:before {\r\n                content: '';\r\n                display: block;\r\n                background: url(https://gowebsmarty.com/limited-offer.png) no-repeat top center;\r\n                height:120px;\r\n                background-size: 600px auto;\r\n            }\r\n            #fs_pricing_app .fs-package .fs-plan-features{\r\n                margin:20px 25px 0 !important;\r\n            }\r\n            button.fs-button.fs-button--size-large:hover {\r\n                background: linear-gradient(180deg, #6cc703, #148706) !important;\r\n            }\r\n            </style>";
+        return $style . $template;
     }
+
 }
 require_once WPLE_DIR . 'classes/le-trait.php';
 /**

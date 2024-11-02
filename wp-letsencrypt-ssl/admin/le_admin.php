@@ -69,6 +69,10 @@ class WPLE_Admin {
             //since 5.3.12
             add_action( 'admin_notices', [$this, 'wple_mixed_content_notice'] );
         }
+        if ( FALSE != get_option( 'wple_notice_trial' ) && FALSE === get_option( 'wple_notice_disabled_trial' ) ) {
+            //since 7.7.0
+            add_action( 'admin_notices', [$this, 'wple_trial_promo_notice'] );
+        }
         if ( isset( $_GET['successnotice'] ) ) {
             //settings saved
             add_action( 'admin_notices', array($this, 'wple_success_notice') );
@@ -77,10 +81,11 @@ class WPLE_Admin {
         add_action( 'wple_show_reviewrequest', array($this, 'wple_set_review_flag') );
         add_action( 'wple_show_mxalert', array($this, 'wple_set_mxerror_flag') );
         add_action( 'wple_ssl_reminder_notice', [$this, 'wple_start_show_reminder'] );
-        add_filter( 'fs_uninstall_reasons_wp-letsencrypt-ssl', [$this, 'wple_oneyearprom'], 1 );
         add_action( 'wple_init_ssllabs', [$this, 'wple_initialize_ssllabs'] );
         add_action( 'wple_ssl_expiry_update', [$this, 'wple_update_expiry_ssllabs'] );
         //daily once cron
+        add_action( 'wple_remindlater_trial', array($this, 'wple_show_trial_notice') );
+        //since 7.7.0
     }
 
     // function my_custom_pricing_js_path($default_pricing_js_path)
@@ -176,6 +181,16 @@ class WPLE_Admin {
             if ( version_compare( get_option( 'wple_version' ), '7.6.0', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
+            }
+        }
+        ///if (array_key_exists('SERVER_ADDR', $_SERVER)) update_option('wple_sourceip', $_SERVER['SERVER_ADDR']); //Used later for LE requests
+        //show trial prom
+        if ( $activated = get_option( 'wple_activate' ) ) {
+            $after3days = strtotime( '+3 day', $activated );
+            if ( time() >= $after3days ) {
+                if ( FALSE === get_option( 'wple_notice_disabled_trial' ) ) {
+                    update_option( 'wple_notice_trial', true );
+                }
             }
         }
         $this->wple_subdir_ipaddress();
@@ -1314,6 +1329,25 @@ class WPLE_Admin {
     public function wple_update_expiry_ssllabs( $param = '' ) {
         //init new scan daily once
         WPLE_Trait::wple_ssllabs_scan_daily( $param );
+    }
+
+    public function wple_trial_promo_notice() {
+        $upgradebutton = '<a class="wple-lets-review wplerevbtn" href="' . network_admin_url( '/plugin-install.php?fs_allow_updater_and_dialog=true&tab=plugin-information&parent_plugin_id=5090&plugin=wpen-certpanel&section=description' ) . '" target="_blank">' . esc_html__( 'View Details', 'wp-letsencrypt-ssl' ) . '</a>';
+        $html = '<div class="notice notice-info wple-admin-review wple-notice-trial">
+        <div class="wple-review-box">
+            <img src="' . WPLE_URL . 'admin/assets/symbol.png"/>
+            <span><strong>Are you still looking for an SSL certificate?</strong>
+            <p>We truly appreciate your unwavering support as a loyal user of our WordPress plugin! To express our gratitude, we\'re excited to offer you an exclusive <b>7-day free trial</b> of our premium SSL add-on through which you can generate premium SSL certificate and install it on your hosting server.</p></span>
+        </div>
+        ' . $upgradebutton . '
+        <a class="wple-dont-show-btn" data-context="trial" href="#">' . esc_html__( "Don't show again", 'wp-letsencrypt-ssl' ) . '</a>
+        <a class="wple-ignore-btn" data-context="trial" href="#">' . esc_html__( "Remind me later", 'wp-letsencrypt-ssl' ) . '</a>
+        </div>';
+        echo $html;
+    }
+
+    public function wple_show_trial_notice() {
+        update_option( 'wple_notice_trial', true );
     }
 
 }

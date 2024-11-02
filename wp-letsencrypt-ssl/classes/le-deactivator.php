@@ -58,7 +58,8 @@ class WPLE_Deactivator {
             'wple_sourceip',
             'wple_order_refreshed',
             'wple_sourceip_enable',
-            'wple_parent_reachable'
+            'wple_parent_reachable',
+            'wple_notice_disabled_trial'
         );
         foreach ( $opts_to_delete as $optname ) {
             delete_option( $optname );

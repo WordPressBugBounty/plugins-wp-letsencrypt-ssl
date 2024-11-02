@@ -891,7 +891,7 @@ input.wple-domain-input {
   padding: 10px 15px 15px;
 }
 
-a.wplerevbtn {
+a.wplerevbtn, a.wple-ignore-btn, a.wple-dont-show-btn {
   background: #eee;
   text-decoration: none;
   padding: 7px 13px;

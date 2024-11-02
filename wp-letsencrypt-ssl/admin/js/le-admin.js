@@ -725,9 +725,9 @@
     });
   });
 
-  $("#wple-security-settings input").change(function(){
-    var opts = $("#wple-security-settings").serializeArray();
-    var nc = $("#wple-security-settings").attr("data-update");
+  $('#wple-security-settings input').change(function () {
+    var opts = $('#wple-security-settings').serializeArray();
+    var nc = $('#wple-security-settings').attr('data-update');
 
     jQuery.ajax({
       method: 'POST',
@@ -736,21 +736,64 @@
       data: {
         action: 'wple_update_security',
         opt: opts,
-        nc: nc
+        nc: nc,
       },
-      beforeSend: function () {        
-      },
+      beforeSend: function () {},
       error: function () {
         alert('Could not update setting! Please try again.');
       },
       success: function (response) {
-        if(response==0){
+        if (response == 0) {
           alert('Could not update setting! Please try again.');
         } else {
           console.log(response);
         }
-      }
+      },
     });
+  });
 
+  //since 7.7.0
+  $('.wple-ignore-btn').click(function (e) {
+    var $this = $(this);
+    e.preventDefault();
+
+    jQuery.ajax({
+      method: 'POST',
+      url: ajaxurl,
+      dataType: 'text',
+      data: {
+        action: 'wple_global_ignore',
+        context: $this.attr('data-context'),
+      },
+      beforeSend: function () {},
+      error: function () {
+        //alert("Failed to save! Please try again");
+      },
+      success: function (response) {
+        $('.wple-notice-' + $this.attr('data-context')).fadeOut('slow');
+      },
+    });
+  });
+
+  $('.wple-dont-show-btn').click(function (e) {
+    var $this = $(this);
+    e.preventDefault();
+
+    jQuery.ajax({
+      method: 'POST',
+      url: ajaxurl,
+      dataType: 'text',
+      data: {
+        action: 'wple_global_dontshow',
+        context: $this.attr('data-context'),
+      },
+      beforeSend: function () {},
+      error: function () {
+        //alert("Failed to save! Please try again");
+      },
+      success: function (response) {
+        $('.wple-notice-' + $this.attr('data-context')).fadeOut('slow');
+      },
+    });
   });
 })(jQuery);
