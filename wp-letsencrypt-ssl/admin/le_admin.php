@@ -188,7 +188,7 @@ class WPLE_Admin {
         if ( $activated = get_option( 'wple_activate' ) ) {
             $after3days = strtotime( '+3 day', $activated );
             if ( time() >= $after3days ) {
-                if ( FALSE === get_option( 'wple_notice_disabled_trial' ) ) {
+                if ( FALSE === get_option( 'wple_notice_disabled_trial' ) && !wp_next_scheduled( 'wple_remindlater_trial' ) ) {
                     update_option( 'wple_notice_trial', true );
                 }
             }
@@ -552,7 +552,7 @@ class WPLE_Admin {
      * @return void
      */
     public function wple_upgrade_block( &$html ) {
-        $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing' );
+        $upgradeurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=upgrade&utm_campaign=wpencryption#pricing';
         ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&coupon=FIRSTBUY');
         $nopricing = get_option( 'wple_no_pricing' );
         //gdy

@@ -26,7 +26,7 @@
  */
 require_once WPLE_DIR . 'admin/le_admin_page_wrapper.php';
 require_once WPLE_DIR . 'classes/le-advanced-scanner.php';
-require_once WPLE_DIR . 'classes/le-security.php';
+require_once plugin_dir_path( __DIR__ ) . 'classes/le-security.php';
 class WPLE_SubAdmin extends WPLE_Admin_Page {
     private $threats = array();
 
@@ -150,6 +150,22 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'wp_encryption_reset',
             [$this, 'wple_tools_block']
         );
+        add_submenu_page(
+            'wp_encryption',
+            'Upgrade to Premium',
+            __( 'Upgrade to Premium', 'wp-letsencrypt-ssl' ),
+            'manage_options',
+            'wp_encryption_upgrade',
+            [$this, 'wple_upgrade_page']
+        );
+        global $submenu;
+        foreach ( $submenu['wp_encryption'] as $key => $val ) {
+            if ( in_array( 'wp_encryption_upgrade', $val ) ) {
+                $submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html( $submenu['wp_encryption'][$key][0] ) . '</span>';
+                $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing';
+                break;
+            }
+        }
     }
 
     /**
@@ -458,7 +474,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
 
     public function wple_mixed_scanner_page() {
         $html = '<h2>' . esc_html__( 'Advanced Insecure Content Scanner', 'wp-letsencrypt-ssl' ) . '</h2><p style="margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;">' . WPLE_Trait::wple_kses( __( 'Scan your entire site (public posts + pages) for mixed/insecure content issues that are causing secure browser padlock to not show even if SSL certificate is installed correctly. SOURCE column shows you where the insecure url is coming from, you can easily find the mixed content url and update it to https:// to resolve the issue. Issues arising from Widgets or Inline are global issues which could be breaking HTTPS padlock on several of your webpages. Resolve the issues, reload and re-scan to confirm everything is resolved.', 'wp-letsencrypt-ssl' ) ) . '.</p>';
-        $html .= "<p style=\"margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;font-style:italic;color:#666;\">We're working hard to add more features. Please consider upgrading to <a href=\"" . admin_url( '/admin.php?page=wp_encryption-pricing' ) . "\">PRO</a> version if you wish to support the development.</p>";
+        $html .= "<p style=\"margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;font-style:italic;color:#666;\">We're working hard to add more features. Please consider upgrading to <a href=\"https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing\">PRO</a> version if you wish to support the development.</p>";
         $html .= '<div id="wple-scanner">
     <button class="wple-scan" data-nc="' . wp_create_nonce( 'wplemixedscanner' ) . '">' . esc_html__( 'START THE SCAN', 'wp-letsencrypt-ssl' ) . '</button>
     </div>';
@@ -583,9 +599,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'httponly_cookies'    => 'HttpOnly secure cookies enabled',
             'ssl_monitoring'      => 'SSL monitoring enabled',
             'tls_version'         => 'TLS version up-to-date',
-            'ssl_auto_renew'      => 'SSL certificate is set to auto renew (<a href="' . get_site_url() . '/wp-admin/admin.php?page=wp_encryption-pricing">Premium</a>)',
-            'advanced_security'   => 'Advanced security headers enabled (<a href="' . get_site_url() . '/wp-admin/admin.php?page=wp_encryption-pricing">Premium</a>)',
-            'improve_security'    => 'Improve security with WP Encryption Pro (<a href="' . get_site_url() . '/wp-admin/admin.php?page=wp_encryption-pricing">Premium</a>)',
+            'ssl_auto_renew'      => 'SSL certificate is set to auto renew (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'advanced_security'   => 'Advanced security headers enabled (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'improve_security'    => 'Improve security with WP Encryption Pro (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
         );
         $score = 0;
         $featurelist = '<ul>';
@@ -1260,7 +1276,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         );
         $output = '';
         foreach ( $vuln_headers as $optlabel => $optarr ) {
-            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="' . admin_url( 'admin.php?page=wp_encryption-pricing' ) . '">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
+            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=security&utm_campaign=wpencryption#pricing">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
             $disabled = ( isset( $optarr['premium'] ) ? $optarr['premium'] : 0 );
             $output .= '<div class="plan-toggler" style="text-align: left; margin: 40px 0 0px;">
       <span></span>
@@ -1369,7 +1385,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
       <span class="wple-premium-actions">
       <span>
       <p>Monitor important actions required to safeguard your site with WP Encryption Pro.</p>
-      <a href="' . admin_url( 'admin.php?page=wp_encryption-pricing' ) . '">Go Pro</a>
+      <a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=security&utm_campaign=wpencryption#pricing">Go Pro</a>
       </span>
       </span>';
         }
@@ -1514,6 +1530,10 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             echo "success";
         }
         exit;
+    }
+
+    public function wple_upgrade_page() {
+        echo "<script>\r\n        window.location.href = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing';\r\n        </script>";
     }
 
 }
