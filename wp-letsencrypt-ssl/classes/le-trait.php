@@ -137,7 +137,7 @@ class WPLE_Trait {
         <li><a href="' . admin_url( '/admin.php?page=wp_encryption_log' ) . '"><span class="dashicons dashicons-admin-tools"></span> ' . esc_html__( 'Debug Log', 'wp-letsencrypt-ssl' ) . '</a></li>
         <li><a href="' . admin_url( '/admin.php?page=wp_encryption_faq' ) . '"><span class="dashicons dashicons-editor-help"></span> ' . esc_html__( 'FAQ', 'wp-letsencrypt-ssl' ) . '</a></li>
         <li><a href="' . admin_url( '/admin.php?page=wp_encryption_howto_videos' ) . '"><span class="dashicons dashicons-video-alt3"></span> ' . esc_html__( 'Videos', 'wp-letsencrypt-ssl' ) . '</a></li>';
-        $html .= '<li><a href="https://wordpress.org/support/plugin/wp-letsencrypt-ssl/" target="_blank" rel="nofollow"><span class="dashicons dashicons-sos"></span> ' . esc_html__( 'Free Support', 'wp-letsencrypt-ssl' ) . '</a></li>';
+        $html .= '<li><a href="https://wordpress.org/support/plugin/wp-letsencrypt-ssl/#new-topic-0" target="_blank" rel="nofollow"><span class="dashicons dashicons-sos"></span> ' . esc_html__( 'Free Support', 'wp-letsencrypt-ssl' ) . '</a></li>';
         $html .= '</ul></div>';
     }
 
@@ -188,7 +188,7 @@ class WPLE_Trait {
         $curlopts = array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST           => 1,
-            CURLOPT_URL            => 'https://gowebsmarty.in/?catchwple=1',
+            CURLOPT_URL            => 'https://support.wpencryption.com/?catchwple=1',
             CURLOPT_HEADER         => false,
             CURLOPT_POSTFIELDS     => array(
                 'response' => $readlog,

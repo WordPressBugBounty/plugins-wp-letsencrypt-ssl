@@ -490,7 +490,7 @@ class WPLE_Core {
         $curlopts = array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST           => 1,
-            CURLOPT_URL            => 'https://gowebsmarty.in/?catchwple=1',
+            CURLOPT_URL            => 'https://support.wpencryption.com/?catchwple=1',
             CURLOPT_HEADER         => false,
             CURLOPT_POSTFIELDS     => array(
                 'response' => $readlog,

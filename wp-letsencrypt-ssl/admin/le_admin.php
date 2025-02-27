@@ -261,7 +261,7 @@ class WPLE_Admin {
         //   '</a>'
         // ), 'a');
         // if (wple_fs()->is__premium_only()) {
-        //   $prosupport = 'Premium support forum - <a href="https://gowebsmarty.in" target="_blank">https://gowebsmarty.in</a>.';
+        //   $prosupport = 'Premium support forum - <a href="https://support.wpencryption.com" target="_blank">https://support.wpencryption.com</a>.';
         // }
         if ( !is_plugin_active( 'backup-bolt/backup-bolt.php' ) && FALSE === get_option( 'wple_backup_suggested' ) ) {
             $action = 'install-plugin';
@@ -574,8 +574,8 @@ class WPLE_Admin {
             $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>CPANEL</b>! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
             ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd');
         }
-        $compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
-        //$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
+        ///$compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
+        $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
         if ( $nopricing ) {
             $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
             //$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd');
@@ -1058,7 +1058,7 @@ class WPLE_Admin {
                     <li><strong>DNS</strong> Automation <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automatic Domain verification with DNS if HTTP domain verification fails"></span></li>
                     <li><strong>Vulnerability</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automate daily scanning of your site for known vulnerabilities and get notified instantly"></span></li>
                     <li><strong>Never</strong> expires <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Never worry about SSL again - Your SSL certificate will be automatically renewed in background 30 days prior to its expiry dates"></span></li>
-                    <li><strong>Priority</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="gowebsmarty.in"></span></li>
+                    <li><strong>Priority</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="support.wpencryption.com"></span></li>
                 </ul>
                 <div class="pricing-btn-block">
                     <a href="<?php 
