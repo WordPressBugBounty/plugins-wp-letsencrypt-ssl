@@ -178,7 +178,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.6.0', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.7.3', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
@@ -574,8 +574,8 @@ class WPLE_Admin {
             $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>CPANEL</b>! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
             ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd');
         }
-        ///$compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
-        $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
+        $compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
+        //$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
         if ( $nopricing ) {
             $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
             //$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd');
@@ -620,6 +620,12 @@ class WPLE_Admin {
               <h4>' . esc_html__( 'SSL Renewal', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'Free users must manually renew / re-generate SSL certificate every 90 days.', 'wp-letsencrypt-ssl' ) . '"></span></h4>
               <span class="wple-free">' . $manual . '</span>
               <span class="wple-pro">' . $automatic . '</span>
+            </div>
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/secure-mail.png"/>
+              <h4>' . esc_html__( 'Secure Mail', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'Secure email & webmail with SSL/TLS', 'wp-letsencrypt-ssl' ) . '"></span></h4>
+              <span class="wple-free">' . esc_html__( 'Not Available', 'wp-letsencrypt-ssl' ) . '</span>
+              <span class="wple-pro">' . esc_html__( 'Available', 'wp-letsencrypt-ssl' ) . '</span>
             </div>
             <div class="wple-compare-item">
               <img src="' . WPLE_URL . 'admin/assets/wildcard.png"/>

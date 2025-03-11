@@ -694,9 +694,12 @@ class WPLE_Trait {
      * @return html
      */
     public static function wple_other_plugins( $sslhealthpage = false ) {
-        //removed since 7.0.0
-        return '';
         $action = 'install-plugin';
+        $fastcsslug = 'fast-cookie-consent';
+        $fastcspluginstallURL = wp_nonce_url( add_query_arg( array(
+            'action' => $action,
+            'plugin' => $fastcsslug,
+        ), admin_url( 'update.php' ) ), $action . '_' . $fastcsslug );
         $cklsslug = 'cookieless-analytics';
         $cklspluginstallURL = wp_nonce_url( add_query_arg( array(
             'action' => $action,
@@ -707,11 +710,22 @@ class WPLE_Trait {
             'action' => $action,
             'plugin' => $baboslug,
         ), admin_url( 'update.php' ) ), $action . '_' . $baboslug );
-        $wordmagicslug = 'wordmagic-content-writer';
-        $wordmagicpluginstallURL = wp_nonce_url( add_query_arg( array(
-            'action' => $action,
-            'plugin' => $wordmagicslug,
-        ), admin_url( 'update.php' ) ), $action . '_' . $wordmagicslug );
+        $html = '<div id="wple-recommended">
+        <div class="wple-recommend-tab">
+        <img src="' . WPLE_URL . 'admin/assets/banner-plug.png"/> <strong>Recommended</strong>
+        </div>
+        <div class="wple-recommend-slide">
+        <ul>
+            <li><a href="https://wordpress.org/plugins/fast-cookie-consent/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/fastcookieconsent.png"/>Fast Cookie Consent<br/><small>Quickly setup GDPR/CCPA compliant cookie consent banner</small></a><a href="' . esc_url( $fastcspluginstallURL ) . '">Install</a></li>
+            <li><a href="https://wordpress.org/plugins/backup-bolt/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/backup-bolt.png"/><br/><small>Backup your site within seconds</small></a><a href="' . esc_url( $babopluginstallURL ) . '">Install</a></li>
+            <li><a href="https://wordpress.org/plugins/cookieless-analytics/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/cookieless-analytics.png"/><br/><small>Privacy compliant statistics plugin without any use of cookies</small></a><a href="' . esc_url( $cklspluginstallURL ) . '">Install</a></li>
+            <li><a href="https://oneclickplugins.com/go-viral/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/goviral-logo.png"/><br/><small>Reveal content only upon social share & boost social exposure</small></a></li>
+        </ul>
+        </div>
+        </div>';
+        //since 7.7.5
+        return $html;
+        //discontinued since 7.7.0
         $utmsource = ( $sslhealthpage ? 'sslhealth' : 'footerlink' );
         $html = '<div id="ourotherplugin">
     <h4>You\'ll <span class="dashicons dashicons-heart"></span> These <span class="dashicons dashicons-admin-plugins"></span>!!</h4>

@@ -440,7 +440,6 @@ a.wplecompare span {
 }
 
 .wple-compare-item {
-  width: 14.6%;
   margin: 20px 1%;
   text-align: center;
 }
@@ -452,6 +451,9 @@ a.wplecompare span {
   -ms-flex-flow: wrap;
       flex-flow: wrap;
   margin-bottom: 20px;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
 }
 
 .wple-plans span {
@@ -989,6 +991,7 @@ form#admin-verify-dns button:disabled {
 .wple-success-cols p {
   font-size: 17px;
   color: #7d7d7d;
+  word-break: break-word;
 }
 
 .wple-success-cols h3:before {
@@ -3123,6 +3126,102 @@ span.wple-premium-actions {
 
 span.fs-submenu-item.wp-letsencrypt-ssl.addons, a[href="admin.php?page=wp_encryption-addons"] {
   display: none !important;
+}
+
+/** 7.7.5 **/
+div#wple-recommended {
+  width: 500px;
+  position: fixed;
+  top: 25%;
+  right: -500px;
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+.wple-recommend-slide {
+  background: #fff;
+  padding: 20px;
+  -webkit-box-shadow: 0px 0px 5px #aaa;
+          box-shadow: 0px 0px 5px #aaa;
+}
+
+.wple-recommend-tab {
+  -webkit-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+  width: 130px;
+  text-align: center;
+  background: #222;
+  line-height: 20px;
+  padding: 5px 10px;
+  color: #fff;
+  cursor: pointer;
+  position: absolute;
+  left: -90px;
+  top: 50%;
+  border-radius: 5px 5px 0 0;
+}
+
+.wple-recommend-tab img {
+  float: left;
+  max-width: 20px;
+}
+
+.wple-recommend-slide ul li {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0 15px 10px;
+}
+
+.wple-recommend-slide ul li a {
+  text-decoration: none !important;
+}
+
+.wple-recommend-slide ul li small {
+  color: #222;
+  font-size: 13px;
+  font-weight: 400;
+  display: block;
+  margin-top: 2px;
+}
+
+.wple-recommend-slide ul li img {
+  max-height: 30px;
+  margin-right: 10px;
+}
+
+.wple-recommend-slide ul li:first-child a:first-child {
+  color: #039103;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+.wple-recommend-slide ul li:first-child img {
+  float: left;
+}
+
+.wple-recommend-slide ul li a:nth-of-type(2):hover {
+  font-weight: 600;
+}
+
+.wple-recommend-slide ul li:last-child {
+  border: none;
+}
+
+.wple-recommend-slide ul li a:first-child {
+  max-width: 400px;
+}
+
+div#wple-recommended:hover {
+  right: 0;
 }
 
 @media (max-width: 991px) {
