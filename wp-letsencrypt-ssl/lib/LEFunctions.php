@@ -122,8 +122,6 @@ class LEFunctions
 
         file_put_contents($privateKeyFile, $privateKey);
         file_put_contents($publicKeyFile, $details['key']);
-
-        openssl_pkey_free($res);
     }
 
 

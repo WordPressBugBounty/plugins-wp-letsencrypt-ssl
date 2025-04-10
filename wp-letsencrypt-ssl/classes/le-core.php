@@ -1,30 +1,9 @@
 <?php
 
-//if a valid cert generated for same domain within last 2 days, then use it
-/**
- * @package WP Encryption
- *
- * @author     WP Encryption
- * @copyright  Copyright (C) 2019-2024, WP Encryption
- * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
- * @link       https://wpencryption.com
- * @since      Class available since Release 1.0.0
- *
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- */
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+// Exit if accessed directly
 /**
  * Autoloader
  * 
@@ -483,7 +462,7 @@ class WPLE_Core {
         $srvr = array(
             'challenge_folder_exists' => '',
             'certificate_exists'      => file_exists( WPLE_Trait::wple_cert_directory() . 'certificate.crt' ),
-            'server_software'         => $_SERVER['SERVER_SOFTWARE'],
+            'server_software'         => sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] ),
             'http_host'               => site_url(),
             'pro'                     => ( wple_fs()->is__premium_only() ? 'PRO' : 'FREE' ),
         );

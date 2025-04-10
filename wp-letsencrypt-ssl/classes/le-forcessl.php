@@ -45,43 +45,31 @@ class WPLE_ForceSSL
 
         add_action('wp', array($this, 'wple_revert_force_https'));
 
-        if (isset($opts['force_ssl']) && $opts['force_ssl'] == 1) {
+        if (isset($opts['force_ssl']) && $opts['force_ssl'] == 1) { //force via wordpress
 
             if (!is_admin()) {
-                add_action('wp_loaded', array($this, 'wple_force_ssl'), 20);
+                add_action('wp', array($this, 'wple_ssl_redirect'), 40);
+                add_action('wp_enqueue_scripts', [$this, 'wple_forcessl_js']);
             }
 
             add_action("init", array($this, 'wple_start_buff'));
             add_action("shutdown", array($this, 'wple_end_buff'), 999);
-        } else if (!is_admin() && FALSE !== get_option('wple_mixed_content_fixer')) { //frontend only
+        } else if (!is_admin() && FALSE !== get_option('wple_mixed_content_fixer')) { //mx fixer frontend only
 
             add_action("init", array($this, 'wple_start_buff'));
             add_action("shutdown", array($this, 'wple_end_buff'), 999);
         }
     }
 
-    public function wple_force_ssl()
-    {
-        $this->wple_revert_force_https();
-        add_action('wp', array($this, 'wple_ssl_redirect'), 40, 3);
-        add_action('wp_print_scripts', array($this, 'wple_forcessl_js'));
-    }
-
     public function wple_forcessl_js()
     {
-        $script = '<script>';
-        $script .= 'if (document.location.protocol != "https:") {';
-        $script .= 'document.location = document.URL.replace(/^http:/i, "https:");';
-        $script .= '}';
-        $script .= '</script>';
-
-        echo $script;
+        wp_enqueue_script('wpen-jsredirect', WPLE_URL . 'admin/js/jsredirect.js', [], WPLE_PLUGIN_VER);
     }
 
     public function wple_ssl_redirect()
     {
         if (!is_ssl()) {
-            $redirect_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            $redirect_url = esc_url_raw("https://" . sanitize_text_field($_SERVER['HTTP_HOST']) . sanitize_text_field($_SERVER['REQUEST_URI']));
             wp_redirect($redirect_url, 301);
             exit;
         }

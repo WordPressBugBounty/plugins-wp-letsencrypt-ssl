@@ -24,6 +24,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+if ( !defined( 'ABSPATH' ) ) {
+    exit;
+}
+// Exit if accessed directly
 require_once WPLE_DIR . 'classes/le-trait.php';
 /**
  * Sub-directory http challenge
@@ -197,7 +201,7 @@ class WPLE_Subdir_Challenge_Helper {
 
     public static function download_challenge_files() {
         if ( isset( $_GET['subdir_chfile'] ) ) {
-            if ( !wp_verify_nonce( $_GET['nc'], 'subdir_ch' ) || !current_user_can( 'manage_options' ) ) {
+            if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nc'] ) ), 'subdir_ch' ) || !current_user_can( 'manage_options' ) ) {
                 die( 'Unauthorized request. Please try again.' );
             }
             $opts = get_option( 'wple_opts' );

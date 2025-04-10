@@ -7,7 +7,7 @@
  * Plugin Name:       WP Encryption - One Click SSL & Force HTTPS
  * Plugin URI:        https://wpencryption.com
  * Description:       Secure your WordPress site with free SSL certificate and force HTTPS. Enable HTTPS padlock. Just activating this plugin won't help! - Please run the SSL install form of WP Encryption found on left panel.
- * Version:           7.7.5
+ * Version:           7.7.6
  * Author:            WP Encryption SSL HTTPS
  * Author URI:        https://wpencryption.com
  * License:           GNU General Public License v3.0
@@ -34,7 +34,7 @@ if ( !defined( 'ABSPATH' ) ) {
  * Definitions
  */
 if ( !defined( 'WPLE_PLUGIN_VER' ) ) {
-    define( 'WPLE_PLUGIN_VER', '7.7.5' );
+    define( 'WPLE_PLUGIN_VER', '7.7.6' );
 }
 if ( !defined( 'WPLE_BASE' ) ) {
     define( 'WPLE_BASE', plugin_basename( __FILE__ ) );
@@ -82,21 +82,22 @@ if ( function_exists( 'wple_fs' ) ) {
                 // Include Freemius SDK.
                 require_once dirname( __FILE__ ) . '/freemius/start.php';
                 $wple_fs = fs_dynamic_init( array(
-                    'id'             => '5090',
-                    'slug'           => 'wp-letsencrypt-ssl',
-                    'premium_slug'   => 'wp-letsencrypt-ssl-pro',
-                    'type'           => 'plugin',
-                    'public_key'     => 'pk_f6a07c106bf4ef064d9ac4b989e02',
-                    'is_premium'     => false,
-                    'has_addons'     => true,
-                    'has_paid_plans' => true,
-                    'menu'           => array(
+                    'id'               => '5090',
+                    'slug'             => 'wp-letsencrypt-ssl',
+                    'premium_slug'     => 'wp-letsencrypt-ssl-pro',
+                    'type'             => 'plugin',
+                    'public_key'       => 'pk_f6a07c106bf4ef064d9ac4b989e02',
+                    'is_premium'       => false,
+                    'has_addons'       => true,
+                    'has_paid_plans'   => true,
+                    'is_org_compliant' => true,
+                    'menu'             => array(
                         'slug'    => 'wp_encryption',
                         'support' => false,
                         'contact' => false,
                         'pricing' => $showpricing,
                     ),
-                    'is_live'        => true,
+                    'is_live'          => true,
                 ) );
             }
             return $wple_fs;
@@ -165,7 +166,7 @@ new WPLE_Scanner();
 if ( function_exists( 'wple_fs' ) && !function_exists( 'wple_fs_custom_connect_message' ) ) {
     function wple_fs_custom_connect_message(  $message  ) {
         $current_user = wp_get_current_user();
-        return sprintf( esc_html__( 'Howdy %1$s' ) . ',<br>' . __( 'Due to security nature of this plugin, We <b>HIGHLY</b> recommend you opt-in to our security & feature updates notifications, and <a href="https://freemius.com/wordpress/usage-tracking/5090/wp-letsencrypt-ssl/" target="_blank">non-sensitive diagnostic tracking</a> to get BEST support. If you skip this, that\'s okay! <b>WP Encryption</b> will still work just fine.', 'wp-letsencrypt-ssl' ), ucfirst( $current_user->user_nicename ) );
+        return 'Howdy ' . ucfirst( $current_user->user_nicename ) . ', <br>' . __( 'Due to security nature of this plugin, We <b>HIGHLY</b> recommend you opt-in to our security & feature updates notifications, and <a href="https://freemius.com/wordpress/usage-tracking/5090/wp-letsencrypt-ssl/" target="_blank">non-sensitive diagnostic tracking</a> to get BEST support. If you skip this, that\'s okay! <b>WP Encryption</b> will still work just fine.', 'wp-letsencrypt-ssl' );
     }
 
     wple_fs()->add_filter( 'connect_message', 'wple_fs_custom_connect_message' );

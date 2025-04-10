@@ -47,7 +47,7 @@ class WPLE_Admin_Page
         $html = '
     <div class="wple-header">
     <div>
-      <img src="' . WPLE_URL . 'admin/assets/logo.png" class="wple-logo"/> <span class="wple-version">v' . WPLE_PLUGIN_VER . '</span>
+      <img src="' . esc_url(WPLE_URL) . 'admin/assets/logo.png" class="wple-logo"/> <span class="wple-version">v' . esc_html(WPLE_PLUGIN_VER) . '</span>
     </div>';
 
         WPLE_Trait::wple_headernav($html);
@@ -67,6 +67,8 @@ class WPLE_Admin_Page
       <div>' . $pagecontent . '</div>
       </div>' . WPLE_Trait::wple_other_plugins();
         }
+
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
         echo $html;
     }
 

@@ -9,6 +9,8 @@
  * @since      Class available since Release 5.1.7
  *
  */
+if (! defined('ABSPATH')) exit; // Exit if accessed directly
+
 require_once WPLE_DIR . 'classes/le-advanced-scanner.php';
 
 /**
@@ -27,7 +29,7 @@ class WPLE_Scanner
     public function wple_cspro()
     {
 
-        if (!wp_verify_nonce($_POST['nc'], 'wplemixedscanner') || !current_user_can('manage_options')) {
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'wplemixedscanner') || !current_user_can('manage_options')) {
             http_response_code(403);
             exit('Unauthorized');
         }

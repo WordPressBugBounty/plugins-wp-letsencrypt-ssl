@@ -73,8 +73,8 @@ if (!class_exists('WPLE_Security')) {
         public function wple_stop_user_enumeration()
         {
             if (!is_admin() && isset($_SERVER['REQUEST_URI'])) {
-                if (preg_match('/(wp-comments-post)/', $_SERVER['REQUEST_URI']) === 0 && !empty($_REQUEST['author'])) {
-                    wp_die(__('Author info access is forbidden', 'rrr'), 403);
+                if (preg_match('/(wp-comments-post)/', sanitize_text_field($_SERVER['REQUEST_URI'])) === 0 && !empty($_REQUEST['author'])) {
+                    wp_die(esc_html__('Author info access is forbidden', 'wp-letsencrypt-ssl'), 403);
                 }
             }
             add_filter('oembed_response_data', array($this, 'wple_oembed_user_enumeration'), 10, 1);
@@ -90,7 +90,7 @@ if (!class_exists('WPLE_Security')) {
 
         public function wple_rest_user_enumeration($response)
         {
-            $rest_route = !empty($_GET['rest_route']) ? $_GET['rest_route'] : (empty($_SERVER['REQUEST_URI']) ? '' : (string) parse_url(urldecode($_SERVER['REQUEST_URI']), PHP_URL_PATH));
+            $rest_route = !empty($_GET['rest_route']) ? sanitize_text_field($_GET['rest_route']) : (empty($_SERVER['REQUEST_URI']) ? '' : (string) parse_url(urldecode(sanitize_text_field($_SERVER['REQUEST_URI'])), PHP_URL_PATH));
             $rest_route = trim($rest_route, '/');
 
             if ('' != $rest_route && !current_user_can('edit_others_posts')) {

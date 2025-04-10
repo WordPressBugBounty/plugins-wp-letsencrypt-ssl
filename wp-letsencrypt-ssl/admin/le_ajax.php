@@ -32,7 +32,7 @@ class WPLE_Ajax
 
         if (isset($_POST['nc'])) {
 
-            if (!wp_verify_nonce($_POST['nc'], 'verifyhttprecords')) {
+            if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'verifyhttprecords')) {
                 exit('Unauthorized');
             }
 
@@ -169,7 +169,7 @@ class WPLE_Ajax
     {
 
         if (isset($_POST['nc'])) {
-            if (!wp_verify_nonce($_POST['nc'], 'verifydnsrecords')) {
+            if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'verifydnsrecords')) {
                 exit('Unauthorized');
             }
             $toVerify = get_option('wple_opts');
@@ -290,11 +290,11 @@ class WPLE_Ajax
     public function wple_retrieve_certs_forcopy()
     {
 
-        if (!wp_verify_nonce($_GET['nc'], 'copycerts') || !current_user_can('manage_options')) {
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nc'])), 'copycerts') || !current_user_can('manage_options')) {
             exit('Authorization Failure');
         }
 
-        $ftype = $_GET['gettype'];
+        $ftype = sanitize_text_field($_GET['gettype']);
         $output = '';
         $keypath = WPLE_Trait::wple_cert_directory();
 
@@ -328,7 +328,7 @@ class WPLE_Ajax
     public function wple_include_www_check()
     {
 
-        if (!current_user_can('manage_options') || !wp_verify_nonce($_GET['nc'], 'legenerate')) {
+        if (!current_user_can('manage_options') || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nc'])), 'legenerate')) {
             exit('Unauthorized request');
         }
 
@@ -352,7 +352,7 @@ class WPLE_Ajax
             exit();
         }
 
-        echo $errcode;
+        echo esc_html($errcode);
         exit();
     }
 
