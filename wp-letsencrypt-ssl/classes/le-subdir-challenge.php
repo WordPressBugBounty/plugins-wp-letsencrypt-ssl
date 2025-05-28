@@ -71,9 +71,9 @@ class WPLE_Subdir_Challenge_Helper {
         //     </div>
         //   </div>';
         //   } else {
-        $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' );
+        $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&checkout_style=legacy&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' );
         if ( !$havecPanel ) {
-            $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' );
+            $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&checkout_style=legacy&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' );
         }
         $output .= '<div class="wple-error-firewall">
         <div>

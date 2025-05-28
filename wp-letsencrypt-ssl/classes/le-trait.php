@@ -701,6 +701,8 @@ class WPLE_Trait {
      * @return html
      */
     public static function wple_other_plugins( $sslhealthpage = false ) {
+        //disabled since 7.7.7
+        return '';
         $action = 'install-plugin';
         $fastcsslug = 'fast-cookie-consent';
         $fastcspluginstallURL = wp_nonce_url( add_query_arg( array(
@@ -894,6 +896,8 @@ class WPLE_Trait {
                 set_transient( 'wple_ssllabs', $res, DAY_IN_SECONDS );
                 $validTo = $res['certs'][0]['notAfter'];
                 $to = date( 'd-m-Y', $validTo / 1000 );
+                update_option( 'wple_ssllabs_expiry', strtotime( $to ) );
+                //since 7.7.7 IMP
                 $tenDaysToExpiry = strtotime( '-10 day', strtotime( $to ) );
                 if ( strtotime( 'now' ) >= $tenDaysToExpiry ) {
                     //already in last 10 days to expiry
@@ -957,6 +961,7 @@ class WPLE_Trait {
 
     /**
      * Recheck if installed SSL expiring in 10 days
+     * NO LONGER USED
      *
      * @since 7.2.0
      * @return bool
