@@ -142,8 +142,10 @@ class WPLE_Subdir_Challenge_Helper {
     <button id="verify-subhttp" class="subdir_verify"><span class="dashicons dashicons-update stable"></span>&nbsp;' . esc_html__( 'Verify HTTP Challenges', 'wp-letsencrypt-ssl' ) . '</button>
 
     <div class="http-notvalid">' . esc_html__( 'Could not verify HTTP challenges. Please check whether HTTP challenge files uploaded to acme-challenge folder is publicly accessible.', 'wp-letsencrypt-ssl' ) . ' ' . esc_html__( 'Some hosts purposefully block BOT access to acme-challenge folder, please try completing DNS challenge in such case.', 'wp-letsencrypt-ssl' );
-        if ( FALSE !== ($havecp = get_option( 'wple_have_cpanel' )) && $havecp && !wple_fs()->can_use_premium_code__premium_only() ) {
+        if ( FALSE !== ($havecp = get_option( 'wple_have_cpanel' )) && $havecp ) {
             $list .= ' Upgrade to <b>PRO</b> version for fully automatic domain verification.';
+        } else {
+            $list .= ' You can easily generate premium SSL certificate in Annual <b>PRO</b> Plan without the need of domain verification.';
         }
         $list .= '</div>';
         //5.8.2

@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 7.7.7
+Stable tag: 7.7.8
 
 Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, SSL details & SSL monitoring.
 
@@ -39,7 +39,7 @@ https://youtu.be/jrkFwFH7r6o
 * SSL installation help for non-cPanel sites
 * Daily vulnerability scan & notification
 
-[BUY PREMIUM VERSION](https://wpencryption.com/?utm_source=wordpress&utm_medium=premiumfeatures&utm_campaign=wpencryption)
+[BUY PREMIUM VERSION](https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=premiumfeatures&utm_campaign=wpencryption)
 
 == FREE SSL PLUGIN FEATURES ==
 * Verify domain ownership and generate free SSL certificate

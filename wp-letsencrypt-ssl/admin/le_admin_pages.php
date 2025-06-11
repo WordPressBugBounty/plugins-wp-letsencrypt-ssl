@@ -167,7 +167,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             if ( in_array( 'wp_encryption_upgrade', $val ) ) {
                 $submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html( $submenu['wp_encryption'][$key][0] ) . '</span>';
                 $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing';
-                break;
             } else {
                 if ( in_array( 'wp_encryption', $val ) ) {
                     $submenu['wp_encryption'][$key][0] = 'Install SSL';

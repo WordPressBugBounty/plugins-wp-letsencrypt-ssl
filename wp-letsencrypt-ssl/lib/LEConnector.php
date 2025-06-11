@@ -242,7 +242,7 @@ class LEConnector {
         }
         if ( !file_exists( $privateKeyFile ) ) {
             WPLE_Trait::wple_logger(
-                "Could not create key files due to file permission issues. Please check if folder permission is set to 0755.",
+                "Could not create key files due to file permission issues. Please check if public_html/keys/ folder permission is set to 0755. You can still generate premium SSL certificate in Annual <b>PRO</b> Plan without these requirements.",
                 "error",
                 "a",
                 true

@@ -153,6 +153,7 @@
           // } else if (response !== 'fail') {
           //   alert("Partially verified. Could not verify " + String(response));
         } else {
+          //fail
           if (response.indexOf('ul') >= 0) {
             $('#wple-letsdebug').html(response);
           }
@@ -197,6 +198,7 @@
         if (response == 'empty') {
           alert('HTTP challenges empty. Please use RESET once and try again.');
         } else if (response == 'not_possible') {
+          //deprecated
           $('.http-notvalid-blocked').addClass('active');
         } else if (response === '1') {
           $this.text('Verified');

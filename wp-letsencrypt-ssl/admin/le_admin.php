@@ -172,7 +172,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.7.5', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.7.6', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
@@ -547,7 +547,7 @@ class WPLE_Admin {
      * @return void
      */
     public function wple_upgrade_block( &$html ) {
-        $upgradeurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=upgrade&utm_campaign=wpencryption#pricing';
+        $upgradeurl = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=upgrade&utm_campaign=wpencryption';
         ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&coupon=FIRSTBUY');
         $nopricing = get_option( 'wple_no_pricing' );
         //gdy
@@ -569,7 +569,7 @@ class WPLE_Admin {
             $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>CPANEL</b>! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
             ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd');
         }
-        $compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
+        $compareurl = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
         //$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
         if ( $nopricing ) {
             $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
