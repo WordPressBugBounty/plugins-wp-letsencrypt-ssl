@@ -163,13 +163,16 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             [$this, 'wple_upgrade_page']
         );
         global $submenu;
-        foreach ( $submenu['wp_encryption'] as $key => $val ) {
-            if ( in_array( 'wp_encryption_upgrade', $val ) ) {
-                $submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html( $submenu['wp_encryption'][$key][0] ) . '</span>';
-                $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing';
-            } else {
-                if ( in_array( 'wp_encryption', $val ) ) {
-                    $submenu['wp_encryption'][$key][0] = 'Install SSL';
+        if ( is_array( $submenu ) ) {
+            foreach ( $submenu['wp_encryption'] as $key => $val ) {
+                if ( in_array( 'wp_encryption_upgrade', $val ) ) {
+                    $submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html( $submenu['wp_encryption'][$key][0] ) . '</span>';
+                    $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=upgradepro&utm_campaign=wpencryption';
+                    ///$submenu['wp_encryption'][$key][2] = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&billing_cycle_selector=responsive_list');
+                } else {
+                    if ( in_array( 'wp_encryption', $val ) ) {
+                        $submenu['wp_encryption'][$key][0] = 'Install SSL';
+                    }
                 }
             }
         }
@@ -367,9 +370,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
       <h4>' . esc_html__( 'Have a different question?', 'wp-letsencrypt-ssl' ) . '</h4>
       <p>' . WPLE_Trait::wple_kses( sprintf( __( 'Please use our <a href="%s" target="%s">Plugin support forum</a>. <b>PRO</b> users can register free account & use priority support at support.wpencryption.com. More info - https://wpencryption.com', 'wp-letsencrypt-ssl' ), 'https://wordpress.org/support/plugin/wp-letsencrypt-ssl/', '_blank' ), 'a' ) . '</p>';
         $page .= '<br><hr><h2 id="howitworks">How it works?</h2>
-    <p>First of all, thank you for choosing WP Encryption!. In order to transform your <b>HTTP://</b> site to <b>HTTPS://</b>, you need to have valid SSL certificate installed on your site first. The steps are as below:<br><br>1. Run the SSL install form of WP Encryption<br>2. Complete basic domain verification via HTTP file upload or DNS challenge following video tutorials provided on verification page<br>3. Finally download and install the generated <b>SSL certificate file</b> & <b>key</b> on your hosting panel or cPanel. <br>4. If you already have valid SSL certificate installed on site, feel free to skip above steps and directly enable "Force HTTPS" feature of WP Encryption.<br><a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&checkout_style=legacy&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' ) . '">Upgrade to PRO</a> to enjoy fully <b>automatic</b> domain verification, <b>automatic</b> SSL installation & <b>automatic</b> SSL renewal.</p>
+    <p>First of all, thank you for choosing WP Encryption!. In order to transform your <b>HTTP://</b> site to <b>HTTPS://</b>, you need to have valid SSL certificate installed on your site first. The steps are as below:<br><br>1. Run the SSL install form of WP Encryption<br>2. Complete basic domain verification via HTTP file upload or DNS challenge following video tutorials provided on verification page<br>3. Finally download and install the generated <b>SSL certificate file</b> & <b>key</b> on your hosting panel or cPanel. <br>4. If you already have valid SSL certificate installed on site, feel free to skip above steps and directly enable "Force HTTPS" feature of WP Encryption.<br><a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' ) . '">Upgrade to PRO</a> to enjoy fully <b>automatic</b> domain verification, <b>automatic</b> SSL installation & <b>automatic</b> SSL renewal.</p>
     <br>
-    <p>If you don\'t have either cPanel or root SSH access, you can opt for our <a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&checkout_style=legacy&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' ) . '">Annual Pro</a> solution which works on ANY hosting platform & offers you free automatic CDN boosting your site speed and firewall security (All you need to do is modify your domain DNS record to finish the setup).</p>
+    <p>If you don\'t have either cPanel or root SSH access, you can opt for our <a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' ) . '">Annual Pro</a> solution which works on ANY hosting platform & offers you free automatic CDN boosting your site speed and firewall security (All you need to do is modify your domain DNS record to finish the setup).</p>
     <br>
     <p>Once after you are done with the challenging part of SSL installation, please go to <b>SSL HEALTH</b> page of WP Encryption and enable necessary HTTPS redirection, mixed content fixer, etc. If one or the other pages on your site is showing insecure padlock, you could run the <b>Advanced Insecure Content Scanner</b> of WP Encryption to detect insecure <b>http://</b> links and change them to <b>https://</b> to resolve the issue.</p>
     <br>
@@ -608,9 +611,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'httponly_cookies'    => 'HttpOnly secure cookies enabled',
             'ssl_monitoring'      => 'SSL monitoring enabled',
             'tls_version'         => 'TLS version up-to-date',
-            'ssl_auto_renew'      => 'SSL certificate is set to auto renew (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
-            'advanced_security'   => 'Advanced security headers enabled (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
-            'improve_security'    => 'Improve security with WP Encryption Pro (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'ssl_auto_renew'      => 'SSL certificate is set to auto renew (<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'advanced_security'   => 'Advanced security headers enabled (<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'improve_security'    => 'Improve security with WP Encryption Pro (<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
         );
         $score = 0;
         $featurelist = '<ul>';
@@ -852,7 +855,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     <h2>Security Headers</h2>
     <ul>';
         foreach ( $sec_headers as $optlabel => $optarr ) {
-            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
+            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
             $disabled = ( isset( $optarr['premium'] ) ? $optarr['premium'] : 0 );
             $output .= '<div class="plan-toggler" style="text-align: left; margin: 40px 0 0px;">
       <span></span>

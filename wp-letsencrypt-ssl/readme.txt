@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 7.7.8
+Stable tag: 7.7.9
 
 Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, SSL details & SSL monitoring.
 
@@ -13,13 +13,11 @@ Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HT
 
 HTTPS Secure your WordPress site with SSL certificate provided by [Let's Encrypt®](https://letsencrypt.com) and force SSL / HTTPS sitewide, check your SSL score, fix insecure content & mixed content issues easily. Enable HTTPS secure padlock on your site within minutes.
 
-[WP Encryption](https://wpencryption.com/?utm_source=wordpress&utm_medium=description&utm_campaign=wpencryption) plugin registers your site, verifies your domain, generates SSL certificate for your site in simple mouse clicks without the need of any technical knowledge. 
+[WP Encryption](https://wpencryption.com/?utm_source=wordpress&utm_medium=description&utm_campaign=wpencryption) plugin registers your site, verifies your domain, generates SSL certificate for your site in simple mouse clicks without the need of any technical knowledge. A typical SSL installation without WP Encryption would require you to generate CSR, prove domain ownership, provide your bussiness data and deal with many more technical tasks!.
 
 ### 5M+ SSL certificates generated - Switch to HTTPS easily ###
 
 https://youtu.be/aKvvVlAlZ14
-
-A typical SSL installation without WP Encryption would require you to generate CSR, prove domain ownership, provide your bussiness data and deal with many more technical tasks!.
 
 == PRO FEATURES WORTH UPGRADING ==
 
@@ -31,10 +29,7 @@ https://youtu.be/jrkFwFH7r6o
 * Wildcard SSL support - Install Wildcard SSL certificate for your primary domain that covers ALL sub-domains. Automatic DNS based domain verification for Wildcard SSL installation (DNS should be managed by cPanel or Godaddy)
 * Multisite + Mapped domains support - Supports SSL installation for mapped domains
 * Automated regular vulnerability scanning & reporting.
-* Automatic Content Delivery Network(CDN) to boost your site performance (Annual Plan Only)
-* Blocks SQL injection, XSS, Shellshock, Remote File Inclusion, Apache Structs Exploits, Local File Inclusion attacks.
-* Blocks common web application vulnerabilities and common WordPress attacks.
-* Blocks invalid user agents, unknown user agents, CSRF, Convicted bot traffic, Spam & abuse, Probing & forced browsing, Brute force attacks.
+* Advanced security headers & SSL monitoring
 * Top notch one to one priority support - Live Chat, Email, Premium Support Forum
 * SSL installation help for non-cPanel sites
 * Daily vulnerability scan & notification
@@ -45,12 +40,13 @@ https://youtu.be/jrkFwFH7r6o
 * Verify domain ownership and generate free SSL certificate
 * Secure webmail and email with HTTPS
 * Download generated SSL certificate, key and Intermediate certificate files
-* Force HTTPS / Enable HTTPS 301 redirection sitewide in one click
+* Force HTTPS / Enable HTTPS with 301 htaccess redirection sitewide in one click
 * HTTPS redirection includes redirect loop fix for Cloudflare, StackPath, Load balancers and reverse proxies.
 * SSL Health page - Track your SSL score and control various SSL & Security features like HSTS strict transport security Header, HttpOnly secure cookies, etc,.
 * Enable important security headers including X-XSS-Protection, X-Content-Type-Options, Referrer-Policy
 * Enable mixed content / insecure content fixer
 * SSL monitoring & Automatic email notification prior to SSL certificate expiration
+* Advanced security features - stop user enumeration, disable file editing, hide login error, hide wp version and much more
 
 (Optional) Running WordPress on a specialized VPS/Dedicated server without cPanel? You can download the generated SSL certificate files easily via "Download SSL Certificates" page and install it on your server by modifying server config file via SSH access as explained in our [DOCS](https://wpencryption.com/docs/). 
 
@@ -171,6 +167,11 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 6. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.7.9 =
+* resolved issue with .well-known htaccess
+* readme updated
+* various links corrected
 
 = 7.7.5 =
 * PRO - Improved DNS verification

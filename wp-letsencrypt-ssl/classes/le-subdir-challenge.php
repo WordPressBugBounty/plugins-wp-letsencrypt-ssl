@@ -71,9 +71,9 @@ class WPLE_Subdir_Challenge_Helper {
         //     </div>
         //   </div>';
         //   } else {
-        $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&checkout_style=legacy&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' );
+        $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' );
         if ( !$havecPanel ) {
-            $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&checkout_style=legacy&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' );
+            $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' );
         }
         $output .= '<div class="wple-error-firewall">
         <div>
@@ -145,7 +145,7 @@ class WPLE_Subdir_Challenge_Helper {
         if ( FALSE !== ($havecp = get_option( 'wple_have_cpanel' )) && $havecp ) {
             $list .= ' Upgrade to <b>PRO</b> version for fully automatic domain verification.';
         } else {
-            $list .= ' You can easily generate premium SSL certificate in Annual <b>PRO</b> Plan without the need of domain verification.';
+            $list .= ' Alternatively, you can generate a premium SSL certificate without domain verification by opting for the Annual PRO Plan.';
         }
         $list .= '</div>';
         //5.8.2

@@ -784,9 +784,9 @@ class WPLE_Trait {
                 $htaccess = preg_replace( $group, "", $htaccess );
             }
             $rule = "\n" . "# BEGIN WP_Encryption_Well_Known\n";
-            //$rule .= "RewriteRule ^.well-known/(.*)$ - [L]" . "\n";
-            $rule .= "RewriteCond %{REQUEST_FILENAME} !.well-known/" . "\n";
-            $rule .= 'RewriteRule "(^|/)\\.(?!well-known)" - [F]' . "\n";
+            $rule .= "RewriteEngine On" . "\n";
+            $rule .= "RewriteCond %{REQUEST_URI} ^/\\.well-known/ [NC]" . "\n";
+            $rule .= "RewriteRule ^(.*)\$ - [L]" . "\n";
             $rule .= "# END WP_Encryption_Well_Known" . "\n";
             $finalrule = preg_replace( "/\n+/", "\n", $rule );
             $newhtaccess = $finalrule . $htaccess;
