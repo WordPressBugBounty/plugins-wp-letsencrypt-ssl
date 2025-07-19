@@ -1,13 +1,13 @@
-=== WP Encryption - One Click Free SSL Certificate & SSL / HTTPS Redirect to Force HTTPS, SSL Scan ===
+=== WP Encryption - One Click Free SSL Certificate & SSL / HTTPS Redirect, Security & SSL Scan ===
 Contributors: gowebsmarty, gwsharsha
-Tags: free ssl,ssl,https,https redirect,ssl certificate
+Tags: free ssl,ssl,https,https redirect,security
 Requires at least: 5.4
 License: GPL3
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 7.7.9
+Stable tag: 7.8.0
 
-Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, SSL details & SSL monitoring.
+Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, Adv Security & SSL monitoring.
 
 == Description ==
 
@@ -18,6 +18,10 @@ HTTPS Secure your WordPress site with SSL certificate provided by [Let's Encrypt
 ### 5M+ SSL certificates generated - Switch to HTTPS easily ###
 
 https://youtu.be/aKvvVlAlZ14
+
+== (7.8.0) NEW ADVANCED SECURITY PAGE WITH INTEGRITY SCAN & MALWARE SCAN ==
+
+Discover the brand-new ‘Advanced Security & Scanner’ page — your command center for the most powerful protection your WordPress site has ever seen. Run malware and integrity scans to detect modified, additional, or suspicious files in your installation. Stay ahead of threats and keep your security score at its peak.
 
 == PRO FEATURES WORTH UPGRADING ==
 
@@ -32,7 +36,9 @@ https://youtu.be/jrkFwFH7r6o
 * Advanced security headers & SSL monitoring
 * Top notch one to one priority support - Live Chat, Email, Premium Support Forum
 * SSL installation help for non-cPanel sites
-* Daily vulnerability scan & notification
+* Daily vulnerability scan
+* Daily malware scan & integrity scan
+* Instant notification for threats & security issues
 
 [BUY PREMIUM VERSION](https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=premiumfeatures&utm_campaign=wpencryption)
 
@@ -47,6 +53,7 @@ https://youtu.be/jrkFwFH7r6o
 * Enable mixed content / insecure content fixer
 * SSL monitoring & Automatic email notification prior to SSL certificate expiration
 * Advanced security features - stop user enumeration, disable file editing, hide login error, hide wp version and much more
+* Security score & security scanners including malware & integrity scanner, vulnerability scanner.
 
 (Optional) Running WordPress on a specialized VPS/Dedicated server without cPanel? You can download the generated SSL certificate files easily via "Download SSL Certificates" page and install it on your server by modifying server config file via SSH access as explained in our [DOCS](https://wpencryption.com/docs/). 
 
@@ -159,14 +166,23 @@ By enabling the Vulnerability Scan feature, you agree to terms & conditions of [
 Security is an important subject regarding SSL/TLS certificates, of course. It is obvious that your private key, stored on your web server, should never be accessible from the web. When the plugin created the keys directory for the first time, it will store a .htaccess file in this directory, denying all visitors. Always make sure yourself your keys aren't accessible from the web! We are in no way responsible if your private keys go public. If this does happen, the easiest solution is to check folder permissions on your server and make sure public access is forbidden for root folders. Next, create a new certificate.
 
 == Screenshots ==
-1. SSL Health & Security page with realtime SSL score
+1. SSL Health and Security Headers
 2. Generate and Install free SSL certificate while Agreeing to TOS
 3. SSL certificate generation successful message
-4. Download/Copy generated SSL certificate & key
-5. Force HTTPS via htaccess or WordPress method
-6. Mixed Content Scanner to identify insecure contents on HTTPS site
+4. Malware scanner & Vulnerability scanner
+5. Download/Copy generated SSL certificate & key
+6. Force HTTPS via htaccess or WordPress method
+7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.0 =
+* New Advanced Security & Scanner page
+* resolved issue with JS redirection
+* security score
+* htaccess based redirection for all servers
+* re-organized SSL health & security headers v/s Advanced security features
+* PRO - daily SSL scan if not exists
 
 = 7.7.9 =
 * resolved issue with .well-known htaccess

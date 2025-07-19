@@ -145,7 +145,7 @@ class WPLE_Subdir_Challenge_Helper {
         if ( FALSE !== ($havecp = get_option( 'wple_have_cpanel' )) && $havecp ) {
             $list .= ' Upgrade to <b>PRO</b> version for fully automatic domain verification.';
         } else {
-            $list .= ' Alternatively, you can generate a premium SSL certificate without domain verification by opting for the Annual PRO Plan.';
+            ///$list .= ' Alternatively, you can generate a premium SSL certificate without domain verification by opting for the Annual PRO Plan.';
         }
         $list .= '</div>';
         //5.8.2

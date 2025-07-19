@@ -19,6 +19,9 @@ class WPLE_Ajax
         add_action('wp_ajax_wple_include_www', [$this, 'wple_include_www_check']);
 
         add_action('wp_ajax_wple_backup_ignore', [$this, 'wple_ignore_backup_suggest']);
+
+        //since 7.8.0
+        add_action('wp_ajax_wple_mscan_ignorefile', [$this, 'wple_malware_ignorefile']);
     }
 
     /**
@@ -365,6 +368,46 @@ class WPLE_Ajax
 
         update_option('wple_backup_suggested', true);
         echo 1;
+        exit();
+    }
+
+    public function wple_malware_ignorefile()
+    {
+
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'wplemalwareignore') || !current_user_can('manage_options')) {
+            exit('Authorization Failure');
+        }
+
+        $ignoreFile = sanitize_url($_POST['fyle']);
+        $ignoreFile = str_ireplace(['http://', 'https://'], '', $ignoreFile);
+        $ignoreList = get_option('wple_malware_ignorelist');
+
+        $removeFromList = sanitize_text_field($_POST['remove']);
+
+        if (!$removeFromList) { //add to list
+            if (is_array($ignoreList)) {
+                if (!in_array($ignoreFile, $ignoreList)) {
+                    $ignoreList[] = $ignoreFile;
+                }
+            } else { //1st item
+                $ignoreList[] = $ignoreFile;
+            }
+        } else { //remove from list
+            if (is_array($ignoreList)) {
+                // Look for and remove the item
+                $index = array_search($ignoreFile, $ignoreList);
+                if ($index !== false) {
+                    unset($ignoreList[$index]);
+                    // Reindex to avoid gaps
+                    $ignoreList = array_values($ignoreList);
+                }
+            } else {
+                $ignoreList = array(); // No array exists, start fresh
+            }
+        }
+
+        echo update_option('wple_malware_ignorelist', $ignoreList);
+
         exit();
     }
 }

@@ -5,6 +5,7 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 // Exit if accessed directly
 require_once WPLE_DIR . 'classes/le-core.php';
+require_once WPLE_DIR . 'classes/le-mscan.php';
 /**
  * Todo:
  * A file to disable force https completely when site lockout
@@ -22,6 +23,7 @@ class WPLE_Handler {
         $this->wple_intro_pricing_handler();
         $this->wple_vulnerabilities_update();
         $this->wple_ssllabs_new_scan();
+        $this->wple_malware_scan();
     }
 
     public function wple_auto_handler() {
@@ -206,6 +208,7 @@ class WPLE_Handler {
             ignore_user_abort( true );
         }
         global $wp_version;
+        update_option( 'wple_vulnerability_lastscan', time() );
         $wordpress_core = $wp_version;
         $wordpress_themes = wp_get_themes();
         $wordpress_plugins = get_plugins();
@@ -277,6 +280,17 @@ class WPLE_Handler {
             }
         }
         set_transient( 'wple_vulnerability_scan', $threats, 0 );
+    }
+
+    public function wple_malware_scan() {
+        if ( isset( $_GET['wple_malware'] ) ) {
+            if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['wple_malware'] ) ), 'wple_malwarescan' ) || !current_user_can( 'manage_options' ) ) {
+                exit( 'Authorization Failure' );
+            }
+            update_option( 'wple_malware_lastscan', time() );
+            //run scan
+            new WPLE_Mscan();
+        }
     }
 
     /**

@@ -777,4 +777,40 @@
       },
     });
   });
+
+  //since 7.8.0
+  $('.wple-mscan-ignorefile').click(function (e) {
+    var $this = $(this);
+    e.preventDefault();
+
+    var ky = $this.attr('data-key');
+    var filename = $this.attr('data-file');
+    var nc = $('#wple-mscan-table').attr('data-nc');
+
+    jQuery.ajax({
+      method: 'POST',
+      url: ajaxurl,
+      dataType: 'text',
+      data: {
+        action: 'wple_mscan_ignorefile',
+        fyle: filename,
+        nc: nc,
+        remove: $this.attr('data-remove'),
+      },
+      beforeSend: function () {
+        $this.text('Processing...');
+      },
+      error: function () {
+        $this.text('Failed. Click to re-try..');
+        //alert("Failed to save! Please try again");
+      },
+      success: function (response) {
+        if (response == 1) {
+          $('tr.mscanfile-' + ky).fadeOut('fast');
+        } else {
+          $this.text('Failed. Click to re-try..');
+        }
+      },
+    });
+  });
 })(jQuery);

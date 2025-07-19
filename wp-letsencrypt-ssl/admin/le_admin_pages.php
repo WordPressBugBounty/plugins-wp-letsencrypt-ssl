@@ -72,8 +72,8 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         );
         add_submenu_page(
             'wp_encryption',
-            'Vulnerability Scanner & Security',
-            __( 'Vulnerability Scanner & Security', 'wp-letsencrypt-ssl' ),
+            'Advanced Security and Scanner',
+            __( 'Advanced Security and Scanner', 'wp-letsencrypt-ssl' ),
             'manage_options',
             'wp_encryption_security',
             [$this, 'wple_security_page']
@@ -111,6 +111,14 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'manage_options',
             'wp_encryption_log',
             [$this, 'wple_debug_log_page']
+        );
+        add_submenu_page(
+            'options.php',
+            'Malware & Integrity Report',
+            __( 'Malware & Integrity Report', 'wp-letsencrypt-ssl' ),
+            'manage_options',
+            'wp_encryption_malware_scan',
+            [$this, 'wple_malwarescan_page']
         );
         //if (wple_fs()->can_use_premium_code__premium_only()) {
         //if (wple_fs()->is_plan('firewall', true)) {
@@ -168,6 +176,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
                 if ( in_array( 'wp_encryption_upgrade', $val ) ) {
                     $submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html( $submenu['wp_encryption'][$key][0] ) . '</span>';
                     $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=upgradepro&utm_campaign=wpencryption';
+                    //medium=admin in june
                     ///$submenu['wp_encryption'][$key][2] = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&billing_cycle_selector=responsive_list');
                 } else {
                     if ( in_array( 'wp_encryption', $val ) ) {
@@ -202,14 +211,14 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         $checked = ( isset( $leopts['force_ssl'] ) && $leopts['force_ssl'] === 1 ? 'checked' : '' );
         $htaccesschecked = ( isset( $leopts['force_ssl'] ) && $leopts['force_ssl'] === 2 ? 'checked' : '' );
         $disablechecked = ( !isset( $leopts['force_ssl'] ) || $checked == '' && $htaccesschecked == '' ? 'checked' : '' );
-        $page .= "<div class=\"wple-force\">\r\n      <p>" . WPLE_Trait::wple_kses( __( "If you still don't see a green padlock or notice <b>mixed content</b> warning in your browser console - please enable the below option to force HTTPS on all resources of site.", 'wp-letsencrypt-ssl' ) ) . ' ' . sprintf( __( "If you still notice mixed content issues or issues with browser padlock not showing on your site, please use %sMixed Content Scanner%s to scan and identify exact issues causing browser padlock to not show!.", "wp-letsencrypt-ssl" ), '<strong>', '</strong>' ) . "</p>";
+        $page .= "<div class=\"wple-force\">\r\n      <p>" . WPLE_Trait::wple_kses( __( "If you already have valid SSL certificate installed on site, you can easily enable the below option to force HTTPS redirection throughout the site.", 'wp-letsencrypt-ssl' ) ) . ' ' . sprintf( __( "If you still notice mixed content issues or issues with browser padlock not showing on your site, please use %sMixed Content Scanner%s to scan and identify exact issues causing browser padlock to not show!.", "wp-letsencrypt-ssl" ), '<strong>', '</strong>' ) . "</p>";
         $htaccesswritable = is_writable( ABSPATH . '.htaccess' );
         $htaccessdisabled = ( $htaccesswritable ? '' : 'disabled' );
         $htaccessdisabledmsg = ( $htaccesswritable ? '' : ' (Disabled: Your <strong>.htaccess</strong> file is <a href="https://wpencryption.com/make-htaccess-writable-wordpress/" target="_blank">not writable</a>)' );
-        if ( stripos( sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] ), 'apache' ) === false ) {
-            $htaccessdisabled = 'disabled';
-            $htaccessdisabledmsg = ' (Better suitable for Apache server. Please use below php method.)';
-        }
+        // if (stripos(sanitize_text_field($_SERVER['SERVER_SOFTWARE']), 'apache') === false) {
+        //     $htaccessdisabled = 'disabled';
+        //     $htaccessdisabledmsg = ' (Better suitable for Apache server. Please use below php method.)';
+        // }
         $page .= '<form method="post">
       <label class="checkbox-label" style="float:left">
       <input type="radio" name="wple_forcessl" value="0" ' . $disablechecked . '>
@@ -454,6 +463,83 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         $this->generate_page( $html );
     }
 
+    public function wple_malwarescan_page() {
+        $report = get_option( 'wple_mscan_integrity' );
+        if ( is_array( $report ) ) {
+            $report = array_filter( $report, [$this, 'remove_ignored_files'] );
+        }
+        if ( isset( $_GET['showignorelist'] ) ) {
+            $ignoreList = get_option( 'wple_malware_ignorelist' );
+            $report = ( is_array( $ignoreList ) ? $ignoreList : array() );
+            $report = array_map( 'urldecode', $report );
+        }
+        $scantime = '';
+        if ( $lastscantime = get_option( 'wple_malware_lastscan' ) ) {
+            $scantime = date( 'Y-m-d H:i', $lastscantime );
+        }
+        $html = '<div id="wple-malwarescan-report">
+        <div style="text-align:center">
+        <h2>' . esc_html__( 'Malware and Integrity Scan Report', 'wp-letsencrypt-ssl' ) . '</h2>        
+        <p>The scan report lists files that have been modified or added compared to the original WordPress repository, as well as files containing malicious code. You can examine the file using File Manager / FTP on your hosting panel or safely add to ignore list if you are sure about the file author or source.</p><br />
+        <p><i>Scan Report for ' . esc_html( $scantime ) . '</i></p>
+        </div>';
+        if ( !$report ) {
+            $html .= 'Looks like no scan have been performed yet. Please run Malware & Integrity Scan to generate the report.';
+        } else {
+            if ( count( $report ) === 0 ) {
+                $html .= "Congratulations! We didn't found any integrity issues in recent scan";
+            } else {
+                if ( count( $report ) > 0 ) {
+                    if ( !isset( $_GET['showignorelist'] ) ) {
+                        $html .= '<div class="wple-showignores"><div><b>' . esc_html( count( $report ) ) . '</b> issues needs your attention.</div><div><a href="?page=wp_encryption_malware_scan&showignorelist">Show Ignore List&gt;&gt;</a></div></div>';
+                    } else {
+                        $html .= '<h2>Showing Ignore List</h2>';
+                    }
+                    $ignoreNonce = wp_create_nonce( 'wplemalwareignore' );
+                    $html .= '<table id="wple-mscan-table" data-nc="' . esc_attr( $ignoreNonce ) . '">
+            <thead>
+            <tr>
+            <th>Issue</th>
+            <th>Ignore</th>
+            </tr>
+            </thead>
+            <tbody>';
+                    foreach ( $report as $indx => $item ) {
+                        if ( isset( $_GET['showignorelist'] ) ) {
+                            $btntext = 'Remove from Ignore List';
+                            $remove = 1;
+                            $fyl = $item;
+                        } else {
+                            $fyl = substr( $item, strpos( $item, ':' ) + 2 );
+                            $btntext = 'Add to Ignore List';
+                            $remove = 0;
+                        }
+                        $html .= '<tr class="mscanfile-' . esc_attr( $indx ) . '">
+                <td>' . wp_kses_post( $item ) . '</td>
+                <td><a data-key="' . esc_attr( $indx ) . '" data-file="' . esc_attr( urlencode( $fyl ) ) . '" data-remove="' . esc_attr( $remove ) . '" href="#" class="wple-mscan-ignorefile">' . esc_html( $btntext ) . '</a></td>
+                </tr>';
+                    }
+                    $html .= '</tbody></table>';
+                }
+            }
+        }
+        $html .= '</div>';
+        $this->generate_page( $html );
+    }
+
+    public function remove_ignored_files( $file ) {
+        $ignoreList = get_option( 'wple_malware_ignorelist' );
+        if ( is_array( $ignoreList ) ) {
+            $file = urlencode( substr( $file, strpos( $file, ':' ) + 2 ) );
+            $file = sanitize_url( $file );
+            $file = str_ireplace( ['http://', 'https://'], '', $file );
+            if ( in_array( $file, $ignoreList ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Handy Tools
      *
@@ -624,7 +710,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         // $dictionary = wp_remote_retrieve_headers($response);
         // $currentHeaders = $dictionary ? $dictionary->getAll() : array();
         foreach ( $scoredefinitions as $key => $desc ) {
-            $isenabled = $this->wple_feature_check( $key );
+            $isenabled = WPLE_Security::wple_feature_check( $key );
             if ( $isenabled == 2 ) {
                 $viaAlternateMethod[] = $key;
             }
@@ -689,85 +775,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         return $output;
     }
 
-    private function wple_feature_check( $key ) {
-        switch ( $key ) {
-            case 'valid_ssl':
-                $rootdomain = WPLE_Trait::get_root_domain( false );
-                $client = WPLE_Trait::wple_verify_ssl( $rootdomain );
-                if ( $client || is_ssl() ) {
-                    update_option( 'wple_ssl_valid', true );
-                    return 1;
-                }
-                update_option( 'wple_ssl_valid', false );
-                break;
-            case 'ssl_redirect':
-                $rootdomain = WPLE_Trait::get_root_domain( false );
-                $gethead = wp_remote_head( 'http://' . $rootdomain, array(
-                    'sslverify'   => false,
-                    'redirection' => 0,
-                    'timeout'     => 10,
-                ) );
-                if ( is_wp_error( $gethead ) ) {
-                    return 0;
-                }
-                $privatearray = $gethead['headers']->getAll();
-                if ( isset( $privatearray['location'] ) && untrailingslashit( $privatearray['location'] ) == 'https://' . $rootdomain ) {
-                    return 1;
-                }
-                $opts = get_option( 'wple_opts' );
-                if ( FALSE !== $opts && isset( $opts['force_ssl'] ) && $opts['force_ssl'] >= 1 ) {
-                    return 1;
-                }
-                break;
-            case 'httponly_cookies':
-                if ( get_option( 'wple_' . $key ) ) {
-                    return 1;
-                }
-                $arr = session_get_cookie_params();
-                if ( $arr['httponly'] ) {
-                    return 2;
-                }
-                break;
-            case 'mixed_content_fixer':
-            case 'hsts':
-            case 'ssl_monitoring':
-            case 'disable_directory_listing':
-                if ( get_option( 'wple_' . $key ) ) {
-                    return 1;
-                }
-                break;
-            case 'security_headers':
-                if ( get_option( 'wple_xxss' ) && get_option( 'wple_xcontenttype' ) ) {
-                    return 1;
-                }
-                break;
-            case 'advanced_security':
-                break;
-            case 'tls_version':
-                $tls = '1.2';
-                if ( function_exists( 'curl_init' ) ) {
-                    $ch = curl_init( 'https://www.howsmyssl.com/a/check' );
-                    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-                    curl_setopt( $ch, CURLOPT_TIMEOUT, 5 );
-                    $json = curl_exec( $ch );
-                    curl_close( $ch );
-                    $json = json_decode( $json );
-                    if ( !empty( $json->tls_version ) ) {
-                        $tls = str_replace( "TLS ", "", $json->tls_version );
-                    }
-                }
-                if ( version_compare( $tls, '1.2', '>=' ) ) {
-                    return 1;
-                }
-                break;
-            case 'ssl_auto_renew':
-                break;
-            case 'improve_security':
-                break;
-        }
-        return 0;
-    }
-
     private function wple_ssl_settings() {
         $output = '<div class="wple-activessl-info">
     
@@ -785,10 +792,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'Enable HttpOnly Secure Cookies' => [
                 'key'  => 'httponly_cookies',
                 'desc' => 'Cookies are made accessible server side only. Even if XSS flaw exists in client side or user accidently access a link exploting the flaw, client side script cannot read the cookies',
-            ],
-            'Disable directory listing'      => [
-                'key'  => 'disable_directory_listing',
-                'desc' => 'Disable directory browsing on Apache servers to avoid visibility of file structure on front-end',
             ],
             'Enable SSL Monitoring'          => [
                 'key'  => 'ssl_monitoring',
@@ -886,7 +889,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'hsts',
             'security_headers',
             'upgrade_insecure',
-            'disable_directory_listing',
             'httponly_cookies',
             'ssl_monitoring',
             'xxss',
@@ -911,7 +913,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         // }
         $score_exclusions = array(
             'upgrade_insecure',
-            'disable_directory_listing',
             'ssl_monitoring',
             'vulnerability_scan',
             'daily_vulnerability_scan',
@@ -928,7 +929,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         //file writing not required
         $ssl_not_required = array(
             'httponly_cookies',
-            'disable_directory_listing',
             'ssl_monitoring',
             'xxss',
             'xcontenttype',
@@ -1020,56 +1020,29 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             }
             return $out;
         } else {
-            if ( $opt == 'disable_directory_listing' ) {
-                if ( !is_writable( ABSPATH . '.htaccess' ) ) {
+            if ( $opt == 'httponly_cookies' ) {
+                if ( !is_writable( ABSPATH . 'wp-config.php' ) ) {
                     delete_option( "wple_{$opt}" );
-                    $out = 'htaccessnotwritable';
+                    $out = 'wpconfignotwritable';
                     return $out;
                 }
                 if ( $val == 1 ) {
-                    //add request
-                    if ( is_writable( ABSPATH . '.htaccess' ) ) {
-                        WPLE_Trait::wple_remove_directory_listing();
-                        $htaccess = file_get_contents( ABSPATH . '.htaccess' );
-                        $getrules = WPLE_Trait::compose_directory_listing_rules();
-                        // $wpruleset = "# BEGIN WordPress";
-                        // if (strpos($htaccess, $wpruleset) !== false) {
-                        //   $newhtaccess = str_replace($wpruleset, $getrules . $wpruleset, $htaccess);
-                        // } else {
-                        //   $newhtaccess = $htaccess . $getrules;
-                        // }
-                        insert_with_markers( ABSPATH . '.htaccess', 'WP_Encryption_Disable_Directory_Listing', $getrules );
+                    $config = file_get_contents( ABSPATH . "wp-config.php" );
+                    if ( FALSE == strpos( $config, 'WP_ENCRYPTION_COOKIES' ) ) {
+                        $config = preg_replace( "/^([\r\n\t ]*)(\\<\\?)(php)?/i", '<?php ' . "\n" . '# BEGIN WP_ENCRYPTION_COOKIES' . "\n" . "@ini_set('session.cookie_httponly', true);" . "\n" . "@ini_set('session.use_only_cookies', true);" . "\n" . "@ini_set('session.cookie_secure', true);" . "\n" . '# END WP_ENCRYPTION_COOKIES' . "\n", $config );
+                        file_put_contents( ABSPATH . "wp-config.php", $config );
                     }
                 } else {
-                    //remove request
-                    WPLE_Trait::wple_remove_directory_listing();
+                    if ( is_writable( ABSPATH . 'wp-config.php' ) ) {
+                        $htaccess = file_get_contents( ABSPATH . 'wp-config.php' );
+                        $group = "/#\\s?BEGIN\\s?WP_ENCRYPTION_COOKIES.*?#\\s?END\\s?WP_ENCRYPTION_COOKIES/s";
+                        if ( preg_match( $group, $htaccess ) ) {
+                            $modhtaccess = preg_replace( $group, "", $htaccess );
+                            file_put_contents( ABSPATH . 'wp-config.php', $modhtaccess );
+                        }
+                    }
                 }
                 return $out;
-            } else {
-                if ( $opt == 'httponly_cookies' ) {
-                    if ( !is_writable( ABSPATH . 'wp-config.php' ) ) {
-                        delete_option( "wple_{$opt}" );
-                        $out = 'wpconfignotwritable';
-                        return $out;
-                    }
-                    if ( $val == 1 ) {
-                        $config = file_get_contents( ABSPATH . "wp-config.php" );
-                        if ( FALSE == strpos( $config, 'WP_ENCRYPTION_COOKIES' ) ) {
-                            $config = preg_replace( "/^([\r\n\t ]*)(\\<\\?)(php)?/i", '<?php ' . "\n" . '# BEGIN WP_ENCRYPTION_COOKIES' . "\n" . "@ini_set('session.cookie_httponly', true);" . "\n" . "@ini_set('session.use_only_cookies', true);" . "\n" . "@ini_set('session.cookie_secure', true);" . "\n" . '# END WP_ENCRYPTION_COOKIES' . "\n", $config );
-                            file_put_contents( ABSPATH . "wp-config.php", $config );
-                        }
-                    } else {
-                        if ( is_writable( ABSPATH . 'wp-config.php' ) ) {
-                            $htaccess = file_get_contents( ABSPATH . 'wp-config.php' );
-                            $group = "/#\\s?BEGIN\\s?WP_ENCRYPTION_COOKIES.*?#\\s?END\\s?WP_ENCRYPTION_COOKIES/s";
-                            if ( preg_match( $group, $htaccess ) ) {
-                                $modhtaccess = preg_replace( $group, "", $htaccess );
-                                file_put_contents( ABSPATH . 'wp-config.php', $modhtaccess );
-                            }
-                        }
-                    }
-                    return $out;
-                }
             }
         }
     }
@@ -1242,10 +1215,80 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
      */
     public function wple_security_page() {
         $html = '<div id="wple-ssl-health" class="wple-security">';
+        $html .= WPLE_Security::wple_security_score();
+        $html .= '<div class="wple-activessl-info">
+            <div class="wple-activessl-info-inner">
+            <h2>Malware & Integrity Scan</h2>
+            <small>Scans your WordPress installation against original repo for core integrity changes and suspicious files (themes, plugins, .well-known directories are currently ignored).</small>
+            <ul>';
+        $vuln_headers = array(
+            'Enable Daily Scan (Premium)'           => [
+                'key'     => 'daily_malware_scan',
+                'desc'    => 'Automated daily scan of entire WordPress directory for malware & suspicious files.',
+                'premium' => 1,
+            ],
+            'Enable Instant Notification (Premium)' => [
+                'key'     => 'notify_malware_scan',
+                'desc'    => 'Immediately notifies you via email / admin notice when a malware is detected on site.',
+                'premium' => 1,
+            ],
+        );
+        $output = '';
+        foreach ( $vuln_headers as $optlabel => $optarr ) {
+            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=malwarescan&utm_campaign=wpencryption#pricing">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
+            $disabled = ( isset( $optarr['premium'] ) ? $optarr['premium'] : 0 );
+            $output .= '<div class="plan-toggler" style="text-align: left; margin: 40px 0 0px;">
+            <span></span>
+            <label class="toggle">
+            <input class="toggle-checkbox wple-setting" data-opt="' . esc_attr( $optarr['key'] ) . '" type="checkbox" ' . checked( get_option( "wple_" . esc_attr( $optarr['key'] ) ), "1", false ) . disabled( $disabled, '1', false ) . '>
+            <div class="toggle-switch disabled' . intval( $disabled ) . '" style="transform: scale(0.6);"></div>
+            
+            </label>
+            </div>';
+            $output .= '</li>';
+        }
+        $integrity_issues = get_option( 'wple_mscan_integrity' );
+        $ignored_issues = get_option( 'wple_malware_ignorelist' );
+        $threatcount = ( $integrity_issues ? count( $integrity_issues ) : 0 );
+        $ignorecount = ( $ignored_issues ? count( $ignored_issues ) : 0 );
+        $scantime = '--';
+        if ( $lastscantime = get_option( 'wple_malware_lastscan' ) ) {
+            $scantime = date( 'Y-m-d H:i', $lastscantime );
+        }
+        $vulnerabilityexists = '';
+        if ( $threatcount - $ignorecount > 0 ) {
+            $vulnerabilityexists = 'wple-vuln-active';
+        }
+        $output .= '</ul>
+
+            <div id="wple-vulnerability-scanner">
+                <div class="wple-vuln-count">
+                <div class="wple-malware-results wple-vuln-countinner ' . esc_attr( $vulnerabilityexists ) . '">
+                <a href="' . admin_url( '/admin.php?page=wp_encryption_malware_scan' ) . '" target="_blank" title="View report">
+                    <strong>' . esc_html( $threatcount - $ignorecount ) . '</strong><br/>
+                    <small>Issues</small>
+                </a>
+                </div>
+                <div class="wple-malware-results wple-vuln-countinner wple-ignorecount">
+                <a href="' . admin_url( '/admin.php?page=wp_encryption_malware_scan&showignorelist' ) . '" target="_blank" title="View report">
+                    <strong>' . esc_html( $ignorecount ) . '</strong><br/>
+                    <small>Ignored</small>
+                </a>
+                </div>
+                </div>
+            <div class="wple-vuln-results">
+            <p class="wple-vuln-lastscan" style="text-align:center"><i>Last scan completed on ' . esc_html( $scantime ) . '</i></p>
+            <div class="wple-vuln-scan"><a href="' . wp_nonce_url( admin_url( 'admin.php?page=wp_encryption_security' ), 'wple_malwarescan', 'wple_malware' ) . '"><span class="dashicons dashicons-image-rotate"></span> Run Free Scan</a></div>     
+            </div>
+            </div>
+
+            </div>
+            </div>';
+        $html .= $output;
         $html .= '<div class="wple-activessl-info">
     <div class="wple-activessl-info-inner">
     <h2>Vulnerability Scan</h2>
-    <small>By enabling this option, you grant access to list of installed plugins, themes to scan for known vulnerabilities using <a href="https://vulnerability.wpsysadmin.com/" target="_blank" rel="noreferrer nofollow">WPVulnerability API</a>.</small>
+    <small>Scans your WordPress installation including core, themes, plugins for known vulnerabilities. By enabling this option, you grant access to list of installed plugins, themes to scan for known vulnerabilities using <a href="https://vulnerability.wpsysadmin.com/" target="_blank" rel="noreferrer nofollow">WPVulnerability API</a>.</small>
     <ul>';
         $vuln_headers = array(
             'Enable Vulnerability Scanner'                    => [
@@ -1332,13 +1375,17 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             }
             $vuln_table .= '</tbody>
       </table>';
-            $vuln_table .= '<div class="wple-vuln-pro">Above vulnerablities might exist on your site since many days!. Upgrade to Pro version & be notified as soon as a vulnerability is found in daily scan.</div>';
+            $vuln_table .= '<div class="wple-vuln-pro">Above vulnerablities might exist on your site since many days!. Upgrade to Pro version & be notified as soon as a vulnerability is found in automated DAILY scan.</div>';
         }
         $vuln_style = '';
         if ( !get_option( 'wple_vulnerability_scan' ) ) {
             $vuln_style = 'display:none';
         }
         $vulnerabilityexists = ( $threatcount > 0 ? 'wple-vuln-active' : '' );
+        $scantime = '---';
+        if ( $lastscantime = get_option( 'wple_vulnerability_lastscan' ) ) {
+            $scantime = date( 'Y-m-d H:i', $lastscantime );
+        }
         $output .= '</ul>
 
     <div id="wple-vulnerability-scanner" style="' . esc_attr( $vuln_style ) . '">
@@ -1350,6 +1397,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
       </div>
       <div class="wple-vuln-results">
       ' . $vuln_table . '
+      <p class="wple-vuln-lastscan" style="text-align:center"><i>Last scan completed on ' . esc_html( $scantime ) . '</i></p>
       <div class="wple-vuln-scan"><a href="' . wp_nonce_url( admin_url( 'admin.php?page=wp_encryption_security' ), 'wple_vulnerability', 'wple_vuln' ) . '"><span class="dashicons dashicons-image-rotate"></span> Scan Now</a></div>     
       </div>
     </div>
@@ -1357,7 +1405,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     </div>
     </div>';
         $html .= $output;
-        $html .= '<div class="wple-ssl-score">
+        $html .= '<div class="wple-basic-security-actions wple-ssl-settings">        
     <h2>Security</h2>
     ' . $this->wple_security_settings() . '
     </div>';
@@ -1389,7 +1437,8 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
       <div id="wple-sec-actions">
       ' . $actions_ul . '    
       </div>
-    </div>';
+    </div>
+    ';
         $html .= '</div>';
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
         echo $html;
@@ -1398,35 +1447,39 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     public function wple_security_settings() {
         $stored_opts = ( get_option( 'wple_security_settings' ) ? get_option( 'wple_security_settings' ) : array() );
         $opts = array(
-            'stop_user_enumeration' => [
+            'stop_user_enumeration'     => [
                 'label' => 'Stop user enumeration',
                 'desc'  => 'Prevent exposure of USERNAME on /wp-json/wp/v2/users, /?author=1 & oEmbed requests.',
             ],
-            'hide_wp_version'       => [
+            'hide_wp_version'           => [
                 'label' => 'Hide WordPress version',
                 'desc'  => 'Hackers target exposed vulnerabilities based on WP version. Hide your WordPress version with WP hash.',
             ],
-            'disallow_file_edit'    => [
+            'disallow_file_edit'        => [
                 'label' => 'Disallow File Edit',
                 'desc'  => 'Disallow editing of theme, plugin PHP files via wp-admin interface. Built-in file editors are first tool used by attackers if they are able to login.',
             ],
-            'anyone_can_register'   => [
+            'anyone_can_register'       => [
                 'label' => 'Disable anyone can register option',
                 'desc'  => 'Disable user registration on site.',
             ],
-            'hide_login_error'      => [
+            'disable_directory_listing' => [
+                'label' => 'Disable directory listing',
+                'desc'  => 'Disable directory browsing on Apache servers to avoid visibility of file structure on front-end',
+            ],
+            'hide_login_error'          => [
                 'label' => 'Hide login error',
                 'desc'  => 'WordPress shows whether a username or email is valid on wp-login page. This setting will hide that exposure.',
             ],
-            'disable_pingback'      => [
+            'disable_pingback'          => [
                 'label' => 'Disable pingbacks',
                 'desc'  => 'Protect against WordPress pingback vulnerability via DDOS attacks.',
             ],
-            'remove_feeds'          => [
+            'remove_feeds'              => [
                 'label' => 'Remove RSS & Atom feeds',
                 'desc'  => 'RSS & Atom feeds can be used to read your site content and even site scraping. If you are not using feeds to share your site content, you can disable it here.',
             ],
-            'deny_php_uploads'      => [
+            'deny_php_uploads'          => [
                 'label' => 'Deny php execution in uploads directory',
                 'desc'  => 'Deny execution of any php files inside wp-content/uploads/ directory which is meant for images & files.',
             ],
@@ -1486,6 +1539,10 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
                 } else {
                     if ( $key == 'deny_php_uploads' ) {
                         $security_class->wple_deny_php_in_uploads( true );
+                    } else {
+                        if ( $key == 'disable_directory_listing' ) {
+                            $security_class->wple_disable_directory_listing( true );
+                        }
                     }
                 }
             }
@@ -1500,6 +1557,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         }
         if ( in_array( 'deny_php_uploads', $prevopts ) && !in_array( 'deny_php_uploads', $save ) ) {
             $security_class->wple_deny_php_in_uploads( false );
+        }
+        if ( in_array( 'disable_directory_listing', $prevopts ) && !in_array( 'disable_directory_listing', $save ) ) {
+            $security_class->wple_disable_directory_listing( false );
         }
         update_option( 'wple_security_settings', $save );
         echo 1;
