@@ -531,6 +531,31 @@
     });
   });
 
+  //since 7.8.1
+  $('.wple-notice-dismiss').click(function (e) {
+    var $this = $(this);
+    e.preventDefault();
+
+    var ctxt = $this.attr('data-context');
+
+    jQuery.ajax({
+      method: 'POST',
+      url: ajaxurl,
+      dataType: 'text',
+      data: {
+        action: 'wple_dismiss_notice',
+        context: ctxt,
+      },
+      beforeSend: function () {},
+      error: function () {
+        alert('Failed to save! Please try again');
+      },
+      success: function (response) {
+        $('.notice-info.' + ctxt).fadeOut('slow');
+      },
+    });
+  });
+
   function copycert(elem) {
     var element = document.querySelector(elem);
     if (typeof element !== 'undefined') {

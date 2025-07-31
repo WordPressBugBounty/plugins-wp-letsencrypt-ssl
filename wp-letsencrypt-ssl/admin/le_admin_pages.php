@@ -1595,7 +1595,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     }
 
     public function wple_upgrade_page() {
-        echo "";
+        echo "<script>\r\n        window.location.href = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing';\r\n        </script>";
     }
 
 }

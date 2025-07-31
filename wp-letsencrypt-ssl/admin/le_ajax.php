@@ -22,6 +22,8 @@ class WPLE_Ajax
 
         //since 7.8.0
         add_action('wp_ajax_wple_mscan_ignorefile', [$this, 'wple_malware_ignorefile']);
+
+        add_action('wp_ajax_wple_dismiss_notice', [$this, 'wple_dismiss_notice']);;
     }
 
     /**
@@ -407,6 +409,29 @@ class WPLE_Ajax
         }
 
         echo update_option('wple_malware_ignorelist', $ignoreList);
+
+        exit();
+    }
+
+    public function wple_dismiss_notice()
+    {
+
+        if (!current_user_can('manage_options')) {
+            exit('Authorization Failure');
+        }
+
+        $dismissed = get_option('wple_dismissed_notices');
+
+        $dismissed = is_array($dismissed) ? $dismissed : array();
+
+        $to_dimiss = sanitize_text_field($_POST['context']);
+
+        if (array_search($to_dimiss, $dismissed) === false) {
+            $dismissed[] = $to_dimiss;
+        }
+
+        echo update_option('wple_dismissed_notices', $dismissed);
+
 
         exit();
     }

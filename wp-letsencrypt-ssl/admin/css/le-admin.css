@@ -3322,6 +3322,14 @@ div#wple-malwarescan-report p {
   background: #e2c354;
 }
 
+span.wple-notice-dismiss {
+  position: absolute;
+  right: 30px;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+}
+
 @media (max-width: 991px) {
   div#wple-ssl-health > div {
     width: auto !important;

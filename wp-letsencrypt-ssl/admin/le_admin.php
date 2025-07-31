@@ -80,6 +80,10 @@ class WPLE_Admin {
             //settings saved
             add_action( 'admin_notices', array($this, 'wple_success_notice') );
         }
+        //since 7.8.1
+        if ( $this->wple_not_dismissed( 'advancedsecurity' ) ) {
+            add_action( 'admin_notices', [$this, 'wple_advancedsecurity_notice'] );
+        }
         /** Admin Notices End */
         add_action( 'wple_show_reviewrequest', array($this, 'wple_set_review_flag') );
         add_action( 'wple_show_mxalert', array($this, 'wple_set_mxerror_flag') );
@@ -549,10 +553,10 @@ class WPLE_Admin {
      * @return void
      */
     public function wple_upgrade_block( &$html ) {
-        ///$upgradeurl = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=upgrade&utm_campaign=wpencryption';
-        $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&billing_cycle_selector=responsive_list' );
-        $nopricing = get_option( 'wple_no_pricing' );
-        //gdy
+        $upgradeurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=upgrade&utm_campaign=wpencryption';
+        ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&billing_cycle_selector=responsive_list');
+        ///$nopricing = get_option('wple_no_pricing'); //always false now
+        $nopricing = false;
         $cp = get_option( 'wple_have_cpanel' );
         // if (FALSE === $nopricing && !$cp) { //not gdy & not cpanel
         //   $nopricing = rand(0, 1);
@@ -1362,6 +1366,30 @@ class WPLE_Admin {
         echo '<style>a[href="admin.php?page=wp_encryption-pricing"] {
             display: none !important;
         }</style>';
+    }
+
+    public function wple_advancedsecurity_notice() {
+        $desc = 'Checkout our brand new Advanced Security page with most important security features and scanners including Malware & integrity scanner, Vulnerability scanner.';
+        $html = '<div class="notice notice-info wple-admin-review advancedsecurity">
+      <div class="wple-review-box">
+        <span class="wple-notice-dismiss" data-context="advancedsecurity" title="dismiss">X Dismiss</span>
+        <img src="' . WPLE_URL . 'admin/assets/symbol.png"/>
+        <span><strong>[NEW] Introducing Advanced Security Page with Security Score</strong><p>' . WPLE_Trait::wple_kses( $desc ) . '</p></span>  
+      </div>      
+        <a class="wple-lets-review wplerevbtn" href="' . admin_url( '/admin.php?page=wp_encryption_security' ) . '">' . esc_html__( 'View Details', 'wp-letsencrypt-ssl' ) . '</a>
+      
+    </div>';
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
+        echo $html;
+    }
+
+    private function wple_not_dismissed( $context ) {
+        $dismissed = get_option( 'wple_dismissed_notices' );
+        $dismissed = ( is_array( $dismissed ) ? $dismissed : array() );
+        if ( array_search( $context, $dismissed ) === false ) {
+            return true;
+        }
+        return false;
     }
 
 }
