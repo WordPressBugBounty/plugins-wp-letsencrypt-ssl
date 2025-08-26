@@ -2,6 +2,8 @@
 
 use WPLEClient\LEFunctions;
 
+require_once WPLE_DIR . 'classes/le-trait.php';
+
 class WPLE_Ajax
 {
 
@@ -23,7 +25,11 @@ class WPLE_Ajax
         //since 7.8.0
         add_action('wp_ajax_wple_mscan_ignorefile', [$this, 'wple_malware_ignorefile']);
 
-        add_action('wp_ajax_wple_dismiss_notice', [$this, 'wple_dismiss_notice']);;
+        add_action('wp_ajax_wple_dismiss_notice', [$this, 'wple_dismiss_notice']);
+
+        //since 7.8.2
+        add_action('wp_ajax_wple_wizard_sslscan', [$this, 'wple_wizard_sslscan']);
+        add_action('wp_ajax_wple_wizard_enable_https', [$this, 'wple_wizard_enable_https']);
     }
 
     /**
@@ -380,7 +386,7 @@ class WPLE_Ajax
             exit('Authorization Failure');
         }
 
-        $ignoreFile = sanitize_url($_POST['fyle']);
+        $ignoreFile = esc_url_raw($_POST['fyle']);
         $ignoreFile = str_ireplace(['http://', 'https://'], '', $ignoreFile);
         $ignoreList = get_option('wple_malware_ignorelist');
 
@@ -433,6 +439,56 @@ class WPLE_Ajax
         echo update_option('wple_dismissed_notices', $dismissed);
 
 
+        exit();
+    }
+
+    public function wple_wizard_sslscan()
+    {
+        if (!current_user_can('manage_options') || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'wple-wizard')) {
+            exit('Unauthorized request');
+        }
+
+        $newscan = isset($_POST['recheck']) ? false : true;
+
+        $result = WPLE_Trait::wple_ssllabs_scan($newscan, false);
+
+        if (!$newscan) {
+            echo json_encode($result);
+        } else { //scan started flag
+            echo 1;
+        }
+
+        exit();
+    }
+    public function wple_wizard_enable_https()
+    {
+        if (!current_user_can('manage_options') || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'wple-wizard')) {
+            exit('error');
+        }
+
+        if (is_writable(ABSPATH . '.htaccess')) {
+
+            $htaccess = file_get_contents(ABSPATH . '.htaccess');
+
+            if (stripos($htaccess, 'WP_Encryption_Force_SSL') === false) {
+                $getrules = WPLE_Trait::compose_htaccess_rules();
+
+                $wpruleset = "# BEGIN WordPress";
+
+                if (strpos($htaccess, $wpruleset) !== false) {
+                    $newhtaccess = str_replace($wpruleset, $getrules . $wpruleset, $htaccess);
+                } else {
+                    $newhtaccess = $htaccess . $getrules;
+                }
+
+                ///insert_with_markers(ABSPATH . '.htaccess', '', $newhtaccess);
+                file_put_contents(ABSPATH . '.htaccess', $newhtaccess);
+            }
+
+            echo 'success';
+        } else {
+            echo 'notwritable';
+        }
         exit();
     }
 }

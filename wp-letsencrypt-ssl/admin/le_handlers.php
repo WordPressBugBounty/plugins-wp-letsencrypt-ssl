@@ -13,6 +13,7 @@ require_once WPLE_DIR . 'classes/le-mscan.php';
 class WPLE_Handler {
     public function __construct() {
         add_action( 'admin_init', [$this, 'admin_init_handlers'], 1 );
+        add_action( 'wp_ajax_wple_wizard_generatessl', [$this, 'wple_wizard_generatessl'] );
     }
 
     public function admin_init_handlers() {
@@ -349,6 +350,44 @@ class WPLE_Handler {
                 }
             }
         }
+    }
+
+    public function wple_wizard_generatessl() {
+        if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nc'] ) ), 'wple-wizard' ) || !current_user_can( 'manage_options' ) ) {
+            echo json_encode( [
+                'success' => false,
+                'message' => 'Unauthorized request!',
+            ] );
+            exit;
+        }
+        // SSL generation logic here
+        $leopts = array(
+            'email'           => get_option( 'admin_email' ),
+            'date'            => date( 'd-m-Y' ),
+            'expiry'          => '',
+            'type'            => 'single',
+            'send_usage'      => 1,
+            'include_www'     => 0,
+            'include_mail'    => 0,
+            'include_webmail' => 0,
+            'agree_gws_tos'   => 1,
+            'agree_le_tos'    => 1,
+        );
+        $currentdomain = esc_html( str_ireplace( array('http://', 'https://'), array('', ''), site_url() ) );
+        $slashpos = stripos( $currentdomain, '/' );
+        if ( false !== $slashpos ) {
+            //subdir installation
+            $currentdomain = substr( $currentdomain, 0, $slashpos );
+            $leopts['subdir'] = 1;
+            //flag domain as primary domain of subdir site
+            $leopts['domain'] = sanitize_text_field( $currentdomain );
+        }
+        update_option( 'wple_opts', $leopts );
+        WPLE_Trait::wple_cpanel_identity();
+        $leopts['wizard'] = 1;
+        //flag for wizard
+        echo new WPLE_Core($leopts);
+        exit;
     }
 
 }

@@ -90,6 +90,7 @@ class WPLE_Admin {
         add_action( 'wple_ssl_reminder_notice', [$this, 'wple_start_show_reminder'] );
         //hide default pricing page for non-premium
         add_action( 'admin_head', [$this, 'wple_hide_default_pricing'] );
+        add_filter( 'fs_uninstall_reasons_wp-letsencrypt-ssl', [$this, 'wple_oneyearprom'], 1 );
         add_action( 'wple_init_ssllabs', [$this, 'wple_initialize_ssllabs'] );
         add_action( 'wple_ssl_expiry_update', [$this, 'wple_update_expiry_ssllabs'] );
         //daily once cron
@@ -143,6 +144,26 @@ class WPLE_Admin {
             WPLE_PLUGIN_VER,
             false
         );
+        ///if (isset($_GET['wp_encryption_setup_wizard'])) {
+        wp_enqueue_script(
+            WPLE_NAME . '-wizard',
+            WPLE_URL . 'admin/wizard/dist/bundle.js',
+            array(
+                'react',
+                'react-dom',
+                'wp-element',
+                'wp-i18n'
+            ),
+            WPLE_PLUGIN_VER,
+            false
+        );
+        wp_localize_script( WPLE_NAME . '-wizard', 'WPLEAPP', [
+            'site'       => site_url(),
+            'baredomain' => WPLE_Trait::get_root_domain( true ),
+            'ajax'       => admin_url( 'admin-ajax.php' ),
+            'nc'         => wp_create_nonce( 'wple-wizard' ),
+        ] );
+        ////}
         wp_localize_script( WPLE_NAME, 'SCAN', array(
             'adminajax' => admin_url( '/admin-ajax.php' ),
             'base'      => site_url( '/', 'https' ),
@@ -178,7 +199,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.7.9', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.8.0', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
@@ -307,7 +328,7 @@ class WPLE_Admin {
         }
         $html .= '<div id="wple-sslgen">
     <h2>' . $formheader . '</h2>
-    <div style="text-align: center; margin-top: -30px; font-size: 16px; display: block; width: 100%; margin-bottom: 40px;"><a style="text-decoration-style:dashed;text-decoration-thickness: from-font;" href="' . admin_url( 'admin.php?page=wp_encryption_faq#howitworks' ) . '">How it works?</a> | <a style="text-decoration-style:dashed;text-decoration-thickness: from-font;" href="' . admin_url( 'admin.php?page=wp_encryption_force_https' ) . '">Just need HTTPS redirection?</a></div>';
+    <div style="text-align: center; margin-top: -30px; font-size: 16px; display: block; width: 100%; margin-bottom: 40px;"><a style="text-decoration-style:dashed;text-decoration-thickness: from-font;" href="' . admin_url( 'admin.php?page=wp_encryption_faq#howitworks' ) . '">How it works?</a></div>';
         if ( is_multisite() && !wple_fs()->can_use_premium_code__premium_only() ) {
             $html .= '<p class="wple-multisite">' . WPLE_Trait::wple_kses( __( 'Upgrade to <strong>PRO</strong> version to avail Wildcard SSL support for multisite and ability to install SSL for mapped domains (different domain names).', 'wp-letsencrypt-ssl' ) ) . '</p>';
         }
@@ -574,6 +595,8 @@ class WPLE_Admin {
         if ( FALSE !== $cp && $cp ) {
             $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>CPANEL</b>! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
             ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd');
+        } else {
+            $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! Your site is on <b>' . esc_html( $_SERVER['SERVER_SOFTWARE'] ) . '</b> server! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
         }
         $compareurl = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
         //$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
@@ -1260,7 +1283,7 @@ class WPLE_Admin {
     public function wple_oneyearprom( $reasons ) {
         $reasons['long-term'][] = $reasons['short-term'][] = array(
             'id'                => 20,
-            'text'              => '<a href="' . site_url() . '/wp-admin/plugin-install.php?fs_allow_updater_and_dialog=true&tab=plugin-information&parent_plugin_id=5090&plugin=wpen-certpanel&section=description" target="_blank"><img src="' . WPLE_URL . 'admin/assets/1-year-ssl.png"/></a>',
+            'text'              => '<a href="' . admin_url( '/admin.php?page=wp_encryption_setup_wizard' ) . '"><img src="' . WPLE_URL . 'admin/assets/1-year-ssl.png"/></a>',
             'input_type'        => '',
             'input_placeholder' => 'oneyearssl',
         );

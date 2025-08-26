@@ -813,7 +813,10 @@ class WPLE_Trait {
                     ];
                 }
             }
-            //continue making request if transient not found
+            //continue the request if transient not found
+        } else {
+            //delete transient when new scan
+            delete_transient( 'wple_ssllabs' );
         }
         $API = 'https://api.ssllabs.com/api/v3/analyze';
         $payload = array(
@@ -831,7 +834,7 @@ class WPLE_Trait {
         }
         $res = wp_remote_retrieve_body( $result );
         $res = json_decode( $res, true );
-        if ( array_key_exists( 'status', $res ) ) {
+        if ( is_array( $res ) && array_key_exists( 'status', $res ) ) {
             $status = $res['status'];
             if ( $status == 'READY' ) {
                 set_transient( 'wple_ssllabs', $res, DAY_IN_SECONDS );
@@ -890,7 +893,7 @@ class WPLE_Trait {
         }
         $res = wp_remote_retrieve_body( $result );
         $res = json_decode( $res, true );
-        if ( array_key_exists( 'status', $res ) ) {
+        if ( is_array( $res ) && array_key_exists( 'status', $res ) ) {
             $status = $res['status'];
             if ( $status == 'READY' ) {
                 set_transient( 'wple_ssllabs', $res, DAY_IN_SECONDS );
@@ -929,6 +932,9 @@ class WPLE_Trait {
                     wp_schedule_single_event( time() + 900, 'wple_ssl_expiry_update', array('recheck_status') );
                 }
             }
+        } else {
+            //re-check status after 15mins
+            wp_schedule_single_event( time() + 900, 'wple_ssl_expiry_update', array('recheck_status') );
         }
     }
 

@@ -2285,6 +2285,7 @@ label.disabled {
 
 .wple-ssl-score h2,
 .wple-ssl-settings h2,
+.wple-basic-security-actions h2,
 .wple-activessl-info h2 {
   margin-top: 0;
   font-size: 21px;
@@ -2308,6 +2309,7 @@ div#wple-ssl-health {
 
 .wple-ssl-score h2:after,
 .wple-ssl-settings h2:after,
+.wple-basic-security-actions h2:after,
 .wple-activessl-info h2:after {
   content: "";
   display: block;
@@ -2315,6 +2317,11 @@ div#wple-ssl-health {
   width: 50px;
   height: 5px;
   margin-top: 20px;
+}
+
+.wple-activessl-info-inner > small {
+  display: block;
+  margin-bottom: 20px;
 }
 
 .wple-score {
@@ -3328,6 +3335,35 @@ span.wple-notice-dismiss {
   font-weight: 600;
   color: #888;
   cursor: pointer;
+}
+
+div#wple-setup-wrapper {
+  margin-bottom: 40px;
+}
+
+.wple-wizard-progress {
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  padding: 5px 20px 20px;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.wple-wizard-progress h3 {
+  line-height: 1.5em;
+  margin-bottom: 30px;
+}
+
+div#wple-wizard-generatessl {
+  background: rgba(255, 137, 137, 0.25);
+  margin: 20px;
+  padding: 20px;
+}
+
+div#wple-setup-wizard {
+  display: block;
+  margin-bottom: 100px;
 }
 
 @media (max-width: 991px) {

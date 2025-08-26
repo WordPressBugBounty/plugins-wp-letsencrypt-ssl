@@ -55,6 +55,8 @@ class WPLE_Core {
 
     protected $disablespmode = false;
 
+    private $wizard = false;
+
     /**
      * construct all params & proceed with cert generation
      *
@@ -75,6 +77,9 @@ class WPLE_Core {
             $this->email = sanitize_email( $opts['email'] );
             $this->date = $opts['date'];
             $optss = $opts;
+            if ( isset( $opts['wizard'] ) ) {
+                $this->wizard = true;
+            }
         } else {
             $optss = get_option( 'wple_opts' );
             $this->email = ( isset( $optss['email'] ) ? sanitize_email( $optss['email'] ) : '' );
@@ -154,6 +159,7 @@ class WPLE_Core {
             }
             $PRO = ( wple_fs()->can_use_premium_code__premium_only() ? 'PRO' : '' );
             $PRO .= ( $this->wcard ? ' WILDCARD SSL ' : ' SINGLE DOMAIN SSL ' );
+            $PRO .= ( $this->wizard ? ' WIZARD ' : '' );
             if ( isset( $_SERVER['GD_PHP_HANDLER'] ) ) {
                 $PRO .= 'GD ';
             }
@@ -446,6 +452,14 @@ class WPLE_Core {
             if ( FALSE != ($dlog = get_option( 'wple_send_usage' )) && $dlog ) {
                 $this->wple_send_usage_data();
             }
+            if ( $this->wizard ) {
+                $debug_log = file_get_contents( WPLE_DEBUGGER . 'debug.log' );
+                echo json_encode( [
+                    'success' => false,
+                    'message' => $debug_log,
+                ] );
+                exit;
+            }
             wp_redirect( admin_url( '/admin.php?page=wp_encryption&error=1' ), 302 );
             die;
         }
@@ -691,6 +705,7 @@ class WPLE_Core {
         if ( !$this->order->allAuthorizationsValid() ) {
             if ( !$starthttpverification && !$startdnsverification ) {
                 $this->wple_save_all_challenges();
+                $this->wple_wizard_redirections();
                 ///$this->wple_log("HTTP Challenges --> " . json_encode($updated['challenge_files']), 'success', 'a');
                 ///$this->wple_log("DNS Challenges --> " . json_encode($updated['dns_challenges']), 'success', 'a');
                 $this->wple_log( esc_html__( "Offering manual verification procedure.", 'wp-letsencrypt-ssl' ) . " \n", 'success', 'a' );
@@ -737,6 +752,34 @@ class WPLE_Core {
                     $this->wple_log( esc_html__( "No pending challenges. Proceeding..", 'wp-letsencrypt-ssl' ) . " \n", 'success', 'a' );
                 }
             }
+        }
+    }
+
+    public function wple_wizard_redirections() {
+        if ( $this->wizard ) {
+            $opts = get_option( 'wple_opts' );
+            if ( isset( $opts['challenge_files'] ) ) {
+                $fpath = ABSPATH . '.well-known/acme-challenge/';
+                if ( !file_exists( $fpath ) ) {
+                    mkdir( $fpath, 0775, true );
+                }
+                foreach ( $opts['challenge_files'] as $index => $item ) {
+                    $this->wple_log( esc_html__( 'Deploying challenge file', 'wp-letsencrypt-ssl' ) . ' ' . $item['file'], 'success', 'a' );
+                    file_put_contents( $fpath . $item['file'], trim( $item['value'] ) );
+                }
+                //straight to verification
+                echo json_encode( [
+                    'success' => true,
+                    'message' => admin_url( '/admin.php?page=wp_encryption&wpleauto=http' ),
+                ] );
+            } else {
+                //manual verification page
+                echo json_encode( [
+                    'success' => true,
+                    'message' => admin_url( '/admin.php?page=wp_encryption&subdir=1' ),
+                ] );
+            }
+            exit;
         }
     }
 

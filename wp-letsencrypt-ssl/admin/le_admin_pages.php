@@ -104,6 +104,15 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             [$this, 'wple_mixed_scanner_page']
         );
         //}
+        //since 7.8.2
+        add_submenu_page(
+            'options.php',
+            'Setup Wizard',
+            __( 'Setup Wizard', 'wp-letsencrypt-ssl' ),
+            'manage_options',
+            'wp_encryption_setup_wizard',
+            [$this, 'wple_setup_wizard_page']
+        );
         add_submenu_page(
             'options.php',
             'Debug log',
@@ -232,7 +241,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         <span class="checkbox-custom rectangular"></span>
       </label>
 
-      <label class="' . $htaccessdisabled . '">' . esc_html__( 'Force SSL via HTACCESS (Server level 301 redirect - Faster)', 'wp-letsencrypt-ssl' ) . ' - ' . esc_html__( 'Most suitable for new sites & sites using proxies', 'wp-letsencrypt-ssl' ) . $htaccessdisabledmsg . '</label><br /><br />
+      <label class="' . $htaccessdisabled . '">' . esc_html__( 'Force SSL via HTACCESS (Server level 301 redirect - Faster)', 'wp-letsencrypt-ssl' ) . ' - ' . esc_html__( 'Most suitable for new sites & sites using proxies/firewalls like Cloudflare', 'wp-letsencrypt-ssl' ) . $htaccessdisabledmsg . '</label><br /><br />
 
       <label class="checkbox-label" style="float:left">
       <input type="radio" name="wple_forcessl" value="1" ' . $checked . '>
@@ -1278,7 +1287,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
                 </div>
             <div class="wple-vuln-results">
             <p class="wple-vuln-lastscan" style="text-align:center"><i>Last scan completed on ' . esc_html( $scantime ) . '</i></p>
-            <div class="wple-vuln-scan"><a href="' . wp_nonce_url( admin_url( 'admin.php?page=wp_encryption_security' ), 'wple_malwarescan', 'wple_malware' ) . '"><span class="dashicons dashicons-image-rotate"></span> Run Free Scan</a></div>     
+            <div class="wple-vuln-scan"><a href="' . wp_nonce_url( admin_url( 'admin.php?page=wp_encryption_security' ), 'wple_malwarescan', 'wple_malware' ) . '"><span class="dashicons dashicons-image-rotate"></span> Scan Now</a></div>     
             </div>
             </div>
 
@@ -1405,7 +1414,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     </div>
     </div>';
         $html .= $output;
-        $html .= '<div class="wple-basic-security-actions wple-ssl-settings">        
+        $html .= '<div class="wple-basic-security-actions">        
     <h2>Security</h2>
     ' . $this->wple_security_settings() . '
     </div>';
@@ -1596,6 +1605,132 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
 
     public function wple_upgrade_page() {
         echo "<script>\r\n        window.location.href = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing';\r\n        </script>";
+    }
+
+    public function wple_upgrade_promo_block( &$html ) {
+        $upgradeurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=upgrade&utm_campaign=wpencryption';
+        ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&billing_cycle_selector=responsive_list');
+        ///$nopricing = get_option('wple_no_pricing'); //always false now
+        $nopricing = false;
+        $cp = get_option( 'wple_have_cpanel' );
+        // if (FALSE === $nopricing && !$cp) { //not gdy & not cpanel
+        //   $nopricing = rand(0, 1);
+        // }
+        $automatic = esc_html__( 'Automatic', 'wp-letsencrypt-ssl' );
+        $manual = esc_html__( 'Manual', 'wp-letsencrypt-ssl' );
+        $domain = str_ireplace( array('https://', 'http://', 'www.'), '', site_url() );
+        $dverify = $automatic;
+        if ( stripos( $domain, '/' ) !== false ) {
+            //subdir site
+            $dverify = $manual;
+        }
+        $html .= ' 
+      <div id="wple-upgradepro">';
+        if ( FALSE !== $cp && $cp ) {
+            $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>CPANEL</b>! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
+            ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd');
+        } else {
+            $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! Your site is on <b>' . esc_html( $_SERVER['SERVER_SOFTWARE'] ) . '</b> server! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
+        }
+        $compareurl = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
+        //$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
+        if ( $nopricing ) {
+            $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
+            //$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd');
+            //$upgradeurl = 'https://checkout.freemius.com/mode/dialog/plugin/5090/plan/10643/'; //CDN
+            $html .= '<div class="wple-error-firewall fire-pro wple-procdn">
+        <div>
+          <img src="' . WPLE_URL . 'admin/assets/firewall-shield-pro.png"/>
+        </div>
+        <div class="wple-upgrade-features">
+          <span><b>Automatic SSL Installation</b><br>Hassle free automatic installation of SSL Certificate - Super simple DNS based setup.</span>
+          <span><b>Automatic SSL Renewal</b><br>Your SSL certificate will be automatically renewed in background without the need of any action or manual work.</span>
+          <span><b>Security</b><br>Enterprise level protection against known vulnerabilities, Bad Bots, Brute Force, DDOS, Spam & much more attack vectors.</span>
+          <span><b>Automatic CDN</b><br>Your site is served from 42 full scale edge locations for faster content delivery and fastest performance.</span>
+        </div>
+      </div>';
+        } else {
+            $html .= '<div class="wple-plans">
+            <span class="free">* ' . esc_html__( 'FREE', 'wp-letsencrypt-ssl' ) . '</span>
+            <span class="pro">* ' . esc_html__( 'PRO', 'wp-letsencrypt-ssl' ) . '</span>
+          </div>
+          <div class="wple-plan-compare">
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/verified.png"/>
+              <h4>' . esc_html__( 'HTTP Verification', 'wp-letsencrypt-ssl' ) . '</h4>
+              <span class="wple-free">' . $manual . '</span>
+              <span class="wple-pro">' . $automatic . '</span>
+            </div>
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/DNS.png"/>
+              <h4>' . esc_html__( 'DNS Verification', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'In case of HTTP verification fail / not possible', 'wp-letsencrypt-ssl' ) . '"></span></h4>
+              <span class="wple-free">' . $manual . '</span>
+              <span class="wple-pro">' . $automatic . '</span>
+            </div>
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/Install.png"/>
+              <h4>' . esc_html__( 'SSL Installation', 'wp-letsencrypt-ssl' ) . ' <!--<span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'PRO - We offer one time free manual support for non-cPanel based sites', 'wp-letsencrypt-ssl' ) . '"></span>--></h4>
+              <span class="wple-free">' . $manual . '</span>
+              <span class="wple-pro">' . $automatic . '</span>
+            </div>
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/renewal.png"/>
+              <h4>' . esc_html__( 'SSL Renewal', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'Free users must manually renew / re-generate SSL certificate every 90 days.', 'wp-letsencrypt-ssl' ) . '"></span></h4>
+              <span class="wple-free">' . $manual . '</span>
+              <span class="wple-pro">' . $automatic . '</span>
+            </div>
+            <!--<div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/secure-mail.png"/>
+              <h4>' . esc_html__( 'Secure Mail', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'Secure email & webmail with SSL/TLS', 'wp-letsencrypt-ssl' ) . '"></span></h4>
+              <span class="wple-free">' . esc_html__( 'Not Available', 'wp-letsencrypt-ssl' ) . '</span>
+              <span class="wple-pro">' . esc_html__( 'Available', 'wp-letsencrypt-ssl' ) . '</span>
+            </div>-->
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/wildcard.png"/>
+              <h4>' . esc_html__( 'Wildcard SSL', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'PRO - Your domain DNS must be managed by cPanel or Godaddy for full automation', 'wp-letsencrypt-ssl' ) . '"></span></h4>
+              <span class="wple-free">' . esc_html__( 'Not Available', 'wp-letsencrypt-ssl' ) . '</span>
+              <span class="wple-pro">' . esc_html__( 'Available', 'wp-letsencrypt-ssl' ) . '</span>
+            </div>
+            <div class="wple-compare-item">
+              <img src="' . WPLE_URL . 'admin/assets/multisite.png"/>
+              <h4>' . esc_html__( 'Multisite Support', 'wp-letsencrypt-ssl' ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr__( 'PRO - Support for Multisite + Mapped domains', 'wp-letsencrypt-ssl' ) . '"></span></h4>
+              <span class="wple-free">' . esc_html__( 'Not Available', 'wp-letsencrypt-ssl' ) . '</span>
+              <span class="wple-pro">' . esc_html__( 'Available', 'wp-letsencrypt-ssl' ) . '</span>
+            </div>            
+          </div>';
+        }
+        ///$html .= '<div style="text-align:center"><img src="' . WPLE_URL . '/admin/assets/new-year.png"></div>';
+        $html .= '<div class="wple-upgrade-pro">
+              <a href="' . $compareurl . '" target="_blank" class="wplecompare">' . esc_html__( 'COMPARE FREE & PRO VERSION', 'wp-letsencrypt-ssl' ) . '  <span class="dashicons dashicons-external"></span></a>';
+        // if (isset($_GET['success']) && FALSE == $nopricing) {
+        //   $html .= '<a href="' . $upgradeurl . '">' . esc_html__('UPGRADE TO PRO', 'wp-letsencrypt-ssl') . '<span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Requires cPanel or root SSH access"></span></a>
+        //             <a href="https://wpencryption.com/#firewall" target="_blank">' . esc_html__('UPGRADE TO FIREWALL', 'wp-letsencrypt-ssl') . '<span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Why buy an SSL alone when you can get Premium SSL + CDN + Firewall Security for even lower cost."></span></a>';
+        // } else {
+        // if ($nopricing) {
+        //   $html .= '<a href="' . $upgradeurl . '">' . esc_html__('UPGRADE TO CDN', 'wp-letsencrypt-ssl') . '</a>';
+        // } else {
+        $html .= '<a href="' . $upgradeurl . '">' . esc_html__( 'UPGRADE TO PRO', 'wp-letsencrypt-ssl' ) . '</a>';
+        //}
+        //$html .= '<a href="https://checkout.freemius.com/mode/dialog/plugin/5090/plan/10643/" target="_blank" id="upgradetocdn">' . esc_html__('UPGRADE TO CDN', 'wp-letsencrypt-ssl') . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Sky rocket your WordPress site performance with Fastest Content Delivery Network + Premium Sectigo SSL"></span></a>';
+        // }
+        $html .= '</div>';
+        // $rnd = rand(0, 1);
+        // if ($rnd) {
+        //   $html .= '<div class="wple-hire-expert"><a href="https://wpencryption.com/cdn-firewall/?utm_campaign=wpencryptionsite&utm_medium=checkoutcdn&utm_source=upgradeblock" target="_blank">Sky Rocket your site speed with our <strong>CDN</strong> plan (<strong>Includes SSL + Performance</strong>) <span class="dashicons dashicons-external"></span></a></div>';
+        // } else {
+        //   $html .= '<div class="wple-hire-expert"><a href="https://wpencryption.com/hire-ssl-expert/?utm_campaign=wpencryptionsite&utm_medium=hiresslexpert&utm_source=upgradeblock" target="_blank">Too busy? <b>Hire an expert</b> for secure migration to HTTPS (<b>ONE YEAR PRO LICENSE FREE</b>) <span class="dashicons dashicons-external"></span></a></div>';
+        // }
+        $html .= '</div><!--wple-upgradepro-->';
+    }
+
+    public function wple_setup_wizard_page() {
+        $html = '<h2>' . esc_html__( 'Setup Wizard', 'wp-letsencrypt-ssl' ) . '</h2>';
+        $html .= '<div id="wple-setup-wrapper">
+        <p style="text-align:center;margin:-20px 20px 40px;">This wizard will guide you through the setup process while analyzing & validating your SSL certificate and enforcing HTTPS throughout the site.</p>
+        <div id="wple-setup-wizard">...</div>
+        </div>';
+        $this->wple_upgrade_promo_block( $html );
+        $this->generate_page( $html );
     }
 
 }
