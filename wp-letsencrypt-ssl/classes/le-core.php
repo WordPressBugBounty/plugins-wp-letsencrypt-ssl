@@ -329,9 +329,6 @@ class WPLE_Core {
             update_option( 'wple_ssl_screen', 'complete' );
             $sslgenerated = "<h2>" . esc_html__( 'SSL Certificate generated successfully', 'wp-letsencrypt-ssl' ) . "!</h2>";
             $this->wple_log( $sslgenerated, 'success', 'a' );
-            if ( FALSE != ($dlog = get_option( 'wple_send_usage' )) && $dlog ) {
-                $this->wple_send_usage_data();
-            }
             /**
              * Case: Couldn't store above web root dir
              * Delete private key and store in option
@@ -352,6 +349,16 @@ class WPLE_Core {
                     unlink( $acc_key );
                     $this->wple_log( "Stored private key as option" );
                 }
+            }
+            if ( $this->wizard || FALSE != ($dlog = get_option( 'wple_send_usage' )) && $dlog ) {
+                $this->wple_send_usage_data();
+            }
+            if ( $this->wizard ) {
+                echo json_encode( [
+                    'success' => true,
+                    'message' => admin_url( '/admin.php?page=wp_encryption' ),
+                ] );
+                exit;
             }
             wp_redirect( admin_url( '/admin.php?page=wp_encryption' ), 302 );
             exit;
@@ -767,6 +774,7 @@ class WPLE_Core {
                     $this->wple_log( esc_html__( 'Deploying challenge file', 'wp-letsencrypt-ssl' ) . ' ' . $item['file'], 'success', 'a' );
                     file_put_contents( $fpath . $item['file'], trim( $item['value'] ) );
                 }
+                update_option( 'wple_send_usage', 1 );
                 //straight to verification
                 echo json_encode( [
                     'success' => true,

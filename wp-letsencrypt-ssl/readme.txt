@@ -1,11 +1,11 @@
 === WP Encryption - One Click Free SSL Certificate & SSL / HTTPS Redirect, Security & SSL Scan ===
 Contributors: gowebsmarty, gwsharsha
-Tags: free ssl,ssl,https,https redirect,security,force https
+Tags: free ssl,ssl,https,https redirect,force https,security
 Requires at least: 5.4
 License: GPL3
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 7.8.2
+Stable tag: 7.8.3
 
 Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, Advanced Security & SSL monitoring.
 
