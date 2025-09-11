@@ -4,7 +4,7 @@
  * @package WP Encryption
  *
  * @author     WP Encryption
- * @copyright  Copyright (C) 2019-2024, WP Encryption
+ * @copyright  Copyright (C) 2019-2025, WP Encryption
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
  * @link       https://wpencryption.com
  * @since      Class available since Release 5.0.0

@@ -4,7 +4,7 @@
  * @package WP Encryption
  *
  * @author     WP Encryption
- * @copyright  Copyright (C) 2019-2024, WP Encryption
+ * @copyright  Copyright (C) 2019-2025, WP Encryption
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3
  * @link       https://wpencryption.com
  * @since      Class available since Release 1.0.0
@@ -157,7 +157,7 @@ class WPLE_Admin {
             WPLE_PLUGIN_VER,
             false
         );
-        wp_localize_script( WPLE_NAME . '-wizard', 'WPLEAPP', [
+        wp_localize_script( WPLE_NAME . '-wizard', 'WPLEWIZARD', [
             'site'       => site_url(),
             'baredomain' => WPLE_Trait::get_root_domain( true ),
             'ajax'       => admin_url( 'admin-ajax.php' ),
@@ -199,7 +199,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.8.1', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.8.3', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }

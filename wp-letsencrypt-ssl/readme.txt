@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 7.8.3
+Stable tag: 7.8.5.0
 
 Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, Advanced Security & SSL monitoring.
 
@@ -170,6 +170,14 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.5.0 =
+* React compatibility fix
+
+= 7.8.4 =
+* PRO - LicenseID missing issue fix for CERT PANEL
+* PRO - Fixed SSL renewal issue for SSL installation via sub-directory site
+* Include www checkbox issue resolved
 
 = 7.8.2 =
 * HTTPS setup wizard for free

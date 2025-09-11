@@ -277,7 +277,7 @@
           alert('Something went wrong. Please re-try..');
         },
         success: function (response) {
-          if (response != 1) {
+          if (response != 1 && response != '1') {
             $this.removeAttr('checked');
 
             if (response == 'www') {
