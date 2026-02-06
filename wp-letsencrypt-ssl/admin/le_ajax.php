@@ -448,6 +448,8 @@ class WPLE_Ajax
             exit('Unauthorized request');
         }
 
+        WPLE_Trait::wple_logger("Wizard: Started\n", 'success', 'a', false);
+
         $newscan = isset($_POST['recheck']) ? false : true;
 
         $result = WPLE_Trait::wple_ssllabs_scan($newscan, false);
@@ -465,6 +467,8 @@ class WPLE_Ajax
         if (!current_user_can('manage_options') || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nc'])), 'wple-wizard')) {
             exit('error');
         }
+
+        WPLE_Trait::wple_logger("Wizard: Enabling HTTPS\n", 'success', 'a', false);
 
         if (is_writable(ABSPATH . '.htaccess')) {
 

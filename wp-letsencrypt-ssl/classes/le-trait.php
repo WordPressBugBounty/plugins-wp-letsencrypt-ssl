@@ -316,23 +316,29 @@ class WPLE_Trait {
         $rule .= "<IfModule mod_rewrite.c>" . "\n";
         $rule .= "RewriteEngine on" . "\n";
         $rule .= "RewriteCond %{HTTPS} !=on [NC]" . "\n";
-        if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' ) {
+        // If a proxy sets any of these headers, add a complementary RewriteCond so the redirect only fires
+        // when the proxy header does NOT indicate HTTPS.
+        if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
+            // header typically contains 'http' or 'https'
             $rule .= "RewriteCond %{HTTP:X-Forwarded-Proto} !https" . "\n";
-        } elseif ( isset( $_SERVER['HTTP_X_PROTO'] ) && $_SERVER['HTTP_X_PROTO'] == 'SSL' ) {
+        } elseif ( isset( $_SERVER['HTTP_X_PROTO'] ) ) {
             $rule .= "RewriteCond %{HTTP:X-Proto} !SSL" . "\n";
-        } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_SSL'] ) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on' ) {
-            $rule .= "RewriteCond %{HTTP:X-Forwarded-SSL} !on" . "\n";
-        } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_SSL'] ) && $_SERVER['HTTP_X_FORWARDED_SSL'] == '1' ) {
-            $rule .= "RewriteCond %{HTTP:X-Forwarded-SSL} !=1" . "\n";
-        } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) || $spmode ) {
-            $rule .= "RewriteCond %{HTTP:X-Forwarded-FOR} ^\$" . "\n";
-        } elseif ( isset( $_SERVER['HTTP_CF_VISITOR'] ) && $_SERVER['HTTP_CF_VISITOR'] == 'https' ) {
-            $rule .= "RewriteCond %{HTTP:CF-Visitor} '" . '"scheme":"http"' . "'" . "\n";
-        } elseif ( isset( $_SERVER['SERVER_PORT'] ) && '443' == $_SERVER['SERVER_PORT'] ) {
-            $rule .= "RewriteCond %{SERVER_PORT} !443" . "\n";
-        } elseif ( isset( $_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO'] ) && $_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO'] == 'https' ) {
+        } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_SSL'] ) ) {
+            // X-Forwarded-SSL can be 'on' or '1' depending on proxy; only redirect if it's neither
+            $rule .= "RewriteCond %{HTTP:X-Forwarded-SSL} !(on|1)" . "\n";
+        } elseif ( $spmode || isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+            // special proxy mode or presence of X-Forwarded-For: ensure we don't redirect when proxied
+            $rule .= "RewriteCond %{HTTP:X-Forwarded-For} ^\$" . "\n";
+        } elseif ( isset( $_SERVER['HTTP_CF_VISITOR'] ) ) {
+            // Cloudflare sends JSON like {"scheme":"https"} - avoid redirect when scheme is https
+            $rule .= 'RewriteCond %{HTTP:CF-Visitor} !\\"scheme\\":\\"https\\"' . "\n";
+        } elseif ( isset( $_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO'] ) ) {
+            // CloudFront header normally contains 'https'
             $rule .= "RewriteCond %{HTTP:CloudFront-Forwarded-Proto} !https" . "\n";
-        } elseif ( isset( $_ENV['HTTPS'] ) && 'on' == $_ENV['HTTPS'] ) {
+        } elseif ( isset( $_SERVER['SERVER_PORT'] ) && '443' == $_SERVER['SERVER_PORT'] ) {
+            // If server port is 443, ensure redirect doesn't run
+            $rule .= "RewriteCond %{SERVER_PORT} !443" . "\n";
+        } elseif ( isset( $_ENV['HTTPS'] ) && strtolower( $_ENV['HTTPS'] ) == 'on' ) {
             $rule .= "RewriteCond %{ENV:HTTPS} !=on" . "\n";
         }
         if ( is_multisite() ) {
@@ -359,7 +365,7 @@ class WPLE_Trait {
     }
 
     /**
-     * Get root domain
+     * Get root domain without http:// https://
      *
      * @since 5.3.5
      * @return string
@@ -486,6 +492,28 @@ class WPLE_Trait {
     }
 
     /**
+     * Disable X-Powered-By header
+     * 
+     * @since 7.8.5.3
+     */
+    public static function disable_xpoweredby_header() {
+        $rule = "Header always unset X-Powered-By" . "\n";
+        $finalrule = preg_replace( "/\n+/", "\n", $rule );
+        return $finalrule;
+    }
+
+    public static function wple_remove_xpoweredby() {
+        if ( is_writable( ABSPATH . '.htaccess' ) ) {
+            $htaccess = file_get_contents( ABSPATH . '.htaccess' );
+            $group = "/#\\s?BEGIN\\s?WP_Encryption_Disable_XPoweredBy.*?#\\s?END\\s?WP_Encryption_Disable_XPoweredBy/s";
+            if ( preg_match( $group, $htaccess ) ) {
+                $modhtaccess = preg_replace( $group, "", $htaccess );
+                file_put_contents( ABSPATH . '.htaccess', $modhtaccess );
+            }
+        }
+    }
+
+    /**
      * cPanel existence check
      * mx header support check
      *   
@@ -515,9 +543,48 @@ class WPLE_Trait {
                 }
             }
         }
+        //plesk detect
+        $cpURLs = array('https://' . $host . ':8443', 'http://' . $host . ':8880');
+        foreach ( $cpURLs as $cpURL ) {
+            $response = wp_remote_get( $cpURL, [
+                'headers'   => [
+                    'Connection' => 'close',
+                ],
+                'sslverify' => false,
+                'timeout'   => 20,
+            ] );
+            if ( !is_wp_error( $response ) ) {
+                $resCode = wp_remote_retrieve_response_code( $response );
+                if ( $resCode === 200 ) {
+                    //detected
+                    update_option( 'wple_have_plesk', 1 );
+                    break;
+                }
+            }
+        }
+        //directadmin detect
+        $cpURLs = array('https://' . $host . ':2222', 'http://' . $host . ':2222');
+        foreach ( $cpURLs as $cpURL ) {
+            $response = wp_remote_get( $cpURL, [
+                'headers'   => [
+                    'Connection' => 'close',
+                ],
+                'sslverify' => false,
+                'timeout'   => 20,
+            ] );
+            if ( !is_wp_error( $response ) ) {
+                $resCode = wp_remote_retrieve_response_code( $response );
+                if ( $resCode === 200 ) {
+                    //detected
+                    update_option( 'wple_have_directadmin', 1 );
+                    break;
+                }
+            }
+        }
+        //siteground detect
         if ( false !== stripos( ABSPATH, 'home/customer' ) ) {
             //SG
-            $cpanel = true;
+            update_option( 'wple_have_siteground', 1 );
         }
         if ( $cpanel ) {
             update_option( 'wple_have_cpanel', 1 );
@@ -571,7 +638,7 @@ class WPLE_Trait {
         }
         //ready
         $myssl = $sslinfo['info'];
-        $grade = ( array_key_exists( 'grade', $myssl['endpoints'][0] ) ? $myssl['endpoints'][0]['grade'] : '' );
+        $grade = ( array_key_exists( 'endpoints', $myssl ) && array_key_exists( 'grade', $myssl['endpoints'][0] ) ? $myssl['endpoints'][0]['grade'] : '' );
         if ( $grade == '' && isset( $myssl['endpoints'][1] ) ) {
             $grade = ( array_key_exists( 'grade', $myssl['endpoints'][1] ) ? $myssl['endpoints'][1]['grade'] : '' );
         }
@@ -609,11 +676,16 @@ class WPLE_Trait {
         $validTo = $myssl['certs'][0]['notAfter'];
         $isSectigo = ( false === stripos( $issuer, 'sectigo' ) ? false : true );
         update_option( 'wple_sectigo', $isSectigo );
+        $achieveAGrade = '';
+        if ( $grade != 'A' && $grade != 'A+' ) {
+            $achieveAGrade = '<span style="text-align: center; display: block; background: #eee; padding: 5px;">Achieve <b>A/A+</b> Grade with <a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing" target="_blank">PRO</a> version</span><br />';
+        }
         $html = '<div class="wple-active-ssl">
     <p>Details of <b>ACTIVE</b> SSL certificate installed & running on your site.</p>
     <div class="wple-sslgrade">
       <span class="wple-grade-' . esc_attr( $grade ) . '">' . esc_html( $grade ) . '<small>GRADE</small></span>      
     </div>
+    ' . $achieveAGrade . '
     <b>Issued To</b>: ' . esc_html( $subjectCN ) . '<br><br>';
         $html .= '<b>Issuer</b>: ' . esc_html( $issuer ) . '<br><br>';
         $html .= '<b>Alternative Names Covered</b>: <br>';
@@ -859,7 +931,7 @@ class WPLE_Trait {
                     //in progress
                     return [
                         'status' => 'inprogress',
-                        'info'   => $res['endpoints'][0]['statusDetailsMessage'],
+                        'info'   => ( array_key_exists( 'endpoints', $res ) ? ( isset( $res['endpoints'][0]['statusDetailsMessage'] ) ? $res['endpoints'][0]['statusDetailsMessage'] : '' ) : '' ),
                     ];
                 }
             }
@@ -901,6 +973,8 @@ class WPLE_Trait {
                 $to = date( 'd-m-Y', $validTo / 1000 );
                 update_option( 'wple_ssllabs_expiry', strtotime( $to ) );
                 //since 7.7.7 IMP
+                WPLE_Trait::ssl_expired_email( $to );
+                //since 7.8.5.2
                 $tenDaysToExpiry = strtotime( '-10 day', strtotime( $to ) );
                 if ( strtotime( 'now' ) >= $tenDaysToExpiry ) {
                     //already in last 10 days to expiry
@@ -935,6 +1009,36 @@ class WPLE_Trait {
         } else {
             //re-check status after 15mins
             wp_schedule_single_event( time() + 900, 'wple_ssl_expiry_update', array('recheck_status') );
+        }
+    }
+
+    public static function ssl_expired_email( $expiry_date ) {
+        $expiry_timestamp = strtotime( $expiry_date );
+        $current_timestamp = time();
+        $expired_past3days = strtotime( '+3 days', $current_timestamp );
+        if ( $current_timestamp >= $expiry_timestamp && $current_timestamp <= $expired_past3days ) {
+            $opts = get_option( 'wple_opts' );
+            $to = ( isset( $opts['email'] ) && !empty( $opts['email'] ) ? sanitize_email( $opts['email'] ) : get_option( 'admin_email' ) );
+            $subject = sprintf( esc_html__( 'URGENT: SSL Certificate for %s Has Expired', 'wp-letsencrypt-ssl' ), str_ireplace( array('https://', 'http://'), array('', ''), site_url() ) );
+            $headers = array('Content-Type: text/html; charset=UTF-8');
+            $body = 'Hello,<br /><br />';
+            $body .= '<p>SSL certificate for your site ' . esc_html( site_url() ) . ' has expired, causing your site to show an INSECURE warning. Act fast and renew your SSL before losing potential traffic. Here\'s how you can instantly renew SSL with a click of button using PRO version:</p><br /><br />';
+            $body .= '<ol>';
+            $body .= '<li>Upgrade and activate PRO version via <a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&billing_cycle=lifetime' ) . '">Upgrade Page</a> (Clicking on <b>Advanced > Proceed to insecure site</b> option shown on your browser)</li>';
+            $body .= '<li>If HSTS prevents access, try a different browser or device to reach wp-admin.</li>';
+            $body .= '<li>Once PRO is active, go to the <b>Install SSL</b> page and run the install SSL form.</li>';
+            $body .= '<li>Our plugin handles domain verification and SSL installation automatically.</li>';
+            $body .= '<li>Your site will be secure again in minutes — with <b>auto-renewal enabled</b> going forward.</li>';
+            $body .= '</ol><br />';
+            $body .= '<p>Kind regards,<br/>WP Encryption Team</p><br /><br />';
+            if ( function_exists( 'wp_mail' ) ) {
+                wp_mail(
+                    $to,
+                    $subject,
+                    $body,
+                    $headers
+                );
+            }
         }
     }
 
@@ -1019,6 +1123,25 @@ class WPLE_Trait {
                 return false;
             }
         }
+    }
+
+    /**
+     * Woo check valid SSL
+     * 
+     * @return boolean
+     */
+    public static function wple_has_valid_ssl() {
+        if ( is_ssl() ) {
+            return true;
+        }
+        // Cloudflare / reverse proxy support
+        if ( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+            return true;
+        }
+        if ( !empty( $_SERVER['HTTP_CF_VISITOR'] ) && strpos( $_SERVER['HTTP_CF_VISITOR'], 'https' ) !== false ) {
+            return true;
+        }
+        return false;
     }
 
 }

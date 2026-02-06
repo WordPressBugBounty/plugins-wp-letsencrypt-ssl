@@ -32,7 +32,8 @@ class WPLE_Deactivator {
         //disable ssl forcing
         $opts['force_ssl'] = 0;
         update_option( 'wple_opts', $opts );
-        // retained - wple_opts, wple_show_reminder, wple_send_usage, wple_error, wple_complete, wple_failed_verification, wple_mixed_issues, wple_priv_key
+        // retained - wple_opts, wple_show_reminder, wple_send_usage, wple_error, wple_complete, wple_failed_verification, wple_mixed_issues, wple_priv_key, 'wple_notice_trial', wple_certpanel_used, wple_stage, wple_malware_ignorelist, wple_activate
+        //retained headers - wple_xxss,wple_xcontenttype,wple_referrer,wple_xframe,wple_upgrade_insecure,wple_hsts,wple_httponly_cookies (stored as option name wple_httponly_cookies),wple_daily_vulnerability_scan,wple_daily_malware_scan
         $opts_to_delete = array(
             'wple_backup_suggested',
             'wple_show_review',
@@ -59,7 +60,18 @@ class WPLE_Deactivator {
             'wple_order_refreshed',
             'wple_sourceip_enable',
             'wple_parent_reachable',
-            'wple_notice_disabled_trial'
+            'wple_notice_disabled_trial',
+            'wple_security_settings',
+            'wple_sourceip',
+            'wple_mixed_issues',
+            'wple_renewal_failed_notice',
+            'wple_dismissed_notices',
+            'wple_survey_pending',
+            'wple_survey_interests',
+            'wple_vulnerability_lastscan',
+            'wple_malware_lastscan',
+            'wple_mscan_integrity',
+            'wple_activate'
         );
         foreach ( $opts_to_delete as $optname ) {
             delete_option( $optname );

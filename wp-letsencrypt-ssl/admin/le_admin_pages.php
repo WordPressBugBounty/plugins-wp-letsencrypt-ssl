@@ -80,6 +80,14 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         );
         add_submenu_page(
             'wp_encryption',
+            'Login Security - Passkeys(PRO)',
+            __( 'Login Security - Passkeys', 'wp-letsencrypt-ssl' ),
+            'manage_options',
+            'wp_encryption_login_security',
+            [$this, 'wple_login_security_page']
+        );
+        add_submenu_page(
+            'wp_encryption',
             'Download SSL Certificates',
             __( 'Download SSL Certificates', 'wp-letsencrypt-ssl' ),
             'manage_options',
@@ -102,16 +110,6 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'manage_options',
             'wp_encryption_mixed_scanner',
             [$this, 'wple_mixed_scanner_page']
-        );
-        //}
-        //since 7.8.2
-        add_submenu_page(
-            'options.php',
-            'Setup Wizard',
-            __( 'Setup Wizard', 'wp-letsencrypt-ssl' ),
-            'manage_options',
-            'wp_encryption_setup_wizard',
-            [$this, 'wple_setup_wizard_page']
         );
         add_submenu_page(
             'options.php',
@@ -180,16 +178,21 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             [$this, 'wple_upgrade_page']
         );
         global $submenu;
-        if ( is_array( $submenu ) ) {
+        if ( is_array( $submenu ) && array_key_exists( 'wp_encryption', $submenu ) ) {
             foreach ( $submenu['wp_encryption'] as $key => $val ) {
                 if ( in_array( 'wp_encryption_upgrade', $val ) ) {
                     $submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html( $submenu['wp_encryption'][$key][0] ) . '</span>';
-                    $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=upgradepro&utm_campaign=wpencryption';
+                    $submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=upgradepro&utm_campaign=wpencryption#pricing';
                     //medium=admin in june
                     ///$submenu['wp_encryption'][$key][2] = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd&billing_cycle_selector=responsive_list');
                 } else {
-                    if ( in_array( 'wp_encryption', $val ) ) {
-                        $submenu['wp_encryption'][$key][0] = 'Install SSL';
+                    if ( in_array( 'wp_encryption_login_security', $val ) ) {
+                        //$submenu['wp_encryption'][$key][0] = '<span style="color:#adff2f">' . esc_html($submenu['wp_encryption'][$key][0]) . '</span>';
+                        ///$submenu['wp_encryption'][$key][2] = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=loginsecurity&utm_campaign=wpencryption';
+                    } else {
+                        if ( in_array( 'wp_encryption', $val ) ) {
+                            $submenu['wp_encryption'][$key][0] = 'Install SSL';
+                        }
                     }
                 }
             }
@@ -285,11 +288,30 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             $leopts = get_option( 'wple_opts' );
             $prevforce = ( isset( $leopts['force_ssl'] ) ? $leopts['force_ssl'] : 0 );
             $leopts['force_ssl'] = (int) $_POST['wple_forcessl'];
-            if ( !$client && $leopts['force_ssl'] != 0 && !is_ssl() ) {
+            //reverse proxy / loadbalancer detection
+            $reverseproxy = false;
+            if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_SERVER['HTTP_X_PROTO'] ) ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_SSL'] ) ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_SERVER['HTTP_CF_VISITOR'] ) ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO'] ) ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_SERVER['SERVER_PORT'] ) && '443' == $_SERVER['SERVER_PORT'] ) {
+                $reverseproxy = true;
+            } elseif ( isset( $_ENV['HTTPS'] ) && strtolower( $_ENV['HTTPS'] ) == 'on' ) {
+                $reverseproxy = true;
+            }
+            if ( !$client && $leopts['force_ssl'] != 0 && !is_ssl() && !$reverseproxy ) {
                 $nossl = '<p>' . esc_html__( 'We could not detect valid SSL on your site!. Please double check SSL certificate is properly installed on your cPanel / Server. You can also try opening wp-admin via https:// and then enable force HTTPS.', 'wp-letsencrypt-ssl' ) . '</p>';
                 $nossl .= '<p>' . esc_html__( 'Switching to HTTPS without properly installing the SSL certificate might break your site.', 'wp-letsencrypt-ssl' ) . '</p>';
                 $nossl .= '<a href="?page=wp_encryption&forceenablehttps=' . wp_create_nonce( 'hardforcessl' ) . '&forcetype=' . (int) $leopts['force_ssl'] . '" style="background: #f55656; color: #fff; padding: 10px; text-decoration: none; border-radius: 5px;        display: inline-block; margin:0 0 10px;"><strong>' . esc_html__( 'CLICK TO FORCE ENABLE HTTPS (Do it at your own risk)', 'wp-letsencrypt-ssl' ) . '</strong></a><br />
-        <small>' . sprintf( esc_html__( 'In case you break the site, here is revert back to HTTP:// instructions - %s', 'wp-letsencrypt-ssl' ), 'https://wordpress.org/support/topic/locked-out-unable-to-access-site-after-forcing-https-2/' ) . '</small>';
+                <small>' . sprintf( esc_html__( 'In case you break the site, here is revert back to HTTP:// instructions - %s', 'wp-letsencrypt-ssl' ), 'https://wordpress.org/support/topic/locked-out-unable-to-access-site-after-forcing-https-2/' ) . '</small>';
                 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
                 wp_die( $nossl );
                 exit;
@@ -299,14 +321,19 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             }
             update_option( 'wple_opts', $leopts );
             if ( $leopts['force_ssl'] != 0 ) {
-                update_option( 'siteurl', str_ireplace( 'http:', 'https:', get_option( 'siteurl' ) ) );
-                update_option( 'home', str_ireplace( 'http:', 'https:', get_option( 'home' ) ) );
+                if ( !isset( $_SERVER['HTTP_CF_VISITOR'] ) ) {
+                    //avoid redirection loop with cloudflare flexible ssl
+                    update_option( 'siteurl', str_ireplace( 'http:', 'https:', get_option( 'siteurl' ) ) );
+                    update_option( 'home', str_ireplace( 'http:', 'https:', get_option( 'home' ) ) );
+                }
                 if ( $leopts['force_ssl'] == 1 ) {
+                    //wordpress redirect
                     if ( $prevforce == 2 ) {
                         $this->wple_clean_htaccess();
                     }
                     ///WPLE_Trait::wple_send_reverter_secret($reverter);
                 } elseif ( $leopts['force_ssl'] == 2 ) {
+                    //htaccess redirect
                     $this->wple_force_ssl_htaccess();
                 }
             } else {
@@ -579,10 +606,15 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     }
 
     public function wple_mixed_scanner_page() {
-        $html = '<h2>' . esc_html__( 'Advanced Insecure Content Scanner', 'wp-letsencrypt-ssl' ) . '</h2><p style="margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;">' . WPLE_Trait::wple_kses( __( 'Scan your entire site (public posts + pages) for mixed/insecure content issues that are causing secure browser padlock to not show even if SSL certificate is installed correctly. SOURCE column shows you where the insecure url is coming from, you can easily find the mixed content url and update it to https:// to resolve the issue. Issues arising from Widgets or Inline are global issues which could be breaking HTTPS padlock on several of your webpages. Resolve the issues, reload and re-scan to confirm everything is resolved.', 'wp-letsencrypt-ssl' ) ) . '.</p>';
-        $html .= "<p style=\"margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;font-style:italic;color:#666;\">We're working hard to add more features. Please consider upgrading to <a href=\"https://wpencryption.com/?utm_source=wordpress&utm_medium=admin&utm_campaign=wpencryption#pricing\">PRO</a> version if you wish to support the development.</p>";
+        $html = '<h2>' . esc_html__( 'Advanced Insecure Content Scanner', 'wp-letsencrypt-ssl' ) . '</h2><p style="margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;">' . WPLE_Trait::wple_kses( __( 'Scan your entire site (including public posts and pages) for mixed or insecure content that may prevent the secure browser padlock from appearing, even when your SSL certificate is correctly installed. The SOURCE column identifies where each insecure URL originates, making it easy to locate and update those links to https://. Issues flagged as Widgets or Inline are global in nature and may affect multiple pages across your site. After resolving the issues, reload your site and run another scan to confirm that everything is fully secured.', 'wp-letsencrypt-ssl' ) ) . '.</p>';
+        $html .= '<p style="margin:20px;text-align: center;font-size: 16px;line-height: 30px;">
+        <span style="text-align:left;display:inline-block;">
+        <input style="opacity: 1 !important; border: 1px solid #ccc;" type="checkbox" value="1" name="wple-mx-woocommerce" class="wple-mx-woocommerce" disabled/> Scan WooCommerce pages including products, cart, checkout and  account (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=woocommerce&utm_campaign=wpencryption#pricing" target="_blank">PRO</a>)<br />
+        <input style="opacity: 1 !important; border: 1px solid #ccc;" type="checkbox" value="1" name="wple-mx-elementor" class="wple-mx-elementor" disabled/> Run advanced scan for Elementor page builder (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=elementor&utm_campaign=wpencryption#pricing" target="_blank">PRO</a>)
+        </span>
+        </p>';
         $html .= '<div id="wple-scanner">
-    <button class="wple-scan" data-nc="' . wp_create_nonce( 'wplemixedscanner' ) . '">' . esc_html__( 'START THE SCAN', 'wp-letsencrypt-ssl' ) . '</button>
+    <button class="wple-scan" style="margin-top:40px" data-nc="' . wp_create_nonce( 'wplemixedscanner' ) . '">' . esc_html__( 'START THE SCAN', 'wp-letsencrypt-ssl' ) . '</button>
     </div>';
         $html .= '<div id="wple-scanner-iframe">
     <div class="wple-scanbar"></div>    
@@ -706,9 +738,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'httponly_cookies'    => 'HttpOnly secure cookies enabled',
             'ssl_monitoring'      => 'SSL monitoring enabled',
             'tls_version'         => 'TLS version up-to-date',
-            'ssl_auto_renew'      => 'SSL certificate is set to auto renew (<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
-            'advanced_security'   => 'Advanced security headers enabled (<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
-            'improve_security'    => 'Improve security with WP Encryption Pro (<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'ssl_auto_renew'      => 'SSL certificate is set to auto renew (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'advanced_security'   => 'Advanced security headers enabled (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
+            'improve_security'    => 'Improve security with WP Encryption Pro (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>)',
         );
         $score = 0;
         $featurelist = '<ul>';
@@ -867,10 +899,20 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
     <h2>Security Headers</h2>
     <ul>';
         foreach ( $sec_headers as $optlabel => $optarr ) {
-            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
+            $output .= '<li><label>' . str_ireplace( 'Premium', '<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing">Premium</a>', esc_html( $optlabel ) ) . ' <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="' . esc_attr( $optarr['desc'] ) . '"></span></label>';
             $disabled = ( isset( $optarr['premium'] ) ? $optarr['premium'] : 0 );
+            $isActive = get_option( "wple_" . esc_attr( $optarr['key'] ) );
+            $viaSecondary = false;
+            $alreadyEnabled = '<span></span>';
+            if ( in_array( $optarr['key'], $enabledViaAlternate ) ) {
+                $viaSecondary = 1;
+            }
+            //Not activated from wp-encryption but its already active
+            if ( !$isActive && $viaSecondary ) {
+                $alreadyEnabled = '<span class="dashicons dashicons-info-outline wple-tooltip" style="margin: 7px 0; color: #ff8900;" data-tippy="We have detected that this header is already enforced via other sources like wp-config, htaccess or php.ini"></span>';
+            }
             $output .= '<div class="plan-toggler" style="text-align: left; margin: 40px 0 0px;">
-      <span></span>
+      ' . $alreadyEnabled . '
       <label class="toggle">
       <input class="toggle-checkbox wple-setting" data-opt="' . esc_attr( $optarr['key'] ) . '" type="checkbox" ' . checked( get_option( "wple_" . esc_attr( $optarr['key'] ) ), "1", false ) . disabled( $disabled, '1', false ) . '>
       <div class="toggle-switch disabled' . intval( $disabled ) . '" style="transform: scale(0.6);"></div>
@@ -880,7 +922,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             $output .= '</li>';
         }
         $output .= '<li class="wple-setting-error"><label>' . __( 'You must have a valid SSL certificate installed on your site before enabling this feature', 'wp-letsencrypt-ssl' ) . '!.</label></li>
-    <li class="wple-sec-scanner"><a href="https://securityheaders.com/" target="_blank" rel="nofollow">Security Header Scanner <span class="dashicons dashicons-external"></span></a></li>';
+    <li class="wple-sec-scanner"><a href="https://scan.wpencryption.com/?domain=' . esc_attr( site_url() ) . '" target="_blank">Security Header Scanner <span class="dashicons dashicons-external"></span></a></li>';
         $output .= '</ul>';
         $output .= '</div>';
         return $output;
@@ -1270,7 +1312,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         }
         $output .= '</ul>
 
-            <div id="wple-vulnerability-scanner">
+            <div id="wple-vulnerability-scanner" class="wple-malware-scanner">
                 <div class="wple-vuln-count">
                 <div class="wple-malware-results wple-vuln-countinner ' . esc_attr( $vulnerabilityexists ) . '">
                 <a href="' . admin_url( '/admin.php?page=wp_encryption_malware_scan' ) . '" target="_blank" title="View report">
@@ -1384,7 +1426,7 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             }
             $vuln_table .= '</tbody>
       </table>';
-            $vuln_table .= '<div class="wple-vuln-pro">Above vulnerablities might exist on your site since many days!. Upgrade to Pro version & be notified as soon as a vulnerability is found in automated DAILY scan.</div>';
+            $vuln_table .= '<div class="wple-vuln-pro">' . esc_html__( 'Potential vulnerabilities may have existed on your site for days—undetected. Upgrade to the Pro version and get instant alerts the moment a threat is found, thanks to our automated daily security scans.', 'wp-letsencrypt-ssl' ) . '</div>';
         }
         $vuln_style = '';
         if ( !get_option( 'wple_vulnerability_scan' ) ) {
@@ -1489,8 +1531,12 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
                 'desc'  => 'RSS & Atom feeds can be used to read your site content and even site scraping. If you are not using feeds to share your site content, you can disable it here.',
             ],
             'deny_php_uploads'          => [
-                'label' => 'Deny php execution in uploads directory',
-                'desc'  => 'Deny execution of any php files inside wp-content/uploads/ directory which is meant for images & files.',
+                'label' => __( 'Deny php execution in uploads directory', 'wp-letsencrypt-ssl' ),
+                'desc'  => __( 'Deny execution of any php files inside wp-content/uploads/ directory which is meant for images & files.', 'wp-letsencrypt-ssl' ),
+            ],
+            'disable_poweredby'         => [
+                'label' => __( 'Disable X-Powered-By header', 'wp-letsencrypt-ssl' ),
+                'desc'  => __( 'Remove the X-Powered-By header from HTTP responses to prevent information disclosure.', 'wp-letsencrypt-ssl' ),
             ],
         );
         $output = '<form id="wple-security-settings" data-update="' . wp_create_nonce( 'wple_security' ) . '">
@@ -1551,6 +1597,10 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
                     } else {
                         if ( $key == 'disable_directory_listing' ) {
                             $security_class->wple_disable_directory_listing( true );
+                        } else {
+                            if ( $key == 'disable_poweredby' ) {
+                                $security_class->wple_disable_x_poweredby_header( true );
+                            }
                         }
                     }
                 }
@@ -1569,6 +1619,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         }
         if ( in_array( 'disable_directory_listing', $prevopts ) && !in_array( 'disable_directory_listing', $save ) ) {
             $security_class->wple_disable_directory_listing( false );
+        }
+        if ( in_array( 'disable_poweredby', $prevopts ) && !in_array( 'disable_poweredby', $save ) ) {
+            $security_class->wple_disable_x_poweredby_header( false );
         }
         update_option( 'wple_security_settings', $save );
         echo 1;
@@ -1626,13 +1679,24 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         }
         $html .= ' 
       <div id="wple-upgradepro">';
+        $servertype = esc_html( $_SERVER['SERVER_SOFTWARE'] );
         if ( FALSE !== $cp && $cp ) {
-            $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>CPANEL</b>! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
-            ///$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd');
+            $servertype = 'CPANEL';
         } else {
-            $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! Your site is on <b>' . esc_html( $_SERVER['SERVER_SOFTWARE'] ) . '</b> server! Why struggle with manual SSL renewal every 90 days? - Enjoy 100% automation with PRO version.</strong>';
+            if ( get_option( 'wple_have_plesk' ) ) {
+                $servertype = 'PLESK';
+            } else {
+                if ( get_option( 'wple_have_directadmin' ) ) {
+                    $servertype = 'DIRECTADMIN';
+                } else {
+                    if ( get_option( 'wple_have_siteground' ) ) {
+                        $servertype = 'SITEGROUND';
+                    }
+                }
+            }
         }
-        $compareurl = 'https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
+        $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>' . esc_html( $servertype ) . '</b>! Avoid manual SSL renewals every 90 days - Enjoy automatic renewal with PRO version.</strong>';
+        $compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption';
         //$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
         if ( $nopricing ) {
             $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
@@ -1723,14 +1787,36 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         $html .= '</div><!--wple-upgradepro-->';
     }
 
-    public function wple_setup_wizard_page() {
-        $html = '<h2>' . esc_html__( 'Setup Wizard', 'wp-letsencrypt-ssl' ) . '</h2>';
-        $html .= '<div id="wple-setup-wrapper">
-        <p style="text-align:center;margin:-20px 20px 40px;">This wizard will guide you through the setup process while analyzing & validating your SSL certificate and enforcing HTTPS throughout the site.</p>
-        <div id="wple-setup-wizard">...</div>
+    /**
+     * Login security page
+     * 
+     * @since 7.8.5.3a
+     * @return void
+     */
+    public function wple_login_security_page() {
+        $html = '<div id="wple-ssl-health" class="wple-login-security">';
+        $actions_ul = '<ul><li>
+        <span>
+          <h4>Passwordlesss secure login using passkeys</h4>
+          <small></small>
+        </span>
+        <button class="wple-actions">Enable</button>
+        </li></ul>
+
+      <span class="wple-premium-actions">
+      <span>
+      <p>' . esc_html__( 'No passwords. No brute force. Just secure, frictionless login with passkey-based WebAuthn - powered by your browser and protected by fingerprint, Face ID, or device PIN.', 'wp-letsencrypt-ssl' ) . '</p>
+      <a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=loginsecurity&utm_campaign=wpencryption">' . esc_html__( 'Go Pro', 'wp-letsencrypt-ssl' ) . '</a>
+      </span>
+      </span>';
+        $html .= '<div class="wple-ssl-settings wple-loginsecurity" style="width: 100% !important; min-height: 300px;">
+        <div style="text-align: center; padding: 20px;"><img src="' . WPLE_URL . '/admin/assets/wple-login.png" style="max-width:250px"/></div>
+        <div id="wple-sec-actions">
+        ' . $actions_ul . '    
+        </div>
         </div>';
-        $this->wple_upgrade_promo_block( $html );
-        $this->generate_page( $html );
+        $html .= '</div>';
+        echo $html;
     }
 
 }

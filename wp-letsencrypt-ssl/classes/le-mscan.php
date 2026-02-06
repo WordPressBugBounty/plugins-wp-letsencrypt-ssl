@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * WordPress Integrity Scanner
+ */
+
 if (! defined('ABSPATH')) exit; // Exit if accessed directly
 
 class WPLE_Mscan

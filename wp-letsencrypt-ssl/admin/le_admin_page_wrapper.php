@@ -80,7 +80,7 @@ class WPLE_Admin_Page
             $htaccess = file_get_contents(ABSPATH . '.htaccess');
 
             if (stripos($htaccess, 'WP_Encryption_Force_SSL') === false) {
-                $getrules = WPLE_Trait::compose_htaccess_rules();
+                $getrules = WPLE_Trait::compose_htaccess_rules(); //also updates siteurl and home url to https
 
                 $wpruleset = "# BEGIN WordPress";
 

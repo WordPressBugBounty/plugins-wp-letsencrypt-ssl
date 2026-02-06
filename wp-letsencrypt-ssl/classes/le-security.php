@@ -189,6 +189,28 @@ if ( !class_exists( 'WPLE_Security' ) ) {
         }
 
         /**
+         * Disable X-Powered-By header
+         */
+        public function wple_disable_x_poweredby_header( $enable = true ) {
+            if ( !is_writable( ABSPATH . '.htaccess' ) ) {
+                echo 0;
+                //alert Could not update setting! Please try again.
+                exit;
+            }
+            if ( $enable ) {
+                //add request
+                if ( is_writable( ABSPATH . '.htaccess' ) ) {
+                    WPLE_Trait::wple_remove_xpoweredby();
+                    $getrules = WPLE_Trait::disable_xpoweredby_header();
+                    insert_with_markers( ABSPATH . '.htaccess', 'WP_Encryption_Disable_XPoweredBy', $getrules );
+                }
+            } else {
+                //remove request
+                WPLE_Trait::wple_remove_xpoweredby();
+            }
+        }
+
+        /**
          * Remove RSS & Atom feeds
          */
         public function wple_remove_feeds() {
@@ -360,6 +382,7 @@ if ( !class_exists( 'WPLE_Security' ) ) {
         }
 
         public static function wple_feature_check( $key ) {
+            $rootdomain = WPLE_Trait::get_root_domain( false );
             switch ( $key ) {
                 case 'valid_ssl':
                     $rootdomain = WPLE_Trait::get_root_domain( false );
@@ -371,7 +394,6 @@ if ( !class_exists( 'WPLE_Security' ) ) {
                     update_option( 'wple_ssl_valid', false );
                     break;
                 case 'ssl_redirect':
-                    $rootdomain = WPLE_Trait::get_root_domain( false );
                     $gethead = wp_remote_head( 'http://' . $rootdomain, array(
                         'sslverify'   => false,
                         'redirection' => 0,
@@ -398,8 +420,23 @@ if ( !class_exists( 'WPLE_Security' ) ) {
                         return 2;
                     }
                     break;
-                case 'mixed_content_fixer':
                 case 'hsts':
+                    $gethead = wp_remote_head( 'http://' . $rootdomain, array(
+                        'sslverify'   => false,
+                        'redirection' => 1,
+                        'timeout'     => 10,
+                    ) );
+                    if ( !is_wp_error( $gethead ) ) {
+                        $privatearray = $gethead['headers']->getAll();
+                        if ( isset( $privatearray['strict-transport-security'] ) ) {
+                            return 2;
+                        }
+                    }
+                    if ( get_option( 'wple_' . $key ) ) {
+                        return 1;
+                    }
+                    break;
+                case 'mixed_content_fixer':
                 case 'ssl_monitoring':
                     if ( get_option( 'wple_' . $key ) ) {
                         return 1;
@@ -422,7 +459,7 @@ if ( !class_exists( 'WPLE_Security' ) ) {
                         curl_close( $ch );
                         $json = json_decode( $json );
                         if ( !empty( $json->tls_version ) ) {
-                            $tls = str_replace( "TLS ", "", $json->tls_version );
+                            $tls = str_replace( "TLS ", "", sanitize_text_field( $json->tls_version ) );
                         }
                     }
                     if ( version_compare( $tls, '1.2', '>=' ) ) {

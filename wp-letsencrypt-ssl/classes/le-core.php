@@ -167,7 +167,8 @@ class WPLE_Core {
                 $PRO .= 'SG ';
             }
             $PRO .= $cpanel;
-            $this->wple_log( '<b>' . WPLE_PLUGIN_VER . ' ' . $PRO . ' - ' . esc_html( site_url() ) . ' - ' . esc_html( $storage ) . '</b>', 'success', 'w' );
+            $interests_survey = get_option( 'wple_survey_interests' );
+            $this->wple_log( '<b>' . WPLE_PLUGIN_VER . ' ' . $PRO . ' - ' . esc_html( site_url() ) . ' - ' . esc_html( $storage ) . ' (' . esc_html( $interests_survey ) . ')</b>', 'success', 'w' );
             $this->wple_log( "Domain covered:\n" . json_encode( $this->domains ) . "\n" );
         }
         //since v6.6
@@ -618,7 +619,7 @@ class WPLE_Core {
         $subject = sprintf( esc_html__( 'Congratulations! Your SSL certificates for %s generated using WP Encryption Plugin', 'wp-letsencrypt-ssl' ), WPLE_Trait::get_root_domain() );
         $headers = array('Content-Type: text/html; charset=UTF-8');
         $body = '<h3>' . esc_html__( 'You are just ONE step away from enabling HTTPS for your WordPress site', 'wp-letsencrypt-ssl' ) . '</h3>';
-        $body .= '<p>' . esc_html__( 'Download the generated SSL certificates from below given links and install it on your cPanel following the video tutorial', 'wp-letsencrypt-ssl' ) . ' (https://youtu.be/KQ2HYtplPEk). ' . esc_html__( 'These certificates expires on', 'wp-letsencrypt-ssl' ) . ' <b>' . esc_html( $opts['expiry'] ) . '</b></p>
+        $body .= '<p>' . esc_html__( 'Download the generated SSL certificates from below given links and install it on your cPanel following the video tutorial', 'wp-letsencrypt-ssl' ) . ' (https://youtu.be/KQ2HYtplPEk). ' . esc_html__( 'These certificates expires on', 'wp-letsencrypt-ssl' ) . ' <b>' . esc_html( $opts['expiry'] ) . '</b> so you will have to generate new certificate & install it manually before it expires.</p>
         <br/>
         <a href="' . admin_url( '/admin.php?page=wp_encryption&le=1', 'http' ) . '" style="background: #0073aa; text-decoration: none; color: #fff; padding: 12px 20px; display: inline-block; margin: 10px 10px 10px 0; font-weight: bold;">' . esc_html__( 'Download Cert File', 'wp-letsencrypt-ssl' ) . '</a>
       <a href="' . admin_url( '/admin.php?page=wp_encryption&le=2', 'http' ) . '" style="background: #0073aa; text-decoration: none; color: #fff; padding: 12px 20px; display: inline-block; margin: 10px; font-weight: bold;">' . esc_html__( 'Download Key File', 'wp-letsencrypt-ssl' ) . '</a>
@@ -626,7 +627,7 @@ class WPLE_Core {
       <br/>';
         ///if (FALSE == get_option('wple_no_pricing')) {
         $body .= '<br /><br />';
-        $body .= '<b>' . esc_html__( 'WP Encryption PRO can automate this entire process in one click including SSL installation on cPanel hosting and auto renewal of certificates every 90 days', 'wp-letsencrypt-ssl' ) . '!. <br><a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' ) . '" style="background: #0073aa; text-decoration: none; color: #fff; padding: 12px 20px; display: inline-block; margin: 10px 0; font-weight: bold;">' . esc_html__( 'UPGRADE TO PREMIUM', 'wp-letsencrypt-ssl' ) . '</a></b><br /><br />';
+        $body .= '<b>' . esc_html__( 'WP Encryption PRO can automate this entire process in one click including SSL installation on cPanel hosting and auto renewal of certificates every 90 days', 'wp-letsencrypt-ssl' ) . '!. <br><a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=lifetime&pricing_id=7965&currency=usd' ) . '" style="background: #0073aa; text-decoration: none; color: #fff; padding: 12px 20px; display: inline-block; margin: 10px 0; font-weight: bold;">' . esc_html__( 'UPGRADE TO PREMIUM', 'wp-letsencrypt-ssl' ) . '</a></b><br /><br />';
         $body .= "<h3>" . esc_html__( "Don't have cPanel hosting?", 'wp-letsencrypt-ssl' ) . "</h3>";
         $body .= '<p>No cPanel? No problem! Secure your site effortlessly with our <a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' ) . '"><strong>Annual Pro plan</strong><a> designed to work across ANY hosting platform.' . WPLE_Trait::wple_kses( __( 'With free version, You can download and send these SSL certificates to your hosting support asking them to install these SSL certificates.', 'wp-letsencrypt-ssl' ) ) . '</p><br /><br />';
         ///}

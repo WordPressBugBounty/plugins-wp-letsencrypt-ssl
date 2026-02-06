@@ -698,13 +698,20 @@
 
         if ($opt == 'vulnerability_scan') {
           if ($val == 1) {
-            $('#wple-vulnerability-scanner').show();
+            $('#wple-vulnerability-scanner:not(.wple-malware-scanner)').show();
           } else {
-            $('#wple-vulnerability-scanner').hide();
+            $('#wple-vulnerability-scanner:not(.wple-malware-scanner)').hide();
           }
         }
 
         $('.wple-score').text($new_score);
+        //append html to sibiling label
+        var $label = $this.closest('li').children('label').first();
+        var $saved = $("<span class='wple-opt-saved'>Saved!</span>");
+        $label.append($saved);
+        $saved.delay(2000).fadeOut(400, function () {
+          $(this).remove();
+        });
       },
     });
   });

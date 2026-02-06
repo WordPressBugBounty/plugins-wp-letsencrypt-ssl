@@ -3,11 +3,11 @@ Contributors: gowebsmarty, gwsharsha
 Tags: free ssl,ssl,https,https redirect,force https,security
 Requires at least: 5.4
 License: GPL3
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 7.8.5.0
+Stable tag: 7.8.5.10
 
-Lifetime SSL solution - Install free SSL certificate & enable HTTPS redirect, HTTPS mail, fix SSL errors, SSL score, Advanced Security & SSL monitoring.
+Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, SSL score, SSL monitoring, really simple setup.
 
 == Description ==
 
@@ -27,17 +27,19 @@ https://youtu.be/jrkFwFH7r6o
 * Advanced security headers & SSL monitoring
 * Top notch one to one priority support - Live Chat, Email, Premium Support Forum
 * SSL installation help for non-cPanel sites
+* Login security via passkeys (powered by WebAuthn) - No passwords. No brute force. Log in with passkeys protected by your browser or password manager — fast, secure, and frictionless.
 * Automated daily vulnerability scanning & reporting.
 * Automated daily malware & integrity scan
 * Instant notification for threats & security issues
 
-[BUY PREMIUM VERSION](https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=premiumfeatures&utm_campaign=wpencryption)
+[BUY PREMIUM VERSION](https://wpencryption.com/?utm_source=wordpress&utm_medium=premiumfeatures&utm_campaign=wpencryption)
 
 ### 5M+ SSL certificates generated - Switch to HTTPS easily ###
 
 https://youtu.be/aKvvVlAlZ14
 
 == FREE SSL PLUGIN FEATURES ==
+* Unlock every premium feature other plugins charge for — absolutely Free.
 * Verify domain ownership and generate free SSL certificate
 * Secure webmail and email with HTTPS
 * Download generated SSL certificate, key and Intermediate certificate files
@@ -72,7 +74,12 @@ Safeguard your site from cross-site scripting attacks, clickjacking, MIME sniffi
 
 * SSL encryption ensures protection against man-in-middle attacks by securely encrypting the data transfer between client and your server.
 
-== Why does My WordPress site need SSL? ==
+== Optimized for Cloudflare and Reverse Proxies ==
+* Forcing HTTPS using the .htaccess method prevents redirect loops when your site is behind Cloudflare.
+
+* Compatible with reverse proxies and load balancers — avoids redirection conflicts.
+
+== Top Reasons Your WordPress Site Needs an SSL Certificate ==
 1. SEO Benefit: Major search engines like Google ranks SSL enabled sites higher compared to non SSL sites. Thus bringing more organic traffic for your site.
 
 2. Data Encryption: Data transmission between server and visitor are securely encrypted on a SSL site thus avoiding any data hijacks in-between the transmission(Ex: personal information, credit card information).
@@ -170,6 +177,44 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.5.10 =
+* Resolved issue with mixed content scanner
+* removed checkout security page notice 
+
+= 7.8.5.9 = 
+* Freemius sdk updated
+* Delete options upon plugin de-activation
+* Next step after SSL installation success
+
+= 7.8.5.8 =
+* PRO - Intermediate CA support for Plesk SSL install
+* Detect when Strict-Transport-Security header is already enabled
+* Settings Saved animation
+* CSS fixes
+
+= 7.8.5.7 =
+* PRO - license not active note in log during renewal
+* PRO - DirectAdmin automatic SSL install
+* Free - New security headers scanner
+* cPanel, Plesk, DirectAdmin detection
+
+= 7.8.5.6 =
+* removed interests survey
+
+= 7.8.5.5 =
+* Cloudflare compatibility improvements
+
+= 7.8.5.4 =
+* Skipped ignored versions
+* php warning fix
+* security setting to disable X-Powered-By header
+* login security page
+
+
+= 7.8.5.1 =
+* freemius hooks & custom css
+* cherry picked commits
 
 = 7.8.5.0 =
 * React compatibility fix

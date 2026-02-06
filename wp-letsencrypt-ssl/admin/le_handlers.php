@@ -6,6 +6,7 @@ if ( !defined( 'ABSPATH' ) ) {
 // Exit if accessed directly
 require_once WPLE_DIR . 'classes/le-core.php';
 require_once WPLE_DIR . 'classes/le-mscan.php';
+require_once WPLE_DIR . 'classes/le-trait.php';
 /**
  * Todo:
  * A file to disable force https completely when site lockout
@@ -14,6 +15,7 @@ class WPLE_Handler {
     public function __construct() {
         add_action( 'admin_init', [$this, 'admin_init_handlers'], 1 );
         add_action( 'wp_ajax_wple_wizard_generatessl', [$this, 'wple_wizard_generatessl'] );
+        add_action( 'wp_ajax_wple_interests_survey', [$this, 'wple_interests_survey'] );
     }
 
     public function admin_init_handlers() {
@@ -158,11 +160,13 @@ class WPLE_Handler {
     public function wple_intro_pricing_handler() {
         $goplan = '';
         if ( isset( $_GET['gofree'] ) ) {
+            set_transient( 'wple_plan_chosen', true, 7 * DAY_IN_SECONDS );
             update_option( 'wple_plan_choose', 1 );
             wp_redirect( admin_url( '/admin.php?page=wp_encryption' ), 302 );
             exit;
         } else {
             if ( isset( $_GET['gopro'] ) ) {
+                set_transient( 'wple_plan_chosen', true, 7 * DAY_IN_SECONDS );
                 update_option( 'wple_plan_choose', 1 );
                 if ( $_GET['gopro'] == 2 ) {
                     //unlimited
@@ -179,12 +183,14 @@ class WPLE_Handler {
                 exit;
             } else {
                 if ( isset( $_GET['gofirewall'] ) ) {
+                    set_transient( 'wple_plan_chosen', true, 7 * DAY_IN_SECONDS );
                     update_option( 'wple_plan_choose', 1 );
                     ///wp_redirect(admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd'), 302);
                     wp_redirect( admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' ), 302 );
                     exit;
                 } else {
                     if ( isset( $_GET['gositelock'] ) ) {
+                        set_transient( 'wple_plan_chosen', true, 7 * DAY_IN_SECONDS );
                         update_option( 'wple_plan_choose', 1 );
                         ///wp_redirect(admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd'), 302);
                         wp_redirect( admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=20784&plan_name=sitelock&billing_cycle=annual&currency=usd' ), 302 );
@@ -360,6 +366,12 @@ class WPLE_Handler {
             ] );
             exit;
         }
+        WPLE_Trait::wple_logger(
+            "Wizard: Generating SSL\n",
+            'success',
+            'a',
+            false
+        );
         // SSL generation logic here
         $leopts = array(
             'email'           => get_option( 'admin_email' ),
@@ -387,6 +399,20 @@ class WPLE_Handler {
         $leopts['wizard'] = 1;
         //flag for wizard
         echo new WPLE_Core($leopts);
+        exit;
+    }
+
+    public function wple_interests_survey() {
+        if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nc'] ) ), 'wple-survey' ) || !current_user_can( 'manage_options' ) ) {
+            echo 'Unauthorized request!';
+            exit;
+        }
+        $interests = ( isset( $_POST['data'] ) ? json_decode( wp_unslash( $_POST['data'] ), false ) : array() );
+        $interests = array_map( 'sanitize_text_field', $interests );
+        update_option( 'wple_survey_interests', json_encode( $interests ) );
+        ///WPLE_Trait::wple_logger("Survey: " . json_encode($interests) . "\n", 'info', 'a', false);
+        delete_transient( 'wple_survey_pending' );
+        echo 1;
         exit;
     }
 
