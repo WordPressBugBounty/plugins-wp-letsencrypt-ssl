@@ -24,6 +24,10 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+if (!defined('ABSPATH')) {
+    die('Access Denied');
+}
+
 require_once WPLE_DIR . 'classes/le-trait.php';
 
 class WPLE_Admin_Page

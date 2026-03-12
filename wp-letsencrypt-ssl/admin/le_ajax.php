@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    die('Access Denied');
+}
+
 use WPLEClient\LEFunctions;
 
 require_once WPLE_DIR . 'classes/le-trait.php';

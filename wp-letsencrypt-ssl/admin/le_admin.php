@@ -33,8 +33,8 @@ if ( !defined( 'ABSPATH' ) ) {
  * 
  * @since 5.1.1
  */
-require_once plugin_dir_path( __DIR__ ) . 'vendor/autoload.php';
 use WPLEClient\LEFunctions;
+//since php5.3.0
 require_once WPLE_DIR . 'admin/le_ajax.php';
 require_once WPLE_DIR . 'admin/le_handlers.php';
 require_once WPLE_DIR . 'classes/le-core.php';
@@ -191,7 +191,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.8.5.7', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.8.5.10', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
@@ -1314,15 +1314,10 @@ class WPLE_Admin {
         //since 5.1.0
         if ( isset( $_GET['restart'] ) ) {
             //click to restart from beginning
+            if ( !current_user_can( 'manage_options' ) ) {
+                exit( 'Unauthorized request' );
+            }
             delete_option( 'wple_ssl_screen' );
-            wp_redirect( admin_url( '/admin.php?page=wp_encryption' ), 302 );
-            exit;
-        }
-        if ( isset( $_GET['force_complete'] ) ) {
-            //Forced SSL completion flag
-            update_option( 'wple_ssl_screen', 'success' );
-            update_option( 'wple_backend', 1 );
-            WPLE_Trait::clear_all_renewal_crons( true );
             wp_redirect( admin_url( '/admin.php?page=wp_encryption' ), 302 );
             exit;
         }

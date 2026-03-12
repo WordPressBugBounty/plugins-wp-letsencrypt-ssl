@@ -1810,12 +1810,13 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
       </span>
       </span>';
         $html .= '<div class="wple-ssl-settings wple-loginsecurity" style="width: 100% !important; min-height: 300px;">
-        <div style="text-align: center; padding: 20px;"><img src="' . WPLE_URL . '/admin/assets/wple-login.png" style="max-width:250px"/></div>
+        <div style="text-align: center; padding: 20px;"><img src="' . esc_attr( WPLE_URL ) . '/admin/assets/wple-login.png" style="max-width:250px"/></div>
         <div id="wple-sec-actions">
         ' . $actions_ul . '    
         </div>
         </div>';
         $html .= '</div>';
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
         echo $html;
     }
 

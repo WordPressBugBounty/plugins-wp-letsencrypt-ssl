@@ -7,17 +7,39 @@ namespace Composer\Autoload;
 class ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982
 {
     public static $prefixLengthsPsr4 = array (
-        'W' => 
+        'W' =>
         array (
+            'WPLE\\' => 5,
             'WPLEClient\\' => 11,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPLEClient\\' => 
+        'WPLE\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/classes',
+        ),
+        'WPLEClient\\' =>
         array (
             0 => __DIR__ . '/../..' . '/lib',
         ),
+    );
+
+    public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'WPLEClient\\Exceptions\\LEAccountException' => __DIR__ . '/../..' . '/lib/Exceptions/LEAccountException.php',
+        'WPLEClient\\Exceptions\\LEAuthorizationException' => __DIR__ . '/../..' . '/lib/Exceptions/LEAuthorizationException.php',
+        'WPLEClient\\Exceptions\\LEClientException' => __DIR__ . '/../..' . '/lib/Exceptions/LEClientException.php',
+        'WPLEClient\\Exceptions\\LEConnectorException' => __DIR__ . '/../..' . '/lib/Exceptions/LEConnectorException.php',
+        'WPLEClient\\Exceptions\\LEException' => __DIR__ . '/../..' . '/lib/Exceptions/LEException.php',
+        'WPLEClient\\Exceptions\\LEFunctionsException' => __DIR__ . '/../..' . '/lib/Exceptions/LEFunctionsException.php',
+        'WPLEClient\\Exceptions\\LEOrderException' => __DIR__ . '/../..' . '/lib/Exceptions/LEOrderException.php',
+        'WPLEClient\\LEAccount' => __DIR__ . '/../..' . '/lib/LEAccount.php',
+        'WPLEClient\\LEAuthorization' => __DIR__ . '/../..' . '/lib/LEAuthorization.php',
+        'WPLEClient\\LEClient' => __DIR__ . '/../..' . '/lib/LEClient.php',
+        'WPLEClient\\LEConnector' => __DIR__ . '/../..' . '/lib/LEConnector.php',
+        'WPLEClient\\LEFunctions' => __DIR__ . '/../..' . '/lib/LEFunctions.php',
+        'WPLEClient\\LEOrder' => __DIR__ . '/../..' . '/lib/LEOrder.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
@@ -25,6 +47,7 @@ class ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -25,6 +25,10 @@
  *
  */
 
+if (!defined('ABSPATH')) {
+    die('Access Denied');
+}
+
 /**
  * WPLE_ForceSSL
  * 

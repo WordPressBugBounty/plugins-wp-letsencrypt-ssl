@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 7.8.5.10
+Stable tag: 7.8.5.11
 
 Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, SSL score, SSL monitoring, really simple setup.
 
@@ -177,6 +177,11 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.5.11 =
+* Composer autoload moved to main file
+* Capability checks for restart & plan selection
+* plugin check fixes
 
 = 7.8.5.10 =
 * Resolved issue with mixed content scanner

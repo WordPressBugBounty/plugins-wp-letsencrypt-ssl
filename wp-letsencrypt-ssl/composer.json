@@ -1,13 +1,40 @@
 {
   "name": "wpencryption/wp-encryption",
   "description": "WordPress SSL Plugin",
-  "type": "library",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
   "require": {
-    "php": ">=5.2"
+    "php": ">=7.0"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "*",
+    "wp-coding-standards/wpcs": "*",
+    "phpstan/phpstan": "*"
   },
   "autoload": {
     "psr-4": {
-      "WPLEClient\\": "lib/"
+      "WPLEClient\\": "lib/",
+      "WPLE\\": "classes/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit --configuration phpunit.xml",
+    "cs-check": "vendor/bin/phpcs --standard=WordPress --extensions=php classes admin lib",
+    "cs-fix": "vendor/bin/phpcbf --standard=WordPress --extensions=php classes admin lib",
+    "stan": "vendor/bin/phpstan analyse -c phpstan.neon",
+    "install-prod": "composer install --no-dev --prefer-dist --optimize-autoloader --classmap-authoritative"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "WP Encryption",
+      "homepage": "https://wpencryption.com"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   }
 }

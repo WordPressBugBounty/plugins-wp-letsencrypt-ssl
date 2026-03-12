@@ -14,7 +14,6 @@ require_once WPLE_DIR . 'classes/le-trait.php';
 class WPLE_Handler {
     public function __construct() {
         add_action( 'admin_init', [$this, 'admin_init_handlers'], 1 );
-        add_action( 'wp_ajax_wple_wizard_generatessl', [$this, 'wple_wizard_generatessl'] );
         add_action( 'wp_ajax_wple_interests_survey', [$this, 'wple_interests_survey'] );
     }
 
@@ -158,6 +157,11 @@ class WPLE_Handler {
      * @return void
      */
     public function wple_intro_pricing_handler() {
+        if ( isset( $_GET['gofree'] ) || isset( $_GET['gopro'] ) || isset( $_GET['gofirewall'] ) || isset( $_GET['gositelock'] ) ) {
+            if ( !current_user_can( 'manage_options' ) ) {
+                exit( 'Unauthorized request' );
+            }
+        }
         $goplan = '';
         if ( isset( $_GET['gofree'] ) ) {
             set_transient( 'wple_plan_chosen', true, 7 * DAY_IN_SECONDS );
@@ -356,50 +360,6 @@ class WPLE_Handler {
                 }
             }
         }
-    }
-
-    public function wple_wizard_generatessl() {
-        if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nc'] ) ), 'wple-wizard' ) || !current_user_can( 'manage_options' ) ) {
-            echo json_encode( [
-                'success' => false,
-                'message' => 'Unauthorized request!',
-            ] );
-            exit;
-        }
-        WPLE_Trait::wple_logger(
-            "Wizard: Generating SSL\n",
-            'success',
-            'a',
-            false
-        );
-        // SSL generation logic here
-        $leopts = array(
-            'email'           => get_option( 'admin_email' ),
-            'date'            => date( 'd-m-Y' ),
-            'expiry'          => '',
-            'type'            => 'single',
-            'send_usage'      => 1,
-            'include_www'     => 0,
-            'include_mail'    => 0,
-            'include_webmail' => 0,
-            'agree_gws_tos'   => 1,
-            'agree_le_tos'    => 1,
-        );
-        $currentdomain = esc_html( str_ireplace( array('http://', 'https://'), array('', ''), site_url() ) );
-        $slashpos = stripos( $currentdomain, '/' );
-        if ( false !== $slashpos ) {
-            //subdir installation
-            $currentdomain = substr( $currentdomain, 0, $slashpos );
-            $leopts['subdir'] = 1;
-            //flag domain as primary domain of subdir site
-            $leopts['domain'] = sanitize_text_field( $currentdomain );
-        }
-        update_option( 'wple_opts', $leopts );
-        WPLE_Trait::wple_cpanel_identity();
-        $leopts['wizard'] = 1;
-        //flag for wizard
-        echo new WPLE_Core($leopts);
-        exit;
     }
 
     public function wple_interests_survey() {
