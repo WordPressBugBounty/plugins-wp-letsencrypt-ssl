@@ -78,7 +78,7 @@ class WPLE_Trait {
             }
         }
         $out = '<ul class="wple-progress">
-      <li class="' . $stage1 . '"><a href="?page=wp_encryption&restart=1" class="wple-tooltip" data-tippy="' . esc_attr__( "Click to re-start from beginning", 'wp-letsencrypt-ssl' ) . '"><span>1</span>&nbsp;' . esc_html__( 'Registration', 'wp-letsencrypt-ssl' ) . '</a></li>
+      <li class="' . $stage1 . '"><a href="?page=wp_encryption&restart=' . wp_create_nonce( 'restart_ssl' ) . '" class="wple-tooltip" data-tippy="' . esc_attr__( "Click to re-start from beginning", 'wp-letsencrypt-ssl' ) . '"><span>1</span>&nbsp;' . esc_html__( 'Registration', 'wp-letsencrypt-ssl' ) . '</a></li>
       <li class="' . $stage2 . '"><span>2</span>&nbsp;' . esc_html__( 'Domain Verification', 'wp-letsencrypt-ssl' ) . '</li>
       <!--<li class="' . $stage3 . '"><span>3</span>&nbsp;' . esc_html__( 'Certificate Generated', 'wp-letsencrypt-ssl' ) . '</li>-->
       <li class="' . $stage4 . ' onprocess' . esc_attr( $yellow ) . '"><span>3</span>&nbsp;' . esc_html__( 'Install SSL Certificate', 'wp-letsencrypt-ssl' ) . '</li>';

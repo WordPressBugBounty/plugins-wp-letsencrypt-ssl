@@ -1033,9 +1033,9 @@ class WPLE_Admin {
         ?></h2>
 
         <h4 class="pricing-intro-subhead">Purchase once and use for lifetime - Trusted Globally by <b>250,000+</b> WordPress Users (Looking for <a href="<?php 
-        echo esc_url_raw( admin_url( '/admin.php?page=wp_encryption&gopro=3' ) );
+        echo esc_url_raw( wp_nonce_url( admin_url( '/admin.php?page=wp_encryption&gopro=3' ), 'choose_plan' ) );
         ?>">Annual</a> | <a href="<?php 
-        echo esc_url_raw( admin_url( '/admin.php?page=wp_encryption&gopro=2' ) );
+        echo esc_url_raw( wp_nonce_url( admin_url( '/admin.php?page=wp_encryption&gopro=2' ), 'choose_plan' ) );
         ?>">Unlimited Sites License?</a>)</h4>
 
         <div style="text-align:center">
@@ -1072,7 +1072,7 @@ class WPLE_Admin {
                 </ul>
                 <div class="pricing-btn-block">
                     <a href="<?php 
-        echo esc_url_raw( admin_url( '/admin.php?page=wp_encryption&gofree=1' ) );
+        echo esc_url_raw( wp_nonce_url( admin_url( '/admin.php?page=wp_encryption&gofree=1' ), 'choose_plan' ) );
         ?>" class="pricingbtn free">Select Plan</a>
                 </div>
             </div>
@@ -1093,13 +1093,15 @@ class WPLE_Admin {
                     <li><strong>Wildcard</strong> SSL support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="One SSL certificate to cover all your sub-domains"></span></li>
                     <li><strong>Multisite</strong> mapped domains <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Install SSL for different domains mapped to your multisite network with MU domain mapping plugin"></span></li>
                     <li><strong>DNS</strong> Automation <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automatic Domain verification with DNS if HTTP domain verification fails"></span></li>
-                    <li><strong>Vulnerability</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automate daily scanning of your site for known vulnerabilities and get notified instantly"></span></li>
+                    <li><strong>Woocommerce & Elementor</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="We will help resolve insecure padlock issues for Elementor & Woocommerce sites for free"></span></li>
+                    <li><strong>Vulnerability & Malware</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automate daily scanning of your site for known vulnerabilities and get notified instantly"></span></li>
+                    <li><strong>Secure</strong> Passkey Login <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Passwordless MFA login with WebAuthn - Powered by your browser and protected by Face ID, Fingerprint or device PIN."></span></li>
                     <li><strong>Never</strong> expires <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Never worry about SSL again - Your SSL certificate will be automatically renewed in background 30 days prior to its expiry dates"></span></li>
                     <li><strong>Priority</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="support.wpencryption.com"></span></li>
                 </ul>
                 <div class="pricing-btn-block">
                     <a href="<?php 
-        echo esc_url_raw( admin_url( '/admin.php?page=wp_encryption&gopro=1' ) );
+        echo esc_url_raw( wp_nonce_url( admin_url( '/admin.php?page=wp_encryption&gopro=1' ), 'choose_plan' ) );
         ?>" class="pricingbtn free">Select Plan</a>
                 </div>
             </div>
@@ -1128,7 +1130,7 @@ class WPLE_Admin {
         ?>
 
         <h2 class="pricing-intro-head">FLAWLESS SSL SOLUTION FOR LOWEST PRICE EVER <small>(Activation Offer)</small></h2>
-        <h4 class="pricing-intro-subhead">Upgrade to PRO today for <strong>Fully automatic SSL / HTTPS</strong> & get automatic <strong>CDN + Security</strong> for FREE! - Trusted Globally by <b>300,000+</b> WordPress Users <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="A complete bundle worth $360!"></span></h4>
+        <h4 class="pricing-intro-subhead">Trusted Globally by <b>300,000+</b> WordPress Users</h4>
 
         <div style="text-align:center">
             <img src="<?php 
@@ -1150,7 +1152,7 @@ class WPLE_Admin {
                 </ul>
                 <div class="pricing-btn-block">
                     <a href="<?php 
-        echo esc_url_raw( admin_url( '/admin.php?page=wp_encryption&gofree=1' ) );
+        echo esc_url_raw( wp_nonce_url( admin_url( '/admin.php?page=wp_encryption&gofree=1' ), 'choose_plan' ) );
         ?>" class="pricingbtn free">Select Plan</a>
                 </div>
             </div>
@@ -1170,15 +1172,16 @@ class WPLE_Admin {
                     <li><strong>Automatic</strong> SSL Renewal</li>
                     <li><strong>Wildcard</strong> SSL support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="One SSL certificate to cover all your sub-domains"></span></li>
                     <li><strong>Multisite</strong> mapped domains <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Install SSL for different domains mapped to your multisite network with MU domain mapping plugin"></span></li>
-                    <li><strong>Vulnerability</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automate daily scanning of your site for known vulnerabilities and get notified instantly"></span></li>
-                    <li><strong>Automatic</strong> CDN <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Your site is cached and served from 45+ full-scale edge locations worldwide for faster delivery and lowest TTFB thus improving Google pagespeed score"></span></li>
-                    <li><strong>Security</strong> Firewall <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="All your site traffic routed through secure StackPath firewall offering protection against DDOS attacks, XSS, SQL injection, File inclusion, Common WordPress exploits, CSRF, etc.,"></span></li>
-                    <li><strong>100%</strong> Compatible <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Guaranteed to work on ANY hosting platform"></span></li>
+                    <li><strong>Woocommerce & Elementor</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="We will help resolve insecure padlock issues for Elementor & Woocommerce sites for free"></span></li>
+                    <li><strong>Vulnerability</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automated daily scanning of your site for known vulnerabilities and get notified instantly"></span></li>
+                    <li><strong>Malware & Integrity</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automated daily scanning of your site for malware and integrity issues"></span></li>
+                    <li><strong>Secure</strong> Passkey Login <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Passwordless MFA login with WebAuthn - Powered by your browser and protected by Face ID, Fingerprint or device PIN."></span></li>
+                    <li><strong>100%</strong> Compatible <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="We will help deploying SSL for ANY hosting platform"></span></li>
                     <li><strong>One Year</strong> Support & Updates</li>
                 </ul>
                 <div class="pricing-btn-block">
                     <a href="<?php 
-        echo esc_url_raw( admin_url( '/admin.php?page=wp_encryption&gofirewall=1' ) );
+        echo esc_url_raw( wp_nonce_url( admin_url( '/admin.php?page=wp_encryption&gofirewall=1' ), 'choose_plan' ) );
         ?>" class="pricingbtn free">Select Plan</a>
                 </div>
             </div>
@@ -1213,7 +1216,7 @@ class WPLE_Admin {
         $renewtext = esc_html__( 'Click Here To Renew SSL Certificate', 'wp-letsencrypt-ssl' );
         // $renewlink = '<a href="#" class="letsrenew wple-tooltip disabled" data-tippy="' . esc_html__('This renew button will get enabled during last 30 days of current SSL certificate expiry', 'wp-letsencrypt-ssl') . ' ' . esc_html__('You can also click on STEP 1 in above progress bar to renew/re-generate SSL Certificate again.', 'wp-letsencrypt-ssl') . '">' . $renewtext . '</a>';
         // if ($daysleft <= 30) {
-        $renewlink = '<a href="' . admin_url( '/admin.php?page=wp_encryption&restart=1' ) . '" class="letsrenew">' . $renewtext . '</a>';
+        $renewlink = '<a href="' . admin_url( '/admin.php?page=wp_encryption&restart=' . wp_create_nonce( 'restart_ssl' ) ) . '" class="letsrenew">' . $renewtext . '</a>';
         // }
         if ( $wple_support ) {
             //forced completion
@@ -1315,6 +1318,9 @@ class WPLE_Admin {
         if ( isset( $_GET['restart'] ) ) {
             //click to restart from beginning
             if ( !current_user_can( 'manage_options' ) ) {
+                exit( 'Unauthorized request' );
+            }
+            if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['restart'] ) ), 'restart_ssl' ) ) {
                 exit( 'Unauthorized request' );
             }
             delete_option( 'wple_ssl_screen' );

@@ -157,8 +157,11 @@ class WPLE_Handler {
      * @return void
      */
     public function wple_intro_pricing_handler() {
-        if ( isset( $_GET['gofree'] ) || isset( $_GET['gopro'] ) || isset( $_GET['gofirewall'] ) || isset( $_GET['gositelock'] ) ) {
+        if ( isset( $_GET['gofree'] ) || isset( $_GET['gopro'] ) || isset( $_GET['gofirewall'] ) ) {
             if ( !current_user_can( 'manage_options' ) ) {
+                exit( 'Unauthorized request' );
+            }
+            if ( !wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'choose_plan' ) ) {
                 exit( 'Unauthorized request' );
             }
         }
@@ -192,17 +195,16 @@ class WPLE_Handler {
                     ///wp_redirect(admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd'), 302);
                     wp_redirect( admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' ), 302 );
                     exit;
-                } else {
-                    if ( isset( $_GET['gositelock'] ) ) {
-                        set_transient( 'wple_plan_chosen', true, 7 * DAY_IN_SECONDS );
-                        update_option( 'wple_plan_choose', 1 );
-                        ///wp_redirect(admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd'), 302);
-                        wp_redirect( admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=20784&plan_name=sitelock&billing_cycle=annual&currency=usd' ), 302 );
-                        exit;
-                    }
                 }
             }
         }
+        // else if (isset($_GET['gositelock'])) {
+        //     set_transient('wple_plan_chosen', true, 7 * DAY_IN_SECONDS);
+        //     update_option('wple_plan_choose', 1);
+        //     ///wp_redirect(admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd'), 302);
+        //     wp_redirect(admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=20784&plan_name=sitelock&billing_cycle=annual&currency=usd'), 302);
+        //     exit();
+        // }
     }
 
     private function wple_vulnerabilities_update() {
