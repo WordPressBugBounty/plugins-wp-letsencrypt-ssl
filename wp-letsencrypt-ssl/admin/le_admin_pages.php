@@ -64,6 +64,14 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         $notifications = ( FALSE !== $ecount ? '<span class="awaiting-mod">' . (int) $ecount . '</span>' : '' );
         add_submenu_page(
             'wp_encryption',
+            'Upload Custom SSL',
+            __( 'Upload Custom SSL', 'wp-letsencrypt-ssl' ),
+            'manage_options',
+            'wp_encryption_upload',
+            [$this, 'wple_upload_ssl_page']
+        );
+        add_submenu_page(
+            'wp_encryption',
             'SSL Health and Headers',
             __( 'SSL Health and Headers', 'wp-letsencrypt-ssl' ) . ' ' . $notifications . '',
             'manage_options',
@@ -96,8 +104,8 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         );
         add_submenu_page(
             'wp_encryption',
-            'Force HTTPS',
-            __( 'Force HTTPS', 'wp-letsencrypt-ssl' ),
+            'Force HTTPS Redirect',
+            __( 'Force HTTPS Redirect', 'wp-letsencrypt-ssl' ),
             'manage_options',
             'wp_encryption_force_https',
             [$this, 'wple_force_https_page']
@@ -1818,6 +1826,34 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
         $html .= '</div>';
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
         echo $html;
+    }
+
+    public function wple_upload_ssl_page() {
+        $page = '<h2>' . __( 'Upload Custom SSL Certificate', 'wp-letsencrypt-ssl' ) . '</h2>
+        <p class="wple-upload-desc">Upload and install custom SSL certificate from the comfort of your WordPress dashboard, without the need of logging into your hosting panel and going through complex procedures.</p>';
+        $page .= '<div class="wple-custom-ssl">
+        <div class="wple-upload-pro">
+        <span>
+        <p>Fully compatible with cPanel, Plesk, DirectAdmin, Cloudways and more. Our premium support team will assist with integration on any server stack (free of cost) — Apache, Nginx, LiteSpeed, IONOS, Network Solutions and more. Upgrade to PRO lifetime once and use this tool forever.</p>
+        <button class="button button-primary"><a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=customssl&utm_campaign=wpencryption" target="_blank">' . esc_html__( 'Go Pro', 'wp-letsencrypt-ssl' ) . '</a></button>
+        </span>
+        </div>
+        <div class="wple-ssl-input">
+        <formgroup><label for="custom_ssl_certificate">' . esc_html__( 'Certificate:', 'wp-letsencrypt-ssl' ) . '</label>
+        <textarea name="custom_ssl_certificate" rows="10" cols="60"></textarea>
+        </formgroup>
+        <formgroup><label for="custom_ssl_certificate_key">' . esc_html__( 'Private Key:', 'wp-letsencrypt-ssl' ) . '</label>
+        <textarea name="custom_ssl_certificate_key" rows="10" cols="60"></textarea>
+        </formgroup>
+        <formgroup><label for="custom_ssl_ca_bundle">' . esc_html__( 'CA Bundle:', 'wp-letsencrypt-ssl' ) . '</label>
+        <textarea name="custom_ssl_ca_bundle" rows="10" cols="60"></textarea>
+        </formgroup>
+        </div>
+        <div class="wple-uploadssl-btn">
+        <button class="button button-primary">' . esc_html__( 'Upload Certificate', 'wp-letsencrypt-ssl' ) . '</button>
+        </div>
+        </div>';
+        $this->generate_page( $page );
     }
 
 }
