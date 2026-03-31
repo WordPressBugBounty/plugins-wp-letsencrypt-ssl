@@ -957,7 +957,6 @@ class WPLE_Trait {
         );
         $laburl = $API . '?' . http_build_query( $payload );
         $result = wp_remote_get( $laburl );
-        SELF::wple_logger( 'SSLLabs - ' . $param . ' - ' . json_encode( $result ) );
         // echo '<pre>';
         // print_r($result);
         // exit();

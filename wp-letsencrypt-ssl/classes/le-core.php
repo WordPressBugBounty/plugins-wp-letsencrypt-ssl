@@ -614,7 +614,6 @@ class WPLE_Core {
      * @moved from le-admin.php on 5.7.2
      */
     private function wple_send_success_mail() {
-        WPLE_Trait::wple_logger( 'Email - SSL generated' );
         $opts = get_option( 'wple_opts' );
         $to = sanitize_email( $opts['email'] );
         $subject = sprintf( esc_html__( 'Congratulations! Your SSL certificates for %s generated using WP Encryption Plugin', 'wp-letsencrypt-ssl' ), WPLE_Trait::get_root_domain() );
