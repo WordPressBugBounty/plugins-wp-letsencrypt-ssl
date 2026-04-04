@@ -136,8 +136,10 @@ class WPLE_Trait {
         $html .= '
         <li><a href="' . admin_url( '/admin.php?page=wp_encryption_log' ) . '"><span class="dashicons dashicons-admin-tools"></span> ' . esc_html__( 'Debug Log', 'wp-letsencrypt-ssl' ) . '</a></li>
         <li><a href="' . admin_url( '/admin.php?page=wp_encryption_faq' ) . '"><span class="dashicons dashicons-editor-help"></span> ' . esc_html__( 'FAQ', 'wp-letsencrypt-ssl' ) . '</a></li>
-        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_howto_videos' ) . '"><span class="dashicons dashicons-video-alt3"></span> ' . esc_html__( 'Videos', 'wp-letsencrypt-ssl' ) . '</a></li>';
-        $html .= '<li><a href="https://wordpress.org/support/plugin/wp-letsencrypt-ssl/#new-topic-0" target="_blank" rel="nofollow"><span class="dashicons dashicons-sos"></span> ' . esc_html__( 'Free Support', 'wp-letsencrypt-ssl' ) . '</a></li>';
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_howto_videos' ) . '"><span class="dashicons dashicons-video-alt3"></span> ' . esc_html__( 'Videos', 'wp-letsencrypt-ssl' ) . '</a></li>
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_ssl_health' ) . '"><span class="dashicons dashicons-heart"></span> ' . esc_html__( 'SSL Health', 'wp-letsencrypt-ssl' ) . '</a></li>
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_security' ) . '"><span class="dashicons dashicons-visibility"></span> ' . esc_html__( 'Security', 'wp-letsencrypt-ssl' ) . '</a></li>';
+        $html .= '<li><a href="https://wordpress.org/support/plugin/wp-letsencrypt-ssl/#new-topic-0" target="_blank" rel="nofollow"><span class="dashicons dashicons-sos"></span> ' . esc_html__( 'Support', 'wp-letsencrypt-ssl' ) . '</a></li>';
         $html .= '</ul></div>';
     }
 
@@ -678,7 +680,7 @@ class WPLE_Trait {
         update_option( 'wple_sectigo', $isSectigo );
         $achieveAGrade = '';
         if ( $grade != 'A' && $grade != 'A+' ) {
-            $achieveAGrade = '<span style="text-align: center; display: block; background: #eee; padding: 5px;">Achieve <b>A/A+</b> Grade with <a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=score&utm_campaign=wpencryption#pricing" target="_blank">PRO</a> version</span><br />';
+            $achieveAGrade = '<span style="text-align: center; display: block; background: #eee; padding: 5px;">Achieve <b>A/A+</b> Grade with <a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=scoregrade&utm_campaign=wpencryption#pricing" target="_blank">PRO</a> version</span><br />';
         }
         $html = '<div class="wple-active-ssl">
     <p>Details of <b>ACTIVE</b> SSL certificate installed & running on your site.</p>
@@ -694,8 +696,18 @@ class WPLE_Trait {
         }
         $from = date( 'd-m-Y', $validFrom / 1000 );
         $to = date( 'd-m-Y', $validTo / 1000 );
+        //days left till expiry
+        $timeleft = $validTo / 1000 - time();
+        $daysleft = round( $timeleft / 24 / 60 / 60 );
         $html .= '<br><b>Valid From</b>: ' . esc_html( $from ) . '<br><br>';
         $html .= '<b>Valid Till</b>: ' . esc_html( $to ) . '<br><br>';
+        $html .= '
+        <div class="wple-sslhealth-daysleft">
+          <div class="progress--circle progress--' . esc_attr( $daysleft ) . '">
+            <div class="progress__number"><strong>' . esc_html( $daysleft ) . '</strong><br><small style="color:#777;">' . esc_html__( 'Days Left', 'wp-letsencrypt-ssl' ) . '</small></div>
+          </div>
+          <small>Visitors may see "<b>Not Secure</b>" warning if the SSL is not renewed in time. Switch to <a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=scorerenew&utm_campaign=wpencryption#pricing" target="_blank">PRO</a> version for automatic SSL renewal and complete peace of mind.</small>
+        </div>';
         $html .= '<a href="https://www.ssllabs.com/ssltest/analyze.html?d=' . esc_attr( SELF::get_root_domain() ) . '" target="_blank" class="ssllabslink" rel="nofollow noopener">Full details&gt;&gt;</a><br>';
         if ( !wp_next_scheduled( 'wple_ssl_expiry_update' ) ) {
             wp_schedule_event( strtotime( '05:30:00' ), 'daily', 'wple_ssl_expiry_update' );

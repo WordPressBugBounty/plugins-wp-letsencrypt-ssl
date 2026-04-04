@@ -3401,6 +3401,68 @@ div#wple-setup-wizard {
   font-weight: 600;
 }
 
+.wple-login-security ul li {
+  border: none !important;
+  display: block;
+  font-size: 15px;
+}
+
+.wple-login-security ul li small {
+  max-width: 90%;
+  display: inline-block;
+}
+
+li a[href="admin.php?page=wp_encryption_login_security"]:after {
+  content: "NEW";
+  position: absolute;
+  top: 6px;
+  font-size: 10px;
+  right: 5px;
+  color: #adff2f;
+}
+
+li a[href="admin.php?page=wp_encryption_login_security"] {
+  position: relative;
+  padding-right: 30px !important;
+}
+
+span.wple-fix-auto {
+  position: absolute;
+  top: 0;
+  background: #888888;
+  color: #fff;
+  padding: 4px 13px;
+  border-radius: 0 0 5px 5px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+}
+
+.wple-error-firewall {
+  position: relative;
+  padding: 35px 15px 20px;
+}
+
+.wple-sslhealth-daysleft {
+  background: #fff;
+  text-align: center;
+  padding: 0 10px 10px;
+  margin-bottom: 20px;
+}
+
+.wple-sslhealth-daysleft .progress--circle {
+  -webkit-transform: scale(0.7);
+          transform: scale(0.7);
+  margin: 0;
+}
+
+.wple-sslhealth-daysleft small {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5em;
+  color: #444;
+}
+
 @media (max-width: 991px) {
   div#wple-ssl-health > div {
     width: auto !important;

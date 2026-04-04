@@ -76,19 +76,20 @@ class WPLE_Subdir_Challenge_Helper {
             $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' );
         }
         $output .= '<div class="wple-error-firewall">
-        <div>
-          <img src="' . WPLE_URL . 'admin/assets/firewall-shield-pro.png"/>
-        </div>
-        <div class="wple-upgrade-features">
-          <span><b>Automatic</b><br>Domain Verification</span>
-          <span><b>Wildcard</b><br>SSL Support</span>
-          <span><b>Automatic</b><br>SSL Installation</span>
-          <span><b>Automatic</b><br>SSL Renewal</span>          
-          <!--<span><b>Automatic</b><br>Content Delivery Network</span>
-          <span><b>Website</b><br>Security</span>-->          
-          <a href="' . $upgradeurl . '">UPGRADE</a>
-        </div>
-      </div>';
+            <span class="wple-fix-auto">Fix SSL Automatically (Recommended)</span>
+                <div>
+                <img src="' . WPLE_URL . 'admin/assets/firewall-shield-pro.png"/>
+                </div>
+                <div class="wple-upgrade-features">
+                <span><b>Automatic</b><br>Domain Verification</span>
+                <span><b>Wildcard</b><br>SSL Support</span>
+                <span><b>Automatic</b><br>SSL Installation</span>
+                <span><b>Automatic</b><br>SSL Renewal</span>          
+                <!--<span><b>Automatic</b><br>Content Delivery Network</span>
+                <span><b>Website</b><br>Security</span>-->          
+                <a href="' . $upgradeurl . '">UPGRADE</a>
+                </div>
+            </div>';
         // }
         return $output;
     }
