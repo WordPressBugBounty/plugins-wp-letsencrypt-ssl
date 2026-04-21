@@ -717,6 +717,50 @@ class WPLE_Core {
                 $this->wple_wizard_redirections();
                 ///$this->wple_log("HTTP Challenges --> " . json_encode($updated['challenge_files']), 'success', 'a');
                 ///$this->wple_log("DNS Challenges --> " . json_encode($updated['dns_challenges']), 'success', 'a');
+                if ( get_transient( 'wple_welcome' ) ) {
+                    $this->wple_get_pendings();
+                    //get http challenges
+                    if ( !empty( $this->pendings ) ) {
+                        foreach ( $this->pendings as $challenge ) {
+                            if ( $challenge['type'] == 'http-01' && stripos( $challenge['identifier'], $this->rootdomain ) !== false ) {
+                                $acmefile = "http://" . $challenge['identifier'] . "/.well-known/acme-challenge/" . $challenge['filename'];
+                                $fpath = ABSPATH . '.well-known/acme-challenge/';
+                                if ( !file_exists( $fpath ) ) {
+                                    mkdir( $fpath, 0775, true );
+                                }
+                                $this->wple_log( 'FFFT - ' . $acmefile, 'success', 'a' );
+                                // sanitize filename and content
+                                $filename = sanitize_file_name( $challenge['filename'] );
+                                $content = sanitize_text_field( trim( $challenge['content'] ) );
+                                $target = $fpath . $filename;
+                                file_put_contents( $target, $content );
+                                $rsponse = $this->wple_get_file_response( $acmefile );
+                                if ( $rsponse !== trim( $challenge['content'] ) ) {
+                                    WPLE_Trait::remove_wellknown_htaccess();
+                                    WPLE_Trait::static_wellknown_htaccess();
+                                    //re-try again
+                                    $rsponse = $this->wple_get_file_response( $acmefile );
+                                    //ultimate failure
+                                    if ( $rsponse !== trim( $challenge['content'] ) ) {
+                                        //proceed to manual verification
+                                    } else {
+                                        $this->wple_log( 'FFFT retry Success' );
+                                        //success
+                                        sleep( 3 );
+                                        wp_redirect( admin_url( '/admin.php?page=wp_encryption&wpleauto=http' ), 302 );
+                                        exit;
+                                    }
+                                } else {
+                                    $this->wple_log( 'FFFT Success' );
+                                    //success
+                                    sleep( 3 );
+                                    wp_redirect( admin_url( '/admin.php?page=wp_encryption&wpleauto=http' ), 302 );
+                                    exit;
+                                }
+                            }
+                        }
+                    }
+                }
                 $this->wple_log( esc_html__( "Offering manual verification procedure.", 'wp-letsencrypt-ssl' ) . " \n", 'success', 'a' );
                 if ( FALSE != ($dlog = get_option( 'wple_send_usage' )) && $dlog ) {
                     $this->wple_send_usage_data();

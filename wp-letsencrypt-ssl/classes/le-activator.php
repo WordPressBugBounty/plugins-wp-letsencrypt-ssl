@@ -37,6 +37,7 @@ class WPLE_Activator {
             do_action( 'cert_expiry_updated' );
         }
         wp_schedule_single_event( time() + 10, 'wple_init_ssllabs' );
+        set_transient( 'wple_welcome', true, 60 * 60 );
         //since 7.8.5.5
         ///set_transient('wple_survey_pending', true, 10 * MINUTE_IN_SECONDS);
         delete_option( 'wple_error' );

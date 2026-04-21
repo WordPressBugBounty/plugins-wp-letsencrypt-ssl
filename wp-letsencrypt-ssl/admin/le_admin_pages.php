@@ -607,10 +607,11 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
 
     public function wple_mixed_scanner_page() {
         $html = '<h2>' . esc_html__( 'Advanced Insecure Content Scanner', 'wp-letsencrypt-ssl' ) . '</h2><p style="margin: -20px auto 40px auto; font-size: 16px; text-align: center; width: 1400px; max-width: 100%;">' . WPLE_Trait::wple_kses( __( 'Scan your entire site (including public posts and pages) for mixed or insecure content that may prevent the secure browser padlock from appearing, even when your SSL certificate is correctly installed. The SOURCE column identifies where each insecure URL originates, making it easy to locate and update those links to https://. Issues flagged as Widgets or Inline are global in nature and may affect multiple pages across your site. After resolving the issues, reload your site and run another scan to confirm that everything is fully secured.', 'wp-letsencrypt-ssl' ) ) . '.</p>';
+        $disabled = 'disabled';
         $html .= '<p style="margin:20px;text-align: center;font-size: 16px;line-height: 30px;">
         <span style="text-align:left;display:inline-block;">
-        <input style="opacity: 1 !important; border: 1px solid #ccc;" type="checkbox" value="1" name="wple-mx-woocommerce" class="wple-mx-woocommerce" disabled/> Scan WooCommerce pages including products, cart, checkout and  account (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=woocommerce&utm_campaign=wpencryption#pricing" target="_blank">PRO</a>)<br />
-        <input style="opacity: 1 !important; border: 1px solid #ccc;" type="checkbox" value="1" name="wple-mx-elementor" class="wple-mx-elementor" disabled/> Run advanced scan for Elementor page builder (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=elementor&utm_campaign=wpencryption#pricing" target="_blank">PRO</a>)
+        <input style="opacity: 1 !important; border: 1px solid #ccc;" type="checkbox" value="1" name="wple-mx-woocommerce" class="wple-mx-woocommerce" ' . esc_attr( $disabled ) . '/> Scan WooCommerce pages including products, cart, checkout and  account (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=woocommerce&utm_campaign=wpencryption#pricing" target="_blank">PRO</a>)<br />
+        <input style="opacity: 1 !important; border: 1px solid #ccc;" type="checkbox" value="1" name="wple-mx-elementor" class="wple-mx-elementor" ' . esc_attr( $disabled ) . '/> Run advanced scan for Elementor page builder (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=elementor&utm_campaign=wpencryption#pricing" target="_blank">PRO</a>)
         </span>
         </p>';
         $html .= '<div id="wple-scanner">
@@ -949,7 +950,9 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             'vulnerability_scan',
             'daily_vulnerability_scan',
             'notify_vulnerability_scan',
-            'autofix_vulnerability_scan'
+            'autofix_vulnerability_scan',
+            'notify_malware_scan',
+            'daily_malware_scan'
         );
         if ( !in_array( $opt, $allowed ) ) {
             echo 0;
@@ -1696,10 +1699,10 @@ class WPLE_SubAdmin extends WPLE_Admin_Page {
             }
         }
         $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>' . esc_html( $servertype ) . '</b>! Avoid manual SSL renewals every 90 days - Enjoy automatic renewal with PRO version.</strong>';
-        ///$compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption#pricing';
-        $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
+        $compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption#pricing';
+        ///$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
         if ( $nopricing ) {
-            $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
+            ///$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
             //$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd');
             //$upgradeurl = 'https://checkout.freemius.com/mode/dialog/plugin/5090/plan/10643/'; //CDN
             $html .= '<div class="wple-error-firewall fire-pro wple-procdn">
