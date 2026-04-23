@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 7.8.5.16
+Stable tag: 7.8.5.17
 
 Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, SSL score, Easiest SSL & Security plugin.
 
