@@ -2,9 +2,7 @@
 
 namespace WPLEClient\Exceptions;
 
-use WPLE_Trait;
-
-require_once WPLE_DIR . 'classes/le-trait.php';
+require_once dirname(dirname(__DIR__)) . '/classes/le-trait.php';
 
 /**
  * LetsEncrypt Client Connector exception, extends LEException
@@ -41,50 +39,50 @@ require_once WPLE_DIR . 'classes/le-trait.php';
  */
 class LEConnectorException extends LEException
 {
-  const NONEWNONCEEXCEPTION       = 0x11;
-  const ACCOUNTDEACTIVATEDEXCEPTION   = 0x12;
-  const METHODNOTSUPPORTEDEXCEPTION   = 0x13;
-  const CURLERROREXCEPTION       = 0x14;
-  const INVALIDRESPONSEEXCEPTION     = 0x15;
+    const NONEWNONCEEXCEPTION       = 0x11;
+    const ACCOUNTDEACTIVATEDEXCEPTION   = 0x12;
+    const METHODNOTSUPPORTEDEXCEPTION   = 0x13;
+    const CURLERROREXCEPTION       = 0x14;
+    const INVALIDRESPONSEEXCEPTION     = 0x15;
 
-  public static function NoNewNonceException()
-  {
-    return new static('No new nonce.', self::NONEWNONCEEXCEPTION);
-  }
-
-  public static function AccountDeactivatedException()
-  {
-    return new static('The account was deactivated. No further requests can be made.', self::ACCOUNTDEACTIVATEDEXCEPTION);
-  }
-
-  public static function MethodNotSupportedException(string $method)
-  {
-    return new static(sprintf('HTTP request %s not supported.', $method), self::METHODNOTSUPPORTEDEXCEPTION);
-  }
-
-  public static function CurlErrorException(string $error)
-  {
-    return new static(sprintf('Curl error: %s', $error), self::CURLERROREXCEPTION);
-  }
-
-  public static function InvalidResponseException(array $response)
-  {
-    $statusCode = array_key_exists('status', $response) ? $response['status'] : 'unknown';
-    $detail = (isset($response['body']) && isset($response['body']['detail'])) ? $response['body']['detail'] : '';
-
-    if ($statusCode == 400) {
-      update_option('wple_error', 400);
-      $detail .= '. Please try using RESET option once. If you notice same issue again, please try after 2-3 hours.';
-      // if (wple_fs()->can_use_premium_code__premium_only()) {
-      //   WPLE_Trait::wple_backup_n_clear_keys__premium_only();
-      // }
-    } else if ($statusCode == 429) {
-      update_option('wple_error', 429);
-    } else {
-      update_option('wple_error', 1);
+    public static function NoNewNonceException()
+    {
+        return new static('No new nonce.', self::NONEWNONCEEXCEPTION);
     }
 
+    public static function AccountDeactivatedException()
+    {
+        return new static('The account was deactivated. No further requests can be made.', self::ACCOUNTDEACTIVATEDEXCEPTION);
+    }
 
-    return new static(sprintf("Invalid response: %s <b>(%s)</b>", $statusCode, $detail), self::INVALIDRESPONSEEXCEPTION, null, $response);
-  }
+    public static function MethodNotSupportedException(string $method)
+    {
+        return new static(sprintf('HTTP request %s not supported.', $method), self::METHODNOTSUPPORTEDEXCEPTION);
+    }
+
+    public static function CurlErrorException(string $error)
+    {
+        return new static(sprintf('Curl error: %s', $error), self::CURLERROREXCEPTION);
+    }
+
+    public static function InvalidResponseException(array $response)
+    {
+        $statusCode = array_key_exists('status', $response) ? $response['status'] : 'unknown';
+        $detail = (isset($response['body']) && isset($response['body']['detail'])) ? $response['body']['detail'] : '';
+
+        if ($statusCode == 400) {
+            update_option('wple_error', 400);
+            $detail .= '. Please try using RESET option once. If you notice same issue again, please try after 2-3 hours.';
+            // if (wple_fs()->can_use_premium_code__premium_only()) {
+            //   WPLE_Trait::wple_backup_n_clear_keys__premium_only();
+            // }
+        } else if ($statusCode == 429) {
+            update_option('wple_error', 429);
+        } else {
+            update_option('wple_error', 1);
+        }
+
+
+        return new static(sprintf("Invalid response: %s <b>(%s)</b>", $statusCode, $detail), self::INVALIDRESPONSEEXCEPTION, null, $response);
+    }
 }

@@ -282,11 +282,11 @@
 
             if (response == 'www') {
               alert(
-                'Your www domain is not reachable, so this option cannot be enabled.'
+                'Your www domain is not reachable, so this option cannot be enabled.',
               );
             } else if (response == 'nonwww') {
               alert(
-                'Your non-www domain is not reachable, so this option cannot be enabled.'
+                'Your non-www domain is not reachable, so this option cannot be enabled.',
               );
             } else {
               alert('Authentication failure! Please try again');
@@ -358,7 +358,7 @@
           $button.text('START THE SCAN').removeAttr('disabled');
           $('#wple-scanner-iframe').fadeOut('fast');
           $('#wple-scanner').after(
-            '<div class="mxnossl">Valid SSL Certificate could not be detected on your site! Please install SSL Certificate & force HTTPS before checking for mixed content issues.</div>'
+            '<div class="mxnossl">Valid SSL Certificate could not be detected on your site! Please install SSL Certificate & force HTTPS before checking for mixed content issues.</div>',
           );
           return false;
         } else {
@@ -483,7 +483,7 @@
           }
         },
       });
-    }
+    },
   );
 
   $('.wple-did-review,.wple-later-review').click(function (e) {
@@ -665,7 +665,7 @@
 
           if ($new_score == 80 && !$('.score-prom').length) {
             $('.wple-scorebar').after(
-              "<h3 class='score-prom'>You still have major task pending!</h3>"
+              "<h3 class='score-prom'>You still have major task pending!</h3>",
             );
           }
         } else if (response < 0) {
@@ -684,13 +684,13 @@
           colorSwitch($new_score);
         } else if (response == 'htaccessnotwritable') {
           alert(
-            '.htaccess file not writable! Please change .htaccess file permission to 644 in order to implement security headers.'
+            '.htaccess file not writable! Please change .htaccess file permission to 644 in order to implement security headers.',
           );
           $this.removeAttr('checked');
           return false;
         } else if (response == 'wpconfignotwritable') {
           alert(
-            'wp-config.php file not writable! Please change wp-config file permission to 644 in order to implement HttpOnly cookies.'
+            'wp-config.php file not writable! Please change wp-config file permission to 644 in order to implement HttpOnly cookies.',
           );
           $this.removeAttr('checked');
           return false;
@@ -845,4 +845,173 @@
       },
     });
   });
+
+  $('.wple-passkey-feature').change(function () {
+    var $this = $(this);
+
+    jQuery.ajax({
+      method: 'POST',
+      url: ajaxurl,
+      dataType: 'text',
+      data: {
+        action: 'wple_enable_passkey',
+        enabled: $('.wple-passkey-feature').is(':checked'),
+        nc: SCAN.nc,
+      },
+      beforeSend: function () {},
+      error: function () {
+        alert('Failed to save opt! Please try again');
+      },
+      success: function (response) {
+        if (response == 'failed') {
+          alert("Couldn't save your settings! Please re-try.");
+        } else {
+          alert('Settings Saved!');
+        }
+      },
+    });
+  });
 })(jQuery);
+
+(function () {
+  const btn = document.getElementById('wple-register-passkey');
+  const msg = document.getElementById('wple-passkey-msg');
+
+  function showMessage(text, isError) {
+    if (!msg) return;
+    msg.textContent = text;
+    msg.style.color = isError ? 'red' : 'green';
+  }
+
+  function base64ToUint8Array(base64) {
+    // server uses base64 (not base64url)
+    const raw = atob(base64);
+    const arr = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; ++i) arr[i] = raw.charCodeAt(i);
+    return arr;
+  }
+
+  function arrayBufferToBase64(buffer) {
+    const bytes =
+      buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    const chunkSize = 0x8000; // 32KB - avoids call stack / arg length limits
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode.apply(
+        null,
+        bytes.subarray(i, i + chunkSize),
+      );
+    }
+    return btoa(binary);
+  }
+
+  function arrayBufferToBase64Url(buffer) {
+    const b64 = arrayBufferToBase64(buffer);
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  async function postForm(data) {
+    const form = new URLSearchParams();
+    for (const k in data) {
+      if (Array.isArray(data[k]) || typeof data[k] === 'object') {
+        form.append(k, JSON.stringify(data[k]));
+      } else {
+        form.append(k, data[k]);
+      }
+    }
+    const res = await fetch(SCAN.adminajax, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: form,
+    });
+    return res.json();
+  }
+
+  async function registerPasskey() {
+    showMessage('', false);
+    btn.disabled = true;
+    try {
+      const optResp = await postForm({
+        action: 'wple_get_register_options',
+        nonce: SCAN.nc,
+      });
+      if (!optResp.success) {
+        showMessage(optResp.data || 'Failed to load options', true);
+        btn.disabled = false;
+        return;
+      }
+
+      const options = optResp.data;
+      // convert server base64 -> Uint8Array
+      options.challenge = base64ToUint8Array(options.challenge);
+      options.user.id = base64ToUint8Array(options.user.id);
+
+      if (options.excludeCredentials) {
+        // convert base64url -> base64 then to Uint8Array
+        options.excludeCredentials = options.excludeCredentials.map((c) => {
+          const b64u = c.id;
+          let b64 = b64u.replace(/-/g, '+').replace(/_/g, '/');
+          while (b64.length % 4) b64 += '=';
+          return {
+            ...c,
+            id: base64ToUint8Array(b64),
+          };
+        });
+      }
+
+      console.log(options);
+
+      const cred = await navigator.credentials.create({ publicKey: options });
+      if (!cred) {
+        showMessage('No credential created', true);
+        btn.disabled = false;
+        return;
+      }
+
+      const response = cred.response;
+      const payload = {
+        action: 'wple_register_passkey',
+        nonce: SCAN.nc,
+        challenge: arrayBufferToBase64(optResp.data.challenge), // original base64 challenge from server
+        id: cred.id,
+        rawId: arrayBufferToBase64(cred.rawId),
+        type: cred.type,
+        clientDataJSON: arrayBufferToBase64(response.clientDataJSON),
+        attestationObject: arrayBufferToBase64(response.attestationObject),
+        transports: cred.response.getTransports
+          ? cred.response.getTransports()
+          : [],
+      };
+
+      //console.log(response);
+
+      const reg = await postForm(payload);
+      if (reg.success) {
+        showMessage(reg.data.message || 'Passkey registered', false);
+        const cleanUrl =
+          window.location.protocol +
+          '//' +
+          window.location.host +
+          window.location.pathname +
+          window.location.hash;
+        setTimeout(() => {
+          window.location.replace(cleanUrl);
+        }, 5000);
+      } else {
+        showMessage(reg.data || 'Registration failed', true);
+      }
+    } catch (err) {
+      console.error(err);
+      showMessage(err.message || 'Error', true);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      registerPasskey();
+    });
+  }
+})();

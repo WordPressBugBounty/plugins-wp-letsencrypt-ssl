@@ -5,13 +5,13 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 7.8.5.17
+Stable tag: 7.8.6.1
 
-Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, SSL score, Easiest SSL & Security plugin.
+Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, SSL score, HTTPS headers, Login Security & Passkey.
 
 == Description ==
 
-HTTPS Secure your WordPress site with SSL certificate provided by [Let's Encrypt®](https://letsencrypt.com) and force SSL / HTTPS sitewide, check your SSL score, fix insecure content & mixed content issues easily. Enable HTTPS secure padlock on your site within minutes.
+HTTPS Secure your WordPress site with SSL certificate provided by [Let's Encrypt®](https://letsencrypt.com) and force HTTPS / SSL sitewide, check your SSL score, fix insecure content & mixed content issues easily. Enable HTTPS secure padlock on your site within minutes.
 
 [WP Encryption](https://wpencryption.com/?utm_source=wordpress&utm_medium=description&utm_campaign=wpencryption) plugin registers your site, verifies your domain, generates SSL certificate for your site in simple mouse clicks without the need of any technical knowledge. A typical SSL installation without WP Encryption would require you to generate CSR, prove domain ownership, provide your bussiness data and deal with many more technical tasks!.
 
@@ -177,6 +177,11 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.6.0 =
+* Passkey registration and login
+* Improved composer autoloading and class loadings
+* Require files improved overall
 
 = 7.8.5.16 =
 * PRO - https file verification for re-located WP

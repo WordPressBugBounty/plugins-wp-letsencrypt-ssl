@@ -28,8 +28,11 @@ if (!defined('ABSPATH')) {
     die('Access Denied');
 }
 
-require_once WPLE_DIR . 'classes/le-trait.php';
+require_once dirname(__DIR__) . '/classes/le-trait.php';
 
+if (class_exists('WPLE_Admin_Page')) {
+    return;
+}
 class WPLE_Admin_Page
 {
     public function __construct()

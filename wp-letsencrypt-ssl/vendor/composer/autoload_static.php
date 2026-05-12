@@ -7,7 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982
 {
     public static $prefixLengthsPsr4 = array (
-        'W' =>
+        'W' => 
         array (
             'WPLE\\' => 5,
             'WPLEClient\\' => 11,
@@ -15,11 +15,11 @@ class ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPLE\\' =>
+        'WPLE\\' => 
         array (
             0 => __DIR__ . '/../..' . '/classes',
         ),
-        'WPLEClient\\' =>
+        'WPLEClient\\' => 
         array (
             0 => __DIR__ . '/../..' . '/lib',
         ),

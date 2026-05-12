@@ -4,9 +4,12 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // Exit if accessed directly
-require_once WPLE_DIR . 'classes/le-core.php';
-require_once WPLE_DIR . 'classes/le-mscan.php';
-require_once WPLE_DIR . 'classes/le-trait.php';
+require_once dirname( __DIR__ ) . '/classes/le-core.php';
+require_once dirname( __DIR__ ) . '/classes/le-mscan.php';
+require_once dirname( __DIR__ ) . '/classes/le-trait.php';
+if ( class_exists( 'WPLE_Handler' ) ) {
+    return;
+}
 /**
  * Todo:
  * A file to disable force https completely when site lockout

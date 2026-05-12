@@ -6,7 +6,11 @@ if (!defined('ABSPATH')) {
 
 use WPLEClient\LEFunctions;
 
-require_once WPLE_DIR . 'classes/le-trait.php';
+require_once dirname(__DIR__) . '/classes/le-trait.php';
+
+if (class_exists('WPLE_Ajax')) {
+    return;
+}
 
 class WPLE_Ajax
 {

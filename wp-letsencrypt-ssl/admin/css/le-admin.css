@@ -3463,6 +3463,41 @@ span.wple-fix-auto {
   color: #444;
 }
 
+.wple-login-steps {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin: 40px 20px 20px;
+}
+
+.wple-login-steps span {
+  min-width: 320px;
+  margin: 20px 10px;
+  width: 32%;
+}
+
+.wple-login-steps img {
+  max-height: 260px;
+  max-width: 100%;
+}
+
+.wple-login-steps p {
+  width: 80%;
+}
+
+.wple-ssl-settings.wple-loginsecurity {
+  width: 100%;
+}
+
+.wple-login-security {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-right: 10px;
+}
+
 @media (max-width: 991px) {
   div#wple-ssl-health > div {
     width: auto !important;
