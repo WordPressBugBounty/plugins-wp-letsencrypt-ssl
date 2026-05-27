@@ -2,7 +2,7 @@
 
 namespace WPLEClient\Exceptions;
 
-require_once dirname(dirname(__DIR__)) . '/classes/le-trait.php';
+///require_once dirname(dirname(__DIR__)) . '/classes/le-trait.php';
 
 /**
  * LetsEncrypt Client Connector exception, extends LEException

@@ -8,9 +8,9 @@ if ( !defined( 'ABSPATH' ) ) {
  * require all the lib files for generating certs
  */
 use WPLEClient\LEFunctions;
-use WPLEClient\LEConnector;
-use WPLEClient\LEAccount;
-use WPLEClient\LEAuthorization;
+// use WPLEClient\LEConnector;
+// use WPLEClient\LEAccount;
+// use WPLEClient\LEAuthorization;
 use WPLEClient\LEClient;
 use WPLEClient\LEOrder;
 require_once dirname( __DIR__ ) . '/classes/le-trait.php';

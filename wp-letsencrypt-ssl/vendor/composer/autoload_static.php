@@ -9,16 +9,11 @@ class ComposerStaticInit8743cf05928ea2a577faad8d8c2c3982
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
-            'WPLE\\' => 5,
             'WPLEClient\\' => 11,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPLE\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/classes',
-        ),
         'WPLEClient\\' => 
         array (
             0 => __DIR__ . '/../..' . '/lib',

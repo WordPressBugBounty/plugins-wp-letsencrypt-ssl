@@ -13,8 +13,7 @@
   },
   "autoload": {
     "psr-4": {
-      "WPLEClient\\": "lib/",
-      "WPLE\\": "classes/"
+      "WPLEClient\\": "lib/"
     }
   },
   "scripts": {

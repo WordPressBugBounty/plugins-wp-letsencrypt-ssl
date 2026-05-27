@@ -2,7 +2,7 @@
 
 namespace WPLEClient;
 
-use WPLE_Trait;
+require_once dirname( __DIR__ ) . '/classes/le-trait.php';
 use WPLEClient\Exceptions\LEConnectorException;
 /**
  * LetsEncrypt Connector class, containing the functions necessary to sign with JSON Web Key and Key ID, and perform GET, POST and HEAD requests.
@@ -160,9 +160,9 @@ class LEConnector {
             'status'   => $statusCode,
             'body'     => ( $jsonbody === null ? $body : $jsonbody ),
         );
-        if ( $this->log instanceof \Psr\Log\LoggerInterface ) {
-            ///$this->log->debug($method . ' response received', $jsonresponse);
-        } elseif ( $this->log >= LEClient::LOG_DEBUG ) {
+        ///if ($this->log instanceof \Psr\Log\LoggerInterface) {
+        ///$this->log->debug($method . ' response received', $jsonresponse);
+        if ( $this->log >= LEClient::LOG_DEBUG ) {
             LEFunctions::log( $jsonresponse );
         } elseif ( stripos( $requestURL, 'authz' ) && $method == 'POST' ) {
             $res_data = $jsonresponse['body'];
@@ -241,7 +241,7 @@ class LEConnector {
             $privateKeyFile = $this->accountKeys['private_key'];
         }
         if ( !file_exists( $privateKeyFile ) ) {
-            WPLE_Trait::wple_logger(
+            \WPLE_Trait::wple_logger(
                 "Could not create key files due to file permission issues. Please check if public_html/keys/ folder permission is set to 0755. You can still generate premium SSL certificate in Annual <b>PRO</b> Plan without these requirements.",
                 "error",
                 "a",
