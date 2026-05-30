@@ -326,7 +326,7 @@ class WPLE_Ajax
                 break;
             case 'cabundle':
                 // if (file_exists(ABSPATH . 'keys/cabundle.crt')) {
-                $output = file_get_contents($keypath . 'cabundle.crt');
+                $output = file_get_contents($keypath . 'fullchain.crt');
                 // } else {
                 ///$output = file_get_contents(WPLE_DIR . 'cabundle/ca.crt');
                 //}

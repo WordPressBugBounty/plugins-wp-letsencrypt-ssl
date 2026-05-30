@@ -313,6 +313,7 @@ class WPLE_Core {
             if ( $this->order->isFinalized() ) {
                 $this->wple_log( esc_html__( 'Getting SSL certificates', 'wp-letsencrypt-ssl' ), 'success', 'a' );
                 $this->order->getCertificate();
+                //'ISRG Root X1'
             }
             delete_option( 'wple_hold_cron' );
             $cert = WPLE_Trait::wple_cert_directory() . 'certificate.crt';
@@ -643,7 +644,7 @@ class WPLE_Core {
                     $zip->addFile( $pemfile, 'private.pem' );
                     ///$cabundle = WPLE_DIR . 'cabundle/ca.crt';
                     // if (file_exists(ABSPATH . 'keys/cabundle.crt')) {
-                    $cabundle = WPLE_Trait::wple_cert_directory() . 'cabundle.crt';
+                    $cabundle = WPLE_Trait::wple_cert_directory() . 'fullchain.crt';
                     // }
                     $zip->addFile( $cabundle, 'cabundle.crt' );
                     $zip->close();

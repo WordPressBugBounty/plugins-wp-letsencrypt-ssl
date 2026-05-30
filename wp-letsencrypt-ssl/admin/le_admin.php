@@ -755,7 +755,9 @@ class WPLE_Admin {
                 '</strong></a>'
             );
         }
-        $html .= '</li>
+        $html .= '<br>
+            <small><b>NOTE:</b> The CA bundle above contains two certificate blocks from <b>-----BEGIN CERTIFICATE-----</b> to <b>-----END CERTIFICATE-----</b>. If your hosting panel reports an error, use only the first block.</small>
+            </li>
           <li>5. ' . sprintf( __( 'Click on %sInstall certificate%s', 'wp-letsencrypt-ssl' ), '<strong>', '</strong>' ) . '</li>
           <li>6. ' . sprintf( __( 'Please wait few minutes and click on %sEnable HTTPS Now%s button', 'wp-letsencrypt-ssl' ), '<strong>', '</strong>' ) . '</li>
         </ul>

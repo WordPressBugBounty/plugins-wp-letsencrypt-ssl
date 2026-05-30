@@ -134,7 +134,7 @@ class WPLE_Handler {
                 case '3':
                     $file = uniqid() . '-cabundle.crt';
                     // if (file_exists(ABSPATH . 'keys/cabundle.crt')) {
-                    $cabundlefile = file_get_contents( WPLE_Trait::wple_cert_directory() . 'cabundle.crt' );
+                    $cabundlefile = file_get_contents( WPLE_Trait::wple_cert_directory() . 'fullchain.crt' );
                     // } else {
                     ///$cabundlefile = file_get_contents(WPLE_DIR . 'cabundle/ca.crt');
                     //}

@@ -592,7 +592,7 @@ a.wplecompare span {
 }
 
 #wple-sslgenerator .wple-success-form ul:not(.wple-progress) li {
-  font-size: 18px;
+  font-size: 17px;
   margin-bottom: 10px;
   color: green;
 }
@@ -3450,7 +3450,7 @@ span.wple-fix-auto {
 
 .wple-error-firewall {
   position: relative;
-  padding: 35px 15px 20px;
+  padding: 20px 15px 20px;
 }
 
 .wple-sslhealth-daysleft {
