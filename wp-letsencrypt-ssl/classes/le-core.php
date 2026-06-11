@@ -672,6 +672,7 @@ class WPLE_Core {
                 }
             }
         } else {
+            //success email to free users only
             if ( function_exists( 'wp_mail' ) ) {
                 wp_mail(
                     $to,

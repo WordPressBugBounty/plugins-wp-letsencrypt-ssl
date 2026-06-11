@@ -1641,9 +1641,13 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
         public function wple_global_ignore() {
             if ( current_user_can( 'manage_options' ) ) {
                 $context = sanitize_text_field( $_POST['context'] );
-                delete_option( 'wple_notice_' . $context );
-                if ( !wp_next_scheduled( 'wple_remindlater_' . $context ) ) {
-                    wp_schedule_single_event( strtotime( '+1 day', time() ), 'wple_remindlater_' . $context );
+                if ( $context == 'monitor' ) {
+                    set_transient( 'wple_monitor_remindlater', true, 1 * DAY_IN_SECONDS );
+                } else {
+                    delete_option( 'wple_notice_' . $context );
+                    if ( !wp_next_scheduled( 'wple_remindlater_' . $context ) ) {
+                        wp_schedule_single_event( strtotime( '+1 day', time() ), 'wple_remindlater_' . $context );
+                    }
                 }
                 echo "success";
             }

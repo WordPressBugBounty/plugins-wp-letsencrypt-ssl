@@ -86,6 +86,10 @@ class WPLE_Admin {
         if ( $this->wple_not_dismissed( 'woosecurity' ) ) {
             add_action( 'admin_notices', [$this, 'wple_woosecurity_notice'] );
         }
+        if ( !get_transient( 'wple_monitor_remindlater' ) && FALSE === get_option( 'wple_notice_disabled_monitor' ) ) {
+            //since 5.3.12
+            add_action( 'admin_notices', [$this, 'wple_monitor_notice'] );
+        }
         /** Admin Notices End */
         add_action( 'wple_show_reviewrequest', array($this, 'wple_set_review_flag') );
         add_action( 'wple_show_mxalert', array($this, 'wple_set_mxerror_flag') );
@@ -1518,6 +1522,22 @@ class WPLE_Admin {
             'adminajax' => admin_url( 'admin-ajax.php' ),
             'nc'        => wp_create_nonce( 'wple-loginjs' ),
         ] );
+    }
+
+    public function wple_monitor_notice() {
+        $upgradebutton = '<a class="wplerevbtn" href="https://monitor.wpencryption.com" target="_blank">' . esc_html__( 'Launch Monitor', 'wp-letsencrypt-ssl' ) . '</a>';
+        $html = '<div class="notice notice-info wple-admin-review wple-notice-monitor">
+        <div class="wple-review-box">
+            <img src="' . WPLE_URL . 'admin/assets/symbol.png"/>
+            <span><strong>Introducing WP Encryption Monitor</strong>
+            <p>Browsers now enforce a max 199-day SSL certificate limit. Keeping track manually across multiple sites isn\'t an option anymore. One missed renewal takes your site offline. WP Encryption Monitor gives you a single place to monitor SSL and domain expiry dates with instant notifications — Absolutely free.</p></span>
+        </div>
+        ' . $upgradebutton . '
+        <a class="wple-dont-show-btn" data-context="monitor" href="#">' . esc_html__( "Don't show again", 'wp-letsencrypt-ssl' ) . '</a>
+        <a class="wple-ignore-btn" data-context="monitor" href="#">' . esc_html__( "Remind me later", 'wp-letsencrypt-ssl' ) . '</a>
+        </div>';
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
+        echo $html;
     }
 
 }

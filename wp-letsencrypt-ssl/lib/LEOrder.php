@@ -675,7 +675,6 @@ class LEOrder
      */
     private function saveCertificate(array $certificates)
     {
-        LEFunctions::log(json_encode($certificates));
         if (isset($this->certificateKeys['certificate'])) file_put_contents($this->certificateKeys['certificate'], $certificates['leaf']);
 
         if (isset($this->certificateKeys['cabundle'])) file_put_contents($this->certificateKeys['cabundle'], $certificates['intermediate']);

@@ -64,6 +64,7 @@ class WPLE_Deactivator {
             'wple_sourceip_enable',
             'wple_parent_reachable',
             'wple_notice_disabled_trial',
+            'wple_notice_disabled_monitor',
             'wple_security_settings',
             'wple_sourceip',
             'wple_mixed_issues',
