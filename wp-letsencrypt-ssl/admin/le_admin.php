@@ -83,9 +83,16 @@ class WPLE_Admin {
             //settings saved
             add_action( 'admin_notices', array($this, 'wple_success_notice') );
         }
-        if ( $this->wple_not_dismissed( 'woosecurity' ) ) {
-            add_action( 'admin_notices', [$this, 'wple_woosecurity_notice'] );
-        }
+        //since 7.8.1 discontinued since 7.8.5.10
+        // if ($this->wple_not_dismissed('advancedsecurity')) {
+        //     add_action('admin_notices', [$this, 'wple_advancedsecurity_notice']);
+        // }
+        //since 7.8.5.9
+        // if (!wple_fs()->is__premium_only()) {
+        //     if ($this->wple_not_dismissed('woosecurity')) {
+        //         add_action('admin_notices', [$this, 'wple_woosecurity_notice']);
+        //     }
+        // } //removed since 7.8.6.5
         if ( !get_transient( 'wple_monitor_remindlater' ) && FALSE === get_option( 'wple_notice_disabled_monitor' ) ) {
             //since 5.3.12
             add_action( 'admin_notices', [$this, 'wple_monitor_notice'] );
@@ -197,7 +204,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.8.5.14', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.8.6.3', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
@@ -237,7 +244,7 @@ class WPLE_Admin {
         if ( isset( $_GET['error'] ) ) {
             $this->wple_error_block( $html );
         }
-        if ( FALSE === get_option( 'wple_plan_choose' ) || isset( $_GET['comparison'] ) || !get_transient( 'wple_plan_chosen' ) ) {
+        if ( FALSE === get_option( 'wple_plan_choose' ) || isset( $_GET['comparison'] ) ) {
             $this->wple_initial_quick_pricing( $html );
             return;
         }
