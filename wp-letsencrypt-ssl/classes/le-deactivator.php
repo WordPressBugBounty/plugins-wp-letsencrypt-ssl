@@ -24,9 +24,6 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-if ( class_exists( 'WPLE_Deactivator' ) ) {
-    return;
-}
 class WPLE_Deactivator {
     public static function deactivate() {
         $opts = ( get_option( 'wple_opts' ) === FALSE ? array(
@@ -64,7 +61,6 @@ class WPLE_Deactivator {
             'wple_sourceip_enable',
             'wple_parent_reachable',
             'wple_notice_disabled_trial',
-            'wple_notice_disabled_monitor',
             'wple_security_settings',
             'wple_sourceip',
             'wple_mixed_issues',

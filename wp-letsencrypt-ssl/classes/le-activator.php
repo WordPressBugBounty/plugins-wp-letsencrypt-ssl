@@ -24,28 +24,26 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-if ( class_exists( 'WPLE_Activator' ) ) {
-    return;
-}
-class WPLE_Activator {
-    public static function activate( $networkwide ) {
-        $opts = ( get_option( 'wple_opts' ) === FALSE ? array(
+class WPLE_Activator
+{
+    public static function activate($networkwide)
+    {
+        $opts = (get_option('wple_opts') === FALSE ? array(
             'expiry' => '',
-        ) : get_option( 'wple_opts' ) );
-        update_option( 'wple_opts', $opts );
-        update_option( 'wple_version', WPLE_PLUGIN_VER );
-        update_option( 'wple_activate', time() );
+        ) : get_option('wple_opts'));
+        update_option('wple_opts', $opts);
+        update_option('wple_version', WPLE_PLUGIN_VER);
+        update_option('wple_activate', time());
         WPLE_Trait::wple_cpanel_identity();
-        if ( isset( $opts['expiry'] ) && $opts['expiry'] != '' ) {
-            do_action( 'cert_expiry_updated' );
+        if (isset($opts['expiry']) && $opts['expiry'] != '') {
+            do_action('cert_expiry_updated');
         }
-        wp_schedule_single_event( time() + 10, 'wple_init_ssllabs' );
+        wp_schedule_single_event(time() + 10, 'wple_init_ssllabs');
         //since 7.8.5.5
         ///set_transient('wple_survey_pending', true, 10 * MINUTE_IN_SECONDS);
-        delete_option( 'wple_error' );
-        delete_option( 'wple_sectigo' );
-        delete_option( 'wple_ssl_screen' );
+        delete_option('wple_error');
+        delete_option('wple_sectigo');
+        delete_option('wple_ssl_screen');
         // wp_redirect(admin_url('/admin.php?page=wp_encryption'), 302); //causes ajax activation error msg
     }
-
 }

@@ -9,9 +9,6 @@
  * @since      Class available since Release 5.7.0
  *
  */
-if ( class_exists( 'WPLE_DeepScanner' ) ) {
-    return;
-}
 class WPLE_DeepScanner {
     private $permalinks_list = [];
 

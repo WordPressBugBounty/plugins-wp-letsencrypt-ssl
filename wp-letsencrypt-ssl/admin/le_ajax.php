@@ -6,11 +6,7 @@ if (!defined('ABSPATH')) {
 
 use WPLEClient\LEFunctions;
 
-require_once dirname(__DIR__) . '/classes/le-trait.php';
-
-if (class_exists('WPLE_Ajax')) {
-    return;
-}
+require_once WPLE_DIR . 'classes/le-trait.php';
 
 class WPLE_Ajax
 {
@@ -326,7 +322,7 @@ class WPLE_Ajax
                 break;
             case 'cabundle':
                 // if (file_exists(ABSPATH . 'keys/cabundle.crt')) {
-                $output = file_get_contents($keypath . 'fullchain.crt');
+                $output = file_get_contents($keypath . 'cabundle.crt');
                 // } else {
                 ///$output = file_get_contents(WPLE_DIR . 'cabundle/ca.crt');
                 //}

@@ -35,13 +35,10 @@ if ( !defined( 'ABSPATH' ) ) {
  */
 use WPLEClient\LEFunctions;
 //since php5.3.0
-require_once dirname( __DIR__ ) . '/admin/le_ajax.php';
-require_once dirname( __DIR__ ) . '/admin/le_handlers.php';
-require_once dirname( __DIR__ ) . '/classes/le-core.php';
-require_once dirname( __DIR__ ) . '/classes/le-subdir-challenge.php';
-if ( class_exists( 'WPLE_Admin' ) ) {
-    return;
-}
+require_once WPLE_DIR . 'admin/le_ajax.php';
+require_once WPLE_DIR . 'admin/le_handlers.php';
+require_once WPLE_DIR . 'classes/le-core.php';
+require_once WPLE_DIR . 'classes/le-subdir-challenge.php';
 /**
  * WPLE_Admin class
  * 
@@ -71,7 +68,7 @@ class WPLE_Admin {
             //ssl expiring in 10 days
             add_action( 'admin_notices', [$this, 'wple_reminder_notice'] );
         }
-        if ( FALSE !== get_option( 'wple_mixed_issues' ) ) {
+        if ( FALSE !== get_option( 'wple_mixed_issues' ) && FALSE === get_option( 'wple_mixed_issues_disabled' ) ) {
             //since 5.3.12
             add_action( 'admin_notices', [$this, 'wple_mixed_content_notice'] );
         }
@@ -88,14 +85,8 @@ class WPLE_Admin {
         //     add_action('admin_notices', [$this, 'wple_advancedsecurity_notice']);
         // }
         //since 7.8.5.9
-        // if (!wple_fs()->is__premium_only()) {
-        //     if ($this->wple_not_dismissed('woosecurity')) {
-        //         add_action('admin_notices', [$this, 'wple_woosecurity_notice']);
-        //     }
-        // } //removed since 7.8.6.5
-        if ( !get_transient( 'wple_monitor_remindlater' ) && FALSE === get_option( 'wple_notice_disabled_monitor' ) ) {
-            //since 5.3.12
-            add_action( 'admin_notices', [$this, 'wple_monitor_notice'] );
+        if ( $this->wple_not_dismissed( 'woosecurity' ) ) {
+            add_action( 'admin_notices', [$this, 'wple_woosecurity_notice'] );
         }
         /** Admin Notices End */
         add_action( 'wple_show_reviewrequest', array($this, 'wple_set_review_flag') );
@@ -108,9 +99,6 @@ class WPLE_Admin {
         //daily once cron
         add_action( 'wple_remindlater_trial', array($this, 'wple_show_trial_notice') );
         //since 7.7.0
-        // place the passkey button below the login form
-        add_action( 'login_form', [$this, 'wple_passkey_loginpage'] );
-        add_action( 'login_enqueue_scripts', [$this, 'wple_login_scripts'] );
     }
 
     // function my_custom_pricing_js_path($default_pricing_js_path)
@@ -155,7 +143,6 @@ class WPLE_Admin {
         wp_localize_script( WPLE_NAME, 'SCAN', [
             'base'      => site_url(),
             'adminajax' => admin_url( 'admin-ajax.php' ),
-            'nc'        => wp_create_nonce( 'wple-adminjs' ),
         ] );
         wp_enqueue_script(
             WPLE_NAME . '-fs',
@@ -204,7 +191,7 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.8.6.3', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.8.5.10', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
@@ -244,7 +231,7 @@ class WPLE_Admin {
         if ( isset( $_GET['error'] ) ) {
             $this->wple_error_block( $html );
         }
-        if ( FALSE === get_option( 'wple_plan_choose' ) || isset( $_GET['comparison'] ) ) {
+        if ( FALSE === get_option( 'wple_plan_choose' ) || isset( $_GET['comparison'] ) || !get_transient( 'wple_plan_chosen' ) ) {
             $this->wple_initial_quick_pricing( $html );
             return;
         }
@@ -615,23 +602,23 @@ class WPLE_Admin {
             }
         }
         $html .= '<strong style="display: block; text-align: center; color: #666;">Woot Woot! You have <b>' . esc_html( $servertype ) . '</b>! Avoid manual SSL renewals every 90 days - Enjoy automatic renewal with PRO version.</strong>';
-        $compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption#pricing';
-        ///$compareurl = admin_url('/admin.php?page=wp_encryption&comparison=1');
+        ///$compareurl = 'https://wpencryption.com/?utm_source=wordpress&utm_medium=comparison&utm_campaign=wpencryption#pricing';
+        $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
         if ( $nopricing ) {
             $compareurl = admin_url( '/admin.php?page=wp_encryption&comparison=1' );
             //$upgradeurl = admin_url('/admin.php?page=wp_encryption-pricing&checkout=true&plan_id=11394&plan_name=pro&billing_cycle=annual&pricing_id=11717&currency=usd');
             //$upgradeurl = 'https://checkout.freemius.com/mode/dialog/plugin/5090/plan/10643/'; //CDN
             $html .= '<div class="wple-error-firewall fire-pro wple-procdn">
-                <div>
-                <img src="' . WPLE_URL . 'admin/assets/firewall-shield-pro.png"/>
-                </div>
-                <div class="wple-upgrade-features">
-                <span><b>Automatic SSL Installation</b><br>Hassle free automatic installation of SSL Certificate - Super simple DNS based setup.</span>
-                <span><b>Automatic SSL Renewal</b><br>Your SSL certificate will be automatically renewed in background without the need of any action or manual work.</span>
-                <span><b>Security</b><br>Enterprise level protection against known vulnerabilities, Bad Bots, Brute Force, DDOS, Spam & much more attack vectors.</span>
-                <span><b>Automatic CDN</b><br>Your site is served from 42 full scale edge locations for faster content delivery and fastest performance.</span>
-                </div>
-            </div>';
+        <div>
+          <img src="' . WPLE_URL . 'admin/assets/firewall-shield-pro.png"/>
+        </div>
+        <div class="wple-upgrade-features">
+          <span><b>Automatic SSL Installation</b><br>Hassle free automatic installation of SSL Certificate - Super simple DNS based setup.</span>
+          <span><b>Automatic SSL Renewal</b><br>Your SSL certificate will be automatically renewed in background without the need of any action or manual work.</span>
+          <span><b>Security</b><br>Enterprise level protection against known vulnerabilities, Bad Bots, Brute Force, DDOS, Spam & much more attack vectors.</span>
+          <span><b>Automatic CDN</b><br>Your site is served from 42 full scale edge locations for faster content delivery and fastest performance.</span>
+        </div>
+      </div>';
         } else {
             $html .= '<div class="wple-plans">
             <span class="free">* ' . esc_html__( 'FREE', 'wp-letsencrypt-ssl' ) . '</span>
@@ -766,9 +753,7 @@ class WPLE_Admin {
                 '</strong></a>'
             );
         }
-        $html .= '<br>
-            <small><b>NOTE:</b> The CA bundle above contains two certificate blocks from <b>-----BEGIN CERTIFICATE-----</b> to <b>-----END CERTIFICATE-----</b>. If your hosting panel reports an error, use only the first block.</small>
-            </li>
+        $html .= '</li>
           <li>5. ' . sprintf( __( 'Click on %sInstall certificate%s', 'wp-letsencrypt-ssl' ), '<strong>', '</strong>' ) . '</li>
           <li>6. ' . sprintf( __( 'Please wait few minutes and click on %sEnable HTTPS Now%s button', 'wp-letsencrypt-ssl' ), '<strong>', '</strong>' ) . '</li>
         </ul>
@@ -1206,7 +1191,7 @@ class WPLE_Admin {
         7 days money back guarantee <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="If you are not satisfied with the service within 7 days of purchase, We will refund your purchase no questions asked"></span>
       </div> -->
 
-    <?php 
+<?php 
         $table = ob_get_clean();
         return $table;
     }
@@ -1261,7 +1246,7 @@ class WPLE_Admin {
           <small>' . esc_html__( 'Just takes a moment', 'wp-letsencrypt-ssl' ) . '</small>
 
           <div class="wple-ssl-next">
-            <b>NEXT:</b> Enable important security headers and achieve <b>"A/A+"</b> grade with SSL Scan via <a href="' . site_url( '/wp-admin/admin.php?page=wp_encryption_ssl_health' ) . '">SSL HEALTH</a>.
+            <b>NEXT:</b> Enable important security headers and achieve <b>"A/A+"</b> grade with SSL Scan via <a href="/wp-admin/admin.php?page=wp_encryption_ssl_health">SSL HEALTH</a>.
           </div>
 
         </div>';
@@ -1480,71 +1465,6 @@ class WPLE_Admin {
             return true;
         }
         return false;
-    }
-
-    public function wple_passkey_loginpage() {
-        if ( is_user_logged_in() ) {
-            return;
-        }
-        if ( !get_option( 'wple_passkeys' ) ) {
-            return;
-        }
-        ob_start();
-        ?>
-        <div id="wpencryption-passkey-wrapper">
-            <div id="wple-login-error" class="notice notice-error" style="display: none;"></div>
-            <div id="wple-login-success" class="notice notice-success" style="display: none;"></div>
-
-            <button id="wple-passkey-login" class="button button-large" type="button"><?php 
-        esc_html_e( 'Login via Passkey', 'wp-letsencrypt-ssl' );
-        ?></button>
-        </div>
-        <style>
-            div#wpencryption-passkey-wrapper {
-                display: inline-block;
-                margin-top: 20px;
-                margin-bottom: 20px;
-                text-align: center;
-                width: 100%;
-            }
-
-            button#wple-passkey-login {
-                margin: 0 auto !important;
-            }
-        </style>
-<?php 
-        echo ob_get_clean();
-    }
-
-    public function wple_login_scripts() {
-        wp_enqueue_script(
-            WPLE_NAME . '-login',
-            WPLE_URL . 'admin/js/le-login.js',
-            array('jquery'),
-            WPLE_PLUGIN_VER,
-            true
-        );
-        wp_localize_script( WPLE_NAME . '-login', 'SIGNIN', [
-            'base'      => site_url(),
-            'adminajax' => admin_url( 'admin-ajax.php' ),
-            'nc'        => wp_create_nonce( 'wple-loginjs' ),
-        ] );
-    }
-
-    public function wple_monitor_notice() {
-        $upgradebutton = '<a class="wplerevbtn" href="https://monitor.wpencryption.com" target="_blank">' . esc_html__( 'Launch Monitor', 'wp-letsencrypt-ssl' ) . '</a>';
-        $html = '<div class="notice notice-info wple-admin-review wple-notice-monitor">
-        <div class="wple-review-box">
-            <img src="' . WPLE_URL . 'admin/assets/symbol.png"/>
-            <span><strong>Introducing WP Encryption Monitor</strong>
-            <p>Browsers now enforce a max 199-day SSL certificate limit. Keeping track manually across multiple sites isn\'t an option anymore. One missed renewal takes your site offline. WP Encryption Monitor gives you a single place to monitor SSL and domain expiry dates with instant notifications — Absolutely free.</p></span>
-        </div>
-        ' . $upgradebutton . '
-        <a class="wple-dont-show-btn" data-context="monitor" href="#">' . esc_html__( "Don't show again", 'wp-letsencrypt-ssl' ) . '</a>
-        <a class="wple-ignore-btn" data-context="monitor" href="#">' . esc_html__( "Remind me later", 'wp-letsencrypt-ssl' ) . '</a>
-        </div>';
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
-        echo $html;
     }
 
 }

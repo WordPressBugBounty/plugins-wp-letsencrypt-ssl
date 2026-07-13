@@ -29,10 +29,6 @@ if (!defined('ABSPATH')) {
     die('Access Denied');
 }
 
-if (class_exists('WPLE_ForceSSL')) {
-    return;
-}
-
 /**
  * WPLE_ForceSSL
  * 

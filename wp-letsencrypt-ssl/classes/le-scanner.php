@@ -11,11 +11,8 @@
  */
 if (! defined('ABSPATH')) exit; // Exit if accessed directly
 
-require_once dirname(__DIR__) . '/classes/le-advanced-scanner.php';
+require_once WPLE_DIR . 'classes/le-advanced-scanner.php';
 
-if (class_exists('WPLE_Scanner')) {
-    return;
-}
 /**
  * Mixed content scanner
  *

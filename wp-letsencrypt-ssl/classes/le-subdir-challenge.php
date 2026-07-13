@@ -28,10 +28,7 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 // Exit if accessed directly
-require_once dirname( __DIR__ ) . '/classes/le-trait.php';
-if ( class_exists( 'WPLE_Subdir_Challenge_Helper' ) ) {
-    return;
-}
+require_once WPLE_DIR . 'classes/le-trait.php';
 /**
  * Sub-directory http challenge
  *
@@ -79,7 +76,7 @@ class WPLE_Subdir_Challenge_Helper {
             $upgradeurl = admin_url( '/admin.php?page=wp_encryption-pricing&checkout=true&billing_cycle_selector=responsive_list&plan_id=8210&plan_name=pro&billing_cycle=annual&pricing_id=7965&currency=usd' );
         }
         $output .= '<div class="wple-error-firewall">
-            
+            <span class="wple-fix-auto">Fix SSL Automatically (Recommended)</span>
                 <div>
                 <img src="' . WPLE_URL . 'admin/assets/firewall-shield-pro.png"/>
                 </div>
