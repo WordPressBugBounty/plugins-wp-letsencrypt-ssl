@@ -6,6 +6,10 @@
 
 if (! defined('ABSPATH')) exit; // Exit if accessed directly
 
+if (class_exists('WPLE_Mscan')) {
+    return;
+}
+
 class WPLE_Mscan
 {
     public function __construct()

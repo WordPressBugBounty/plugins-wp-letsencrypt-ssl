@@ -24,85 +24,87 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-class WPLE_Deactivator {
-    public static function deactivate() {
-        $opts = ( get_option( 'wple_opts' ) === FALSE ? array(
-            'expiry' => '',
-        ) : get_option( 'wple_opts' ) );
+
+if (class_exists('WPLE_Deactivator')) {
+    return;
+}
+
+class WPLE_Deactivator
+{
+
+    public static function deactivate()
+    {
+        $opts = get_option('wple_opts') === FALSE ? array('expiry' => '') : get_option('wple_opts');
+
         //disable ssl forcing
         $opts['force_ssl'] = 0;
-        update_option( 'wple_opts', $opts );
+        update_option('wple_opts', $opts);
+
+        if (wple_fs()->is__premium_only()) {
+
+            //retained - wple_opts, wple_error, wple_complete, wple_backend, wple_firewall_ip, wple_firewall_stage, wple_spmode_error
+
+            $opts_to_delete = array('wple_gdaddy', 'wple_cpapi', 'wple_spmode_dns', 'wple_renewal_failed', 'wple_dns_new', 'wple_disable_spmode', 'wple_force_spmode', 'wple_port_closed', 'wple_renewal_type', 'wple_directadmin', 'wple_pleskapi');
+
+            foreach ($opts_to_delete as $optname) {
+                delete_option($optname);
+            }
+
+            //clean firewall rules in wp-config in all existing sites
+            //temporary cleanup
+            if (is_writable(ABSPATH . 'wp-config.php')) {
+                $htaccess = file_get_contents(ABSPATH . 'wp-config.php');
+                $group = "/#\\s?BEGIN\\s?WP_ENCRYPTION_FIREWALL.*?#\\s?END\\s?WP_ENCRYPTION_FIREWALL/s";
+
+                if (preg_match($group, $htaccess)) {
+                    $modhtaccess = preg_replace($group, "", $htaccess);
+                    file_put_contents(ABSPATH . 'wp-config.php', $modhtaccess);
+                }
+            }
+        }
+
         // retained - wple_opts, wple_show_reminder, wple_send_usage, wple_error, wple_complete, wple_failed_verification, wple_mixed_issues, wple_priv_key, 'wple_notice_trial', wple_certpanel_used, wple_stage, wple_malware_ignorelist, wple_activate
+
         //retained headers - wple_xxss,wple_xcontenttype,wple_referrer,wple_xframe,wple_upgrade_insecure,wple_hsts,wple_httponly_cookies (stored as option name wple_httponly_cookies),wple_daily_vulnerability_scan,wple_daily_malware_scan
-        $opts_to_delete = array(
-            'wple_backup_suggested',
-            'wple_show_review',
-            'wple_have_cpanel',
-            'wple_plan_choose',
-            'wple_no_pricing',
-            'wple_mx',
-            'wple_http_valid',
-            'wple_email_certs',
-            'wple_ssl_errors',
-            'wple_ssl_valid',
-            'wple_version',
-            'wple_backend',
-            'wple_last_error',
-            'wple_ldebug_lasthttp',
-            'wple_ldebug_lastdns',
-            'wple_mixed_issues_disabled',
-            'wple_show_review_disabled',
-            'wple_error',
-            'wple_ssl_screen',
-            'wple_sectigo',
-            'wple_failed_verification',
-            'wple_sourceip',
-            'wple_order_refreshed',
-            'wple_sourceip_enable',
-            'wple_parent_reachable',
-            'wple_notice_disabled_trial',
-            'wple_security_settings',
-            'wple_sourceip',
-            'wple_mixed_issues',
-            'wple_renewal_failed_notice',
-            'wple_dismissed_notices',
-            'wple_survey_pending',
-            'wple_survey_interests',
-            'wple_vulnerability_lastscan',
-            'wple_malware_lastscan',
-            'wple_mscan_integrity',
-            'wple_activate'
-        );
-        foreach ( $opts_to_delete as $optname ) {
-            delete_option( $optname );
+
+        $opts_to_delete = array('wple_backup_suggested', 'wple_show_review', 'wple_have_cpanel', 'wple_plan_choose', 'wple_no_pricing', 'wple_mx', 'wple_http_valid', 'wple_email_certs', 'wple_ssl_errors', 'wple_ssl_valid', 'wple_version', 'wple_backend', 'wple_last_error', 'wple_ldebug_lasthttp', 'wple_ldebug_lastdns', 'wple_mixed_issues_disabled', 'wple_show_review_disabled', 'wple_error', 'wple_ssl_screen', 'wple_sectigo', 'wple_failed_verification', 'wple_sourceip', 'wple_order_refreshed', 'wple_sourceip_enable', 'wple_parent_reachable', 'wple_notice_disabled_trial', 'wple_notice_disabled_monitor', 'wple_security_settings', 'wple_sourceip', 'wple_mixed_issues', 'wple_renewal_failed_notice', 'wple_dismissed_notices', 'wple_survey_pending', 'wple_survey_interests', 'wple_vulnerability_lastscan', 'wple_malware_lastscan', 'wple_mscan_integrity', 'wple_activate');
+
+        foreach ($opts_to_delete as $optname) {
+            delete_option($optname);
         }
-        delete_transient( 'wple_ssllabs' );
+
+        delete_transient('wple_ssllabs');
+
         //clear reminder cron
-        if ( wp_next_scheduled( 'wple_ssl_reminder_notice' ) ) {
-            wp_clear_scheduled_hook( 'wple_ssl_reminder_notice' );
+        if (wp_next_scheduled('wple_ssl_reminder_notice')) {
+            wp_clear_scheduled_hook('wple_ssl_reminder_notice');
         }
+
         //clear daily vuln scan
-        if ( wp_next_scheduled( 'wple_init_vulnerability_scan' ) ) {
-            wp_clear_scheduled_hook( 'wple_init_vulnerability_scan' );
+        if (wp_next_scheduled('wple_init_vulnerability_scan')) {
+            wp_clear_scheduled_hook('wple_init_vulnerability_scan');
         }
+
         //clear daily ssl scan
-        if ( wp_next_scheduled( 'wple_ssl_expiry_update' ) ) {
-            wp_clear_scheduled_hook( 'wple_ssl_expiry_update' );
+        if (wp_next_scheduled('wple_ssl_expiry_update')) {
+            wp_clear_scheduled_hook('wple_ssl_expiry_update');
         }
+
         //remove debug log
-        if ( file_exists( WPLE_DEBUGGER . 'debug.log' ) ) {
-            @unlink( WPLE_DEBUGGER . 'debug.log' );
+        if (file_exists(WPLE_DEBUGGER . 'debug.log')) {
+            @unlink(WPLE_DEBUGGER . 'debug.log');
         }
+
         //clean force https rules in htaccess
-        if ( is_writable( ABSPATH . '.htaccess' ) ) {
-            $htaccess = file_get_contents( ABSPATH . '.htaccess' );
+        if (is_writable(ABSPATH . '.htaccess')) {
+            $htaccess = file_get_contents(ABSPATH . '.htaccess');
             $group = "/#\\s?BEGIN\\s?WP_Encryption_Force_SSL.*?#\\s?END\\s?WP_Encryption_Force_SSL/s";
-            if ( preg_match( $group, $htaccess ) ) {
-                $modhtaccess = preg_replace( $group, "", $htaccess );
+
+            if (preg_match($group, $htaccess)) {
+                $modhtaccess = preg_replace($group, "", $htaccess);
                 //insert_with_markers(ABSPATH . '.htaccess', '', $modhtaccess);
-                file_put_contents( ABSPATH . '.htaccess', $modhtaccess );
+                file_put_contents(ABSPATH . '.htaccess', $modhtaccess);
             }
         }
     }
-
 }

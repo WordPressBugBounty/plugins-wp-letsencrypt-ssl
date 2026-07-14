@@ -6,6 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WPLE\\' => array($baseDir . '/classes'),
     'WPLEClient\\' => array($baseDir . '/lib'),
 );

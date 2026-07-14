@@ -680,7 +680,11 @@ class LEOrder
         if (isset($this->certificateKeys['cabundle'])) file_put_contents($this->certificateKeys['cabundle'], $certificates['intermediate']);
 
         if (count($certificates) > 1 && isset($this->certificateKeys['fullchain_certificate'])) {
-            $fullchain = implode("\n", $certificates) . "\n";
+            if (isset($certificates['root'])) {
+                $fullchain = $certificates['intermediate'] . "\n" . $certificates['root'] . "\n";
+            } else {
+                $fullchain = $certificates['intermediate'] . "\n";
+            }
             file_put_contents(trim($this->certificateKeys['fullchain_certificate']), $fullchain);
         }
         if ($this->log instanceof \Psr\Log\LoggerInterface) {
@@ -693,10 +697,16 @@ class LEOrder
     {
         if ($response['status'] === 200) {
             if (preg_match_all('~(-----BEGIN\sCERTIFICATE-----[\s\S]+?-----END\sCERTIFICATE-----)~i', $response['body'], $matches)) {
-                return [
+                $certificates = [
                     'leaf' => $matches[0][0],
-                    'intermediate' => $matches[0][1],
                 ];
+                if (isset($matches[0][1])) {
+                    $certificates['intermediate'] = $matches[0][1];
+                }
+                if (isset($matches[0][2])) {
+                    $certificates['root'] = $matches[0][2];
+                }
+                return $certificates;
             } else {
                 if ($this->log instanceof \Psr\Log\LoggerInterface) {
                     $this->log->info('Received invalid certificate for \'' . $this->basename . '\'. Cannot save certificate.');

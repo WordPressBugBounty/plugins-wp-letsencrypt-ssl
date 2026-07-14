@@ -1,13 +1,13 @@
 === WP Encryption - One Click Free SSL Certificate & SSL / HTTPS Redirect, Security & SSL Scan ===
 Contributors: gowebsmarty, gwsharsha
-Tags: free ssl,ssl,https,https redirect,force https,security
+Tags: https,https redirect,free ssl,ssl,force https
 Requires at least: 5.4
 License: GPL3
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 7.8.5.17
+Stable tag: 7.8.6.6
 
-Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, SSL score, HTTPS headers, Easy SSL & Security.
+Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, HTTPS headers, Login Security & Passkey.
 
 == Description ==
 
@@ -54,17 +54,25 @@ https://youtu.be/aKvvVlAlZ14
 
 (Optional) Running WordPress on a specialized VPS/Dedicated server without cPanel? You can download the generated SSL certificate files easily via "Download SSL Certificates" page and install it on your server by modifying server config file via SSH access as explained in our [DOCS](https://wpencryption.com/docs/). 
 
+== (7.8.6.0) PASSKEY LOGIN SECURITY ==
+
+Introducing 'Login Security - Passkeys' page - Enable passwordless biometric login powered by WebAuthn. Register secure passkey via profile page and enjoy seamless login experience without the need of remembering any password.
+
 == (7.8.0) NEW ADVANCED SECURITY PAGE WITH INTEGRITY SCAN & MALWARE SCAN ==
 
-Discover the brand-new ‘Advanced Security & Scanner’ page — your command center for the most powerful protection your WordPress site has ever seen. Run malware and integrity scans to detect modified, additional, or suspicious files in your installation. Stay ahead of threats and keep your security score at its peak.
+Discover the brand-new 'Advanced Security & Scanner' page — your command center for the most powerful protection your WordPress site has ever seen. Run malware and integrity scans to detect modified, additional, or suspicious files in your installation. Stay ahead of threats and keep your security score at its peak.
 
-== ADVANCED HTTP SECURITY HEADERS ==
+== ADVANCED HTTPS SECURITY HEADERS ==
 
 Safeguard your site from cross-site scripting attacks, clickjacking, MIME sniffing attacks.
 
 * Enable HTTPS Strict Transport Security Header to avoid request protocol downgrading
 * Disable directory listing to avoid directory traversing
 * Enable X-XSS protection, secure cookies, X-Content-Type-Options to avoid cross site scripting and MIME sniffing
+
+== Force HTTPS with 301 redirect ==
+
+One click enable HTTP to HTTPS redirection via FORCE HTTPS page if you already have valid SSL certificate installed on site. We highly recommend using Force HTTPS via htaccess method to enable server level faster redirection, use Force HTTPS via WordPress method only if you are using Cloudflare or other reverse proxies. Also, make sure to enable important security headers and implement advanced SSL features from the SSL Health page.
 
 == Switch to HTTPS in seconds ==
 
@@ -96,10 +104,6 @@ Linux hosting, OpenSSL, CURL, allow_url_fopen should be enabled.
 Many thanks to the generous efforts of our translators.
 
 If you would like to translate plugin to your language, [Feel free to sign up and start translating!](https://translate.wordpress.org/projects/wp-plugins/wp-letsencrypt-ssl/)
-
-= Show Your Support =
-
-* If you find any issue, please submit a bug via support forum.
 
 == LOVE WP ENCRYPTION SSL PLUGIN? =
 
@@ -177,6 +181,31 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.6.6 =
+* Freemius SDK update
+
+= 7.8.6.5 =
+* Removed admin notice
+
+= 7.8.6.4 =
+* WP Encryption Monitor
+* Removed temporary cert logging 
+
+= 7.8.6.3 =
+* Full chain certificate generation
+* Use full chain as default CA
+* PRO - $host bug fix during renewal
+
+= 7.8.6.2 =
+* Composer improvements
+* css improvements for wp 7.0
+* composer minimum php 5.6
+
+= 7.8.6.0 =
+* Passkey registration and login
+* Improved composer autoloading and class loadings
+* Require files improved overall
 
 = 7.8.5.16 =
 * PRO - https file verification for re-located WP
