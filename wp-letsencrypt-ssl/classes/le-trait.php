@@ -24,106 +24,108 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-if (class_exists('WPLE_Trait')) {
+if ( class_exists( 'WPLE_Trait' ) ) {
     return;
 }
-class WPLE_Trait
-{
-
+class WPLE_Trait {
     /**
      * Progress & error indicator
      *
      * @since 4.4.0 
      * @return void
      */
-    public static function wple_progress_bar($yellow = 0)
-    {
+    public static function wple_progress_bar( $yellow = 0 ) {
         $stage1 = $stage2 = $stage3 = $stage4 = '';
-
-        $progress = get_option('wple_error');
-
-        $screen = get_option('wple_ssl_screen');
-
-        if ($screen === 'success') { //all success
+        $progress = get_option( 'wple_error' );
+        $screen = get_option( 'wple_ssl_screen' );
+        if ( $screen === 'success' ) {
+            //all success
             $stage1 = $stage2 = $stage3 = $stage4 = 'prog-1';
-        } else if ($screen === 'complete') { //ssl install pending
-            $stage1 = $stage2 = $stage3 = 'prog-1';
-        } else if ($screen == 'verification') {
-            $stage1 = 'prog-1';
-        } else if (FALSE === $progress) {
-            //still waiting first run
-        } else if ($progress == 0) { //success
-            $stage1 = $stage2 = $stage3 = 'prog-1';
-        } else if ($progress == 1 || $progress == 400 || $progress == 429) { //failed on first step
-            $stage1 = 'prog-0';
-        } else if ($progress == 2) {
-            $stage1 = 'prog-1';
-            $stage2 = 'prog-0';
-        } else if ($progress == 3) {
-            $stage1 = $stage2 = 'prog-1';
-            $stage3 = 'prog-0';
-        } else if ($progress == 4) {
-            $stage1 = $stage2 = $stage3 = 'prog-1';
-            $stage4 = 'prog-0';
+        } else {
+            if ( $screen === 'complete' ) {
+                //ssl install pending
+                $stage1 = $stage2 = $stage3 = 'prog-1';
+            } else {
+                if ( $screen == 'verification' ) {
+                    $stage1 = 'prog-1';
+                } else {
+                    if ( FALSE === $progress ) {
+                        //still waiting first run
+                    } else {
+                        if ( $progress == 0 ) {
+                            //success
+                            $stage1 = $stage2 = $stage3 = 'prog-1';
+                        } else {
+                            if ( $progress == 1 || $progress == 400 || $progress == 429 ) {
+                                //failed on first step
+                                $stage1 = 'prog-0';
+                            } else {
+                                if ( $progress == 2 ) {
+                                    $stage1 = 'prog-1';
+                                    $stage2 = 'prog-0';
+                                } else {
+                                    if ( $progress == 3 ) {
+                                        $stage1 = $stage2 = 'prog-1';
+                                        $stage3 = 'prog-0';
+                                    } else {
+                                        if ( $progress == 4 ) {
+                                            $stage1 = $stage2 = $stage3 = 'prog-1';
+                                            $stage4 = 'prog-0';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-
         $out = '<ul class="wple-progress">
-      <li class="' . $stage1 . '"><a href="?page=wp_encryption&restart=' . wp_create_nonce('restart_ssl') . '" class="wple-tooltip" data-tippy="' . esc_attr__("Click to re-start from beginning", 'wp-letsencrypt-ssl') . '"><span>1</span>&nbsp;' . esc_html__('Registration', 'wp-letsencrypt-ssl') . '</a></li>
-      <li class="' . $stage2 . '"><span>2</span>&nbsp;' . esc_html__('Domain Verification', 'wp-letsencrypt-ssl') . '</li>
-      <!--<li class="' . $stage3 . '"><span>3</span>&nbsp;' . esc_html__('Certificate Generated', 'wp-letsencrypt-ssl') . '</li>-->
-      <li class="' . $stage4 . ' onprocess' . esc_attr($yellow) . '"><span>3</span>&nbsp;' . esc_html__('Install SSL Certificate', 'wp-letsencrypt-ssl') . '</li>';
-
+      <li class="' . $stage1 . '"><a href="?page=wp_encryption&restart=' . wp_create_nonce( 'restart_ssl' ) . '" class="wple-tooltip" data-tippy="' . esc_attr__( "Click to re-start from beginning", 'wp-letsencrypt-ssl' ) . '"><span>1</span>&nbsp;' . esc_html__( 'Registration', 'wp-letsencrypt-ssl' ) . '</a></li>
+      <li class="' . $stage2 . '"><span>2</span>&nbsp;' . esc_html__( 'Domain Verification', 'wp-letsencrypt-ssl' ) . '</li>
+      <!--<li class="' . $stage3 . '"><span>3</span>&nbsp;' . esc_html__( 'Certificate Generated', 'wp-letsencrypt-ssl' ) . '</li>-->
+      <li class="' . $stage4 . ' onprocess' . esc_attr( $yellow ) . '"><span>3</span>&nbsp;' . esc_html__( 'Install SSL Certificate', 'wp-letsencrypt-ssl' ) . '</li>';
         $out .= '</ul>';
-
         return $out;
     }
 
-    public static function wple_get_acmename($nonwwwdomain, $identifier)
-    {
+    public static function wple_get_acmename( $nonwwwdomain, $identifier ) {
         $dmn = $nonwwwdomain;
-
-        if (false !== ($slashpos = stripos($dmn, '/'))) {
-            $pdomain = substr($dmn, 0, $slashpos);
+        if ( false !== ($slashpos = stripos( $dmn, '/' )) ) {
+            $pdomain = substr( $dmn, 0, $slashpos );
         } else {
             $pdomain = $dmn;
         }
-
-        $www = str_ireplace($pdomain, '', $identifier);
-        if ($www !== '') {
-            $www = '.' . substr($www, 0, -1);
+        $www = str_ireplace( $pdomain, '', $identifier );
+        if ( $www !== '' ) {
+            $www = '.' . substr( $www, 0, -1 );
         }
-
-        $parts = explode('.', $dmn);
+        $parts = explode( '.', $dmn );
         $subdomain = '';
-
-        if (count($parts) == 3) { //subdomain calc
-
-            if (strlen($parts[1]) <= 3 && strlen($parts[2]) == 2) {
+        if ( count( $parts ) == 3 ) {
+            //subdomain calc
+            if ( strlen( $parts[1] ) <= 3 && strlen( $parts[2] ) == 2 ) {
                 //co.uk //com.au
             } else {
                 $subdomain = '.' . $parts[0];
             }
-        } else if (count($parts) > 3) {
-            $subdomain = '.' . $parts[0];
+        } else {
+            if ( count( $parts ) > 3 ) {
+                $subdomain = '.' . $parts[0];
+            }
         }
-
         $acme = '_acme-challenge' . $www . $subdomain;
-
         return $acme;
     }
 
     // public static function wple_Is_SubDomain($syt)
     // {
     //   $parts = explode('.', $syt);
-
     //   if (count($parts) > 2 && strlen($parts[0]) >= 3 && strlen($parts[1]) > 2) {
     //     return true; //probably subdomain
     //   }
-
     //   return false;
     // }
-
     /**
      * FAQ & Videos
      *
@@ -131,31 +133,16 @@ class WPLE_Trait
      * @return void
      * @since 5.2.2
      */
-    public static function wple_headernav(&$html)
-    {
+    public static function wple_headernav( &$html ) {
         $html .= '<div>
     <ul id="wple-nav">';
-
         $html .= '
-        <li><a href="' . admin_url('/admin.php?page=wp_encryption_log') . '"><span class="dashicons dashicons-admin-tools"></span> ' . esc_html__('Debug Log', 'wp-letsencrypt-ssl') . '</a></li>
-        <li><a href="' . admin_url('/admin.php?page=wp_encryption_faq') . '"><span class="dashicons dashicons-editor-help"></span> ' . esc_html__('FAQ', 'wp-letsencrypt-ssl') . '</a></li>
-        <li><a href="' . admin_url('/admin.php?page=wp_encryption_howto_videos') . '"><span class="dashicons dashicons-video-alt3"></span> ' . esc_html__('Videos', 'wp-letsencrypt-ssl') . '</a></li>
-        <li><a href="' . admin_url('/admin.php?page=wp_encryption_ssl_health') . '"><span class="dashicons dashicons-heart"></span> ' . esc_html__('SSL Health', 'wp-letsencrypt-ssl') . '</a></li>
-        <li><a href="' . admin_url('/admin.php?page=wp_encryption_security') . '"><span class="dashicons dashicons-visibility"></span> ' . esc_html__('Security', 'wp-letsencrypt-ssl') . '</a></li>';
-
-        if (wple_fs()->is__premium_only()) {
-            $html .= '<li><a href="https://support.wpencryption.com" target="_blank"><span class="dashicons dashicons-sos"></span> ' . esc_html__('Support', 'wp-letsencrypt-ssl') . '</a></li>';
-        } else {
-            $html .= '<li><a href="https://wordpress.org/support/plugin/wp-letsencrypt-ssl/#new-topic-0" target="_blank" rel="nofollow"><span class="dashicons dashicons-sos"></span> ' . esc_html__('Support', 'wp-letsencrypt-ssl') . '</a></li>';
-        }
-
-        if (wple_fs()->is__premium_only()) {
-            if (FALSE !== get_option('wple_certpanel_used')) {
-                $html .= '<li><a href="' . admin_url('/admin.php?page=wp_encryption&certpanel=1') . '"><span class="dashicons dashicons-flag"></span>Cert Panel</a></li>';
-            }
-        }
-
-
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_log' ) . '"><span class="dashicons dashicons-admin-tools"></span> ' . esc_html__( 'Debug Log', 'wp-letsencrypt-ssl' ) . '</a></li>
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_faq' ) . '"><span class="dashicons dashicons-editor-help"></span> ' . esc_html__( 'FAQ', 'wp-letsencrypt-ssl' ) . '</a></li>
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_howto_videos' ) . '"><span class="dashicons dashicons-video-alt3"></span> ' . esc_html__( 'Videos', 'wp-letsencrypt-ssl' ) . '</a></li>
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_ssl_health' ) . '"><span class="dashicons dashicons-heart"></span> ' . esc_html__( 'SSL Health', 'wp-letsencrypt-ssl' ) . '</a></li>
+        <li><a href="' . admin_url( '/admin.php?page=wp_encryption_security' ) . '"><span class="dashicons dashicons-visibility"></span> ' . esc_html__( 'Security', 'wp-letsencrypt-ssl' ) . '</a></li>';
+        $html .= '<li><a href="https://wordpress.org/support/plugin/wp-letsencrypt-ssl/#new-topic-0" target="_blank" rel="nofollow"><span class="dashicons dashicons-sos"></span> ' . esc_html__( 'Support', 'wp-letsencrypt-ssl' ) . '</a></li>';
         $html .= '</ul></div>';
     }
 
@@ -170,70 +157,58 @@ class WPLE_Trait
      * 
      * @since 5.2.4
      */
-    public static function wple_logger($msg = '', $type = 'success', $mode = 'a', $redirect = false)
-    {
-
-        $handle = fopen(WPLE_DEBUGGER . 'debug.log', $mode);
-
-        if ($type == 'error') {
-            $msg = '<span class="error"><b>' . esc_html__('ERROR', 'wp-letsencrypt-ssl') . ':</b> ' . wp_kses_post($msg) . '</span>';
+    public static function wple_logger(
+        $msg = '',
+        $type = 'success',
+        $mode = 'a',
+        $redirect = false
+    ) {
+        $handle = fopen( WPLE_DEBUGGER . 'debug.log', $mode );
+        if ( $type == 'error' ) {
+            $msg = '<span class="error"><b>' . esc_html__( 'ERROR', 'wp-letsencrypt-ssl' ) . ':</b> ' . wp_kses_post( $msg ) . '</span>';
         }
-
-        fwrite($handle, wp_kses_post($msg) . "\n");
-        fclose($handle);
-
-        if ($redirect) {
-            if (!wple_fs()->is__premium_only()) {
-                if (FALSE != ($dlog = get_option('wple_send_usage')) && $dlog) {
-                    SELF::wple_send_log_data();
-                }
-            }
-
-            if (wple_fs()->is__premium_only()) {
+        fwrite( $handle, wp_kses_post( $msg ) . "\n" );
+        fclose( $handle );
+        if ( $redirect ) {
+            if ( FALSE != ($dlog = get_option( 'wple_send_usage' )) && $dlog ) {
                 SELF::wple_send_log_data();
             }
-
-            wp_redirect(admin_url('/admin.php?page=wp_encryption&error=1'), 302);
-            die();
+            wp_redirect( admin_url( '/admin.php?page=wp_encryption&error=1' ), 302 );
+            die;
         }
     }
 
-    public static function wple_send_log_data($args = array())
-    {
-        WPLE_Trait::wple_logger('Syncing debug log');
-
-        $readlog = file_get_contents(WPLE_DEBUGGER . 'debug.log');
+    public static function wple_send_log_data( $args = array() ) {
+        WPLE_Trait::wple_logger( 'Syncing debug log' );
+        $readlog = file_get_contents( WPLE_DEBUGGER . 'debug.log' );
         $handle = curl_init();
-
         $srvr = array(
             'challenge_folder_exists' => '',
-            'certificate_exists' => file_exists(WPLE_Trait::wple_cert_directory() . 'certificate.crt'),
-            'server_software' => sanitize_text_field($_SERVER['SERVER_SOFTWARE']),
-            'http_host' => sanitize_text_field($_SERVER['HTTP_HOST']),
-            'pro' => (wple_fs()->is__premium_only()) ? 'PRO' : 'FREE',
+            'certificate_exists'      => file_exists( WPLE_Trait::wple_cert_directory() . 'certificate.crt' ),
+            'server_software'         => sanitize_text_field( $_SERVER['SERVER_SOFTWARE'] ),
+            'http_host'               => sanitize_text_field( $_SERVER['HTTP_HOST'] ),
+            'pro'                     => ( wple_fs()->is__premium_only() ? 'PRO' : 'FREE' ),
         );
-
-        $data = array_merge($srvr, $args);
-
+        $data = array_merge( $srvr, $args );
         $curlopts = array(
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_POST => 1,
-            CURLOPT_URL => 'https://support.wpencryption.com/?catchwple=1',
-            CURLOPT_HEADER => false,
-            CURLOPT_POSTFIELDS => array('response' => $readlog, 'server' => json_encode($data)),
-            CURLOPT_TIMEOUT => 30
+            CURLOPT_POST           => 1,
+            CURLOPT_URL            => 'https://support.wpencryption.com/?catchwple=1',
+            CURLOPT_HEADER         => false,
+            CURLOPT_POSTFIELDS     => array(
+                'response' => $readlog,
+                'server'   => json_encode( $data ),
+            ),
+            CURLOPT_TIMEOUT        => 30,
         );
-
-        curl_setopt_array($handle, $curlopts);
-
+        curl_setopt_array( $handle, $curlopts );
         try {
-            curl_exec($handle);
-        } catch (Exception $e) {
-            curl_close($handle);
+            curl_exec( $handle );
+        } catch ( Exception $e ) {
+            curl_close( $handle );
             return;
         }
-
-        curl_close($handle);
+        curl_close( $handle );
     }
 
     /**
@@ -245,15 +220,10 @@ class WPLE_Trait
      * @param string $revertcode
      * @return void
      */
-    public static function wple_send_reverter_secret($revertcode)
-    {
-
+    public static function wple_send_reverter_secret( $revertcode ) {
         // $to = get_bloginfo('admin_email');
-
         // $sub = esc_html__('You have successfully forced HTTPS on your site', 'wp-letsencrypt-ssl');
-
         // $header = array('Content-Type: text/html; charset=UTF-8');
-
         // $rcode = sanitize_text_field($revertcode);
         // $body = SELF::wple_kses(__("HTTPS have been strictly forced on your site now!. In rare cases, this may cause issue / make the site un-accessible <b>IF</b> you dont have valid SSL certificate installed for your WordPress site. Kindly save the below <b>Secret code</b> to revert back to HTTP in such a case.", 'wp-letsencrypt-ssl')) . "
         //   <br><br>
@@ -265,8 +235,6 @@ class WPLE_Trait
         //   <br>
         //   " . esc_html__("We have spent several hours to craft this plugin to perfectness. Please take a moment to rate us with 5 stars", 'wp-letsencrypt-ssl') . " - https://wordpress.org/support/plugin/wp-letsencrypt-ssl/reviews/#new-post
         //   <br />";
-
-
         // wp_mail($to, $sub, $body, $header);
     }
 
@@ -280,72 +248,65 @@ class WPLE_Trait
      * @param string $additional Additional allowed html tags
      * @return void
      */
-    public static function wple_kses($translated, $additional = '')
-    {
-
+    public static function wple_kses( $translated, $additional = '' ) {
         $allowed = array(
             'strong' => array(),
-            'b' => array(),
-            'small' => array(),
-            'sup' => array(
-                'style' => array()
+            'b'      => array(),
+            'small'  => array(),
+            'sup'    => array(
+                'style' => array(),
             ),
-            'h1' => array(),
-            'h2' => array(),
-            'h3' => array(),
-            'h4' => array(),
-            'h5' => array(),
-            'h6' => array(),
-            'br' => array(),
-            'span' => array(
+            'h1'     => array(),
+            'h2'     => array(),
+            'h3'     => array(),
+            'h4'     => array(),
+            'h5'     => array(),
+            'h6'     => array(),
+            'br'     => array(),
+            'span'   => array(
                 'class' => array(),
             ),
         );
-
         //if ($additional == 'a') {
         $allowed['a'] = array(
-            'href' => array(),
-            'rel' => array(),
-            'target' => array(),
-            'title' => array(),
+            'href'       => array(),
+            'rel'        => array(),
+            'target'     => array(),
+            'title'      => array(),
             'data-tippy' => array(),
-            'style' => array()
+            'style'      => array(),
         );
         //}
-
-        return wp_kses($translated, $allowed);
+        return wp_kses( $translated, $allowed );
     }
 
-    public static function wple_verify_ssl($domain)
-    {
-        $streamContext = stream_context_create([
+    public static function wple_verify_ssl( $domain ) {
+        $streamContext = stream_context_create( [
             'ssl' => [
                 'verify_peer' => true,
             ],
-        ]);
-
+        ] );
         $errorDescription = $errorNumber = '';
-
         $client = @stream_socket_client(
-            "ssl://$domain:443",
+            "ssl://{$domain}:443",
             $errorNumber,
             $errorDescription,
             30,
             STREAM_CLIENT_CONNECT,
             $streamContext
         );
-
-        if (!$client) { //Helper in case of local check failure
-            $ssllabs = SELF::wple_ssllabs_scan(false, true);
-            sleep(10);
-            if (isset($ssllabs['status']) && $ssllabs['status'] == 'ready') {
+        if ( !$client ) {
+            //Helper in case of local check failure
+            $ssllabs = SELF::wple_ssllabs_scan( false, true );
+            sleep( 10 );
+            if ( isset( $ssllabs['status'] ) && $ssllabs['status'] == 'ready' ) {
                 $grade = $ssllabs['info'];
-                if ($grade != 'T' && $grade != 'M' && $grade != '') { //not trusted & cert mismatch check
+                if ( $grade != 'T' && $grade != 'M' && $grade != '' ) {
+                    //not trusted & cert mismatch check
                     return true;
                 }
             }
         }
-
         return $client;
     }
 
@@ -355,62 +316,56 @@ class WPLE_Trait
      * @param boolean $spmode
      * @return void
      */
-    public static function compose_htaccess_rules($spmode = false)
-    {
+    public static function compose_htaccess_rules( $spmode = false ) {
         $rule = "\n" . "# BEGIN WP_Encryption_Force_SSL\n";
         $rule .= "<IfModule mod_rewrite.c>" . "\n";
         $rule .= "RewriteEngine on" . "\n";
         $rule .= "RewriteCond %{HTTPS} !=on [NC]" . "\n";
-
         // If a proxy sets any of these headers, add a complementary RewriteCond so the redirect only fires
         // when the proxy header does NOT indicate HTTPS.
-        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+        if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
             // header typically contains 'http' or 'https'
             $rule .= "RewriteCond %{HTTP:X-Forwarded-Proto} !https" . "\n";
-        } elseif (isset($_SERVER['HTTP_X_PROTO'])) {
+        } elseif ( isset( $_SERVER['HTTP_X_PROTO'] ) ) {
             $rule .= "RewriteCond %{HTTP:X-Proto} !SSL" . "\n";
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED_SSL'])) {
+        } elseif ( isset( $_SERVER['HTTP_X_FORWARDED_SSL'] ) ) {
             // X-Forwarded-SSL can be 'on' or '1' depending on proxy; only redirect if it's neither
             $rule .= "RewriteCond %{HTTP:X-Forwarded-SSL} !(on|1)" . "\n";
-        } elseif ($spmode || isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        } elseif ( $spmode || isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
             // special proxy mode or presence of X-Forwarded-For: ensure we don't redirect when proxied
-            $rule .= "RewriteCond %{HTTP:X-Forwarded-For} ^$" . "\n";
-        } elseif (isset($_SERVER['HTTP_CF_VISITOR'])) {
+            $rule .= "RewriteCond %{HTTP:X-Forwarded-For} ^\$" . "\n";
+        } elseif ( isset( $_SERVER['HTTP_CF_VISITOR'] ) ) {
             // Cloudflare sends JSON like {"scheme":"https"} - avoid redirect when scheme is https
-            $rule .= 'RewriteCond %{HTTP:CF-Visitor} !\"scheme\":\"https\"' . "\n";
-        } elseif (isset($_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO'])) {
+            $rule .= 'RewriteCond %{HTTP:CF-Visitor} !\\"scheme\\":\\"https\\"' . "\n";
+        } elseif ( isset( $_SERVER['HTTP_CLOUDFRONT_FORWARDED_PROTO'] ) ) {
             // CloudFront header normally contains 'https'
             $rule .= "RewriteCond %{HTTP:CloudFront-Forwarded-Proto} !https" . "\n";
-        } elseif (isset($_SERVER['SERVER_PORT']) && '443' == $_SERVER['SERVER_PORT']) {
+        } elseif ( isset( $_SERVER['SERVER_PORT'] ) && '443' == $_SERVER['SERVER_PORT'] ) {
             // If server port is 443, ensure redirect doesn't run
             $rule .= "RewriteCond %{SERVER_PORT} !443" . "\n";
-        } elseif (isset($_ENV['HTTPS']) && strtolower($_ENV['HTTPS']) == 'on') {
+        } elseif ( isset( $_ENV['HTTPS'] ) && strtolower( $_ENV['HTTPS'] ) == 'on' ) {
             $rule .= "RewriteCond %{ENV:HTTPS} !=on" . "\n";
         }
-
-        if (is_multisite()) {
+        if ( is_multisite() ) {
             $sites = get_sites();
-            foreach ($sites as $domn) {
-                $domain = str_ireplace(array("http://", "https://", "www."), array("", "", ""), $domn->domain);
-                if (false != ($spos = stripos($domain, '/'))) {
-                    $domain = substr($domain, 0, $spos);
+            foreach ( $sites as $domn ) {
+                $domain = str_ireplace( array("http://", "https://", "www."), array("", "", ""), $domn->domain );
+                if ( false != ($spos = stripos( $domain, '/' )) ) {
+                    $domain = substr( $domain, 0, $spos );
                 }
                 $www = 'www.' . $domain;
-                $rule .= "RewriteCond %{HTTP_HOST} ^" . preg_quote($domain, "/") . " [OR]" . "\n";
-                $rule .= "RewriteCond %{HTTP_HOST} ^" . preg_quote($www, "/") . " [OR]" . "\n";
+                $rule .= "RewriteCond %{HTTP_HOST} ^" . preg_quote( $domain, "/" ) . " [OR]" . "\n";
+                $rule .= "RewriteCond %{HTTP_HOST} ^" . preg_quote( $www, "/" ) . " [OR]" . "\n";
             }
-            if (count($sites) > 0) {
-                $rule = strrev(implode("", explode(strrev("[OR]"), strrev($rule), 2)));
+            if ( count( $sites ) > 0 ) {
+                $rule = strrev( implode( "", explode( strrev( "[OR]" ), strrev( $rule ), 2 ) ) );
             }
         }
-
         $rule .= "RewriteCond %{REQUEST_URI} !^/\\.well-known/acme-challenge/" . "\n";
         $rule .= "RewriteRule ^(.*)\$ https://%{HTTP_HOST}/\$1 [R=301,L]" . "\n";
         $rule .= "</IfModule>" . "\n";
-
         $rule .= "# END WP_Encryption_Force_SSL" . "\n";
-
-        $finalrule = preg_replace("/\n+/", "\n", $rule);
+        $finalrule = preg_replace( "/\n+/", "\n", $rule );
         return $finalrule;
     }
 
@@ -420,22 +375,19 @@ class WPLE_Trait
      * @since 5.3.5
      * @return string
      */
-    public static function get_root_domain($removesubdir = true)
-    {
-        $currentdomain = esc_html(str_ireplace(array('http://', 'https://'), array('', ''), site_url()));
-
-        if ($removesubdir) {
-            $slashpos = stripos($currentdomain, '/');
-            if (false !== $slashpos) { //subdir installation
-                $currentdomain = substr($currentdomain, 0, $slashpos);
+    public static function get_root_domain( $removesubdir = true ) {
+        $currentdomain = esc_html( str_ireplace( array('http://', 'https://'), array('', ''), site_url() ) );
+        if ( $removesubdir ) {
+            $slashpos = stripos( $currentdomain, '/' );
+            if ( false !== $slashpos ) {
+                //subdir installation
+                $currentdomain = substr( $currentdomain, 0, $slashpos );
             }
         }
-
         return $currentdomain;
     }
 
-    public static function wple_copy_and_download(&$html)
-    {
+    public static function wple_copy_and_download( &$html ) {
         $html .= '<span>
         <ul class="step3-download">
           <li class="le-dwnld">Certificate.crt <span class="copy-dwnld-icons">
@@ -452,7 +404,7 @@ class WPLE_Trait
           </li>
         </ul>
         <div class="crt-content">
-          <textarea readonly data-nc="' . wp_create_nonce('copycerts') . '"></textarea>
+          <textarea readonly data-nc="' . wp_create_nonce( 'copycerts' ) . '"></textarea>
           <div class="copied-success">Copied Successfully!</div>
         </div>
     </span>  ';
@@ -465,73 +417,56 @@ class WPLE_Trait
      * @param boolean $spmode
      * @return void
      */
-    public static function compose_htaccess_security_rules()
-    {
-
-        $xxss = get_option('wple_xxss');
-        $ctype = get_option('wple_xcontenttype');
-        $ref = get_option('wple_referrer');
-        $xframe = get_option('wple_xframe');
-
+    public static function compose_htaccess_security_rules() {
+        $xxss = get_option( 'wple_xxss' );
+        $ctype = get_option( 'wple_xcontenttype' );
+        $ref = get_option( 'wple_referrer' );
+        $xframe = get_option( 'wple_xframe' );
         //5.11.5
-        $contentsecuritypolicy = get_option('wple_upgrade_insecure');
-        $stricttransport = get_option('wple_hsts');
-
-        if (!$xxss && !$ctype && !$ref && !$xframe && !$contentsecuritypolicy && !$stricttransport) {
+        $contentsecuritypolicy = get_option( 'wple_upgrade_insecure' );
+        $stricttransport = get_option( 'wple_hsts' );
+        if ( !$xxss && !$ctype && !$ref && !$xframe && !$contentsecuritypolicy && !$stricttransport ) {
             return '';
         }
-
         //$rule = "\n" . "# BEGIN WP_Encryption_Security_Headers\n";
         $rule = "<IfModule mod_headers.c>" . "\n";
-
-        if ($stricttransport) $rule .= 'Header always set Strict-Transport-Security "max-age=31536000;"' . "\n";
-
-        if ($contentsecuritypolicy) $rule .= 'Header always set Content-Security-Policy "upgrade-insecure-requests;"' . "\n";
-
-        if ($xxss) $rule .= 'Header always set X-XSS-Protection "1; mode=block"' . "\n";
-
-        if ($ctype) $rule .= 'Header always set X-Content-Type-Options "nosniff"' . "\n";
-
-        if (wple_fs()->can_use_premium_code__premium_only()) {
-
-            if ($ref) $rule .= 'Header always set Referrer-Policy: "no-referrer-when-downgrade"' . "\n"; //premium    
-
-            if ($xframe) $rule .= 'Header always set X-Frame-Options "SAMEORIGIN"' . "\n"; //premium
-
+        if ( $stricttransport ) {
+            $rule .= 'Header always set Strict-Transport-Security "max-age=31536000;"' . "\n";
         }
-
+        if ( $contentsecuritypolicy ) {
+            $rule .= 'Header always set Content-Security-Policy "upgrade-insecure-requests;"' . "\n";
+        }
+        if ( $xxss ) {
+            $rule .= 'Header always set X-XSS-Protection "1; mode=block"' . "\n";
+        }
+        if ( $ctype ) {
+            $rule .= 'Header always set X-Content-Type-Options "nosniff"' . "\n";
+        }
         $rule .= "</IfModule>" . "\n";
         //$rule .= "# END WP_Encryption_Security_Headers" . "\n";
-
-        $finalruleset = preg_replace("/\n+/", "\n", $rule);
+        $finalruleset = preg_replace( "/\n+/", "\n", $rule );
         return $finalruleset;
     }
 
-    public static function wple_clean_security_headers($singlerule = '')
-    {
-        if (is_writable(ABSPATH . '.htaccess')) {
-            $htaccess = file_get_contents(ABSPATH . '.htaccess');
-
+    public static function wple_clean_security_headers( $singlerule = '' ) {
+        if ( is_writable( ABSPATH . '.htaccess' ) ) {
+            $htaccess = file_get_contents( ABSPATH . '.htaccess' );
             //remove complete block
             $group = "/#\\s?BEGIN\\s?WP_Encryption_Security_Headers.*?#\\s?END\\s?WP_Encryption_Security_Headers/s";
-
-            if (preg_match($group, $htaccess)) {
-                $modhtaccess = preg_replace($group, "", $htaccess);
-                file_put_contents(ABSPATH . '.htaccess', $modhtaccess);
+            if ( preg_match( $group, $htaccess ) ) {
+                $modhtaccess = preg_replace( $group, "", $htaccess );
+                file_put_contents( ABSPATH . '.htaccess', $modhtaccess );
             }
-
-            if ($singlerule != '') { //re-compose with removed line
+            if ( $singlerule != '' ) {
+                //re-compose with removed line
                 $newblock = self::compose_htaccess_security_rules();
-
                 // $wpruleset = "# BEGIN WordPress";
-
                 // if (stripos($htaccess, $wpruleset) !== false) {
                 //   $newhtaccess = str_replace($wpruleset, $newblock . $wpruleset, $htaccess);
                 // } else {
                 //   $newhtaccess = $htaccess . $newblock;
                 // }
-
-                insert_with_markers(ABSPATH . '.htaccess', 'WP_Encryption_Security_Headers', $newblock);
+                insert_with_markers( ABSPATH . '.htaccess', 'WP_Encryption_Security_Headers', $newblock );
             }
         }
     }
@@ -542,25 +477,21 @@ class WPLE_Trait
      * @since 5.8.4
      * @return newhtaccess
      */
-    public static function compose_directory_listing_rules()
-    {
+    public static function compose_directory_listing_rules() {
         //$rule = "\n" . "# BEGIN WP_Encryption_Disable_Directory_Listing\n";
         $rule = "Options -Indexes" . "\n";
         //$rule .= "# END WP_Encryption_Disable_Directory_Listing" . "\n";
-
-        $finalrule = preg_replace("/\n+/", "\n", $rule);
+        $finalrule = preg_replace( "/\n+/", "\n", $rule );
         return $finalrule;
     }
 
-    public static function wple_remove_directory_listing()
-    {
-        if (is_writable(ABSPATH . '.htaccess')) {
-            $htaccess = file_get_contents(ABSPATH . '.htaccess');
+    public static function wple_remove_directory_listing() {
+        if ( is_writable( ABSPATH . '.htaccess' ) ) {
+            $htaccess = file_get_contents( ABSPATH . '.htaccess' );
             $group = "/#\\s?BEGIN\\s?WP_Encryption_Disable_Directory_Listing.*?#\\s?END\\s?WP_Encryption_Disable_Directory_Listing/s";
-
-            if (preg_match($group, $htaccess)) {
-                $modhtaccess = preg_replace($group, "", $htaccess);
-                file_put_contents(ABSPATH . '.htaccess', $modhtaccess);
+            if ( preg_match( $group, $htaccess ) ) {
+                $modhtaccess = preg_replace( $group, "", $htaccess );
+                file_put_contents( ABSPATH . '.htaccess', $modhtaccess );
             }
         }
     }
@@ -570,27 +501,22 @@ class WPLE_Trait
      * 
      * @since 7.8.5.3
      */
-    public static function disable_xpoweredby_header()
-    {
+    public static function disable_xpoweredby_header() {
         $rule = "Header always unset X-Powered-By" . "\n";
-
-        $finalrule = preg_replace("/\n+/", "\n", $rule);
+        $finalrule = preg_replace( "/\n+/", "\n", $rule );
         return $finalrule;
     }
 
-    public static function wple_remove_xpoweredby()
-    {
-        if (is_writable(ABSPATH . '.htaccess')) {
-            $htaccess = file_get_contents(ABSPATH . '.htaccess');
+    public static function wple_remove_xpoweredby() {
+        if ( is_writable( ABSPATH . '.htaccess' ) ) {
+            $htaccess = file_get_contents( ABSPATH . '.htaccess' );
             $group = "/#\\s?BEGIN\\s?WP_Encryption_Disable_XPoweredBy.*?#\\s?END\\s?WP_Encryption_Disable_XPoweredBy/s";
-
-            if (preg_match($group, $htaccess)) {
-                $modhtaccess = preg_replace($group, "", $htaccess);
-                file_put_contents(ABSPATH . '.htaccess', $modhtaccess);
+            if ( preg_match( $group, $htaccess ) ) {
+                $modhtaccess = preg_replace( $group, "", $htaccess );
+                file_put_contents( ABSPATH . '.htaccess', $modhtaccess );
             }
         }
     }
-
 
     /**
      * cPanel existence check
@@ -601,240 +527,196 @@ class WPLE_Trait
      * @since 5.6.1
      * @return void
      */
-    public static function wple_cpanel_identity($return = false)
-    {
-        $host = SELF::get_root_domain(true);
-
+    public static function wple_cpanel_identity( $return = false ) {
+        $host = SELF::get_root_domain( true );
         $cpURLs = array('http://' . $host . '/cpanel', 'https://' . $host . ':2083', 'http://' . $host . ':2082');
-
         $cpanel = false;
-
-        foreach ($cpURLs as $cpURL) {
-            $response = wp_remote_get($cpURL, [
+        foreach ( $cpURLs as $cpURL ) {
+            $response = wp_remote_get( $cpURL, [
                 'headers'   => [
-                    'Connection' => 'close'
+                    'Connection' => 'close',
                 ],
                 'sslverify' => false,
-                'timeout' => 20
-            ]);
-
-            if (!is_wp_error($response)) {
-                $resCode = wp_remote_retrieve_response_code($response);
-
-                if ($resCode === 200 && false !== stripos(wp_remote_retrieve_body($response), 'cpanel')) {
+                'timeout'   => 20,
+            ] );
+            if ( !is_wp_error( $response ) ) {
+                $resCode = wp_remote_retrieve_response_code( $response );
+                if ( $resCode === 200 && false !== stripos( wp_remote_retrieve_body( $response ), 'cpanel' ) ) {
                     //detected
                     $cpanel = true;
                     break;
                 }
             }
         }
-
         //plesk detect
         $cpURLs = array('https://' . $host . ':8443', 'http://' . $host . ':8880');
-
-        foreach ($cpURLs as $cpURL) {
-            $response = wp_remote_get($cpURL, [
+        foreach ( $cpURLs as $cpURL ) {
+            $response = wp_remote_get( $cpURL, [
                 'headers'   => [
-                    'Connection' => 'close'
+                    'Connection' => 'close',
                 ],
                 'sslverify' => false,
-                'timeout' => 20
-            ]);
-
-            if (!is_wp_error($response)) {
-                $resCode = wp_remote_retrieve_response_code($response);
-
-                if ($resCode === 200) {
+                'timeout'   => 20,
+            ] );
+            if ( !is_wp_error( $response ) ) {
+                $resCode = wp_remote_retrieve_response_code( $response );
+                if ( $resCode === 200 ) {
                     //detected
-                    update_option('wple_have_plesk', 1);
+                    update_option( 'wple_have_plesk', 1 );
                     break;
                 }
             }
         }
-
         //directadmin detect
         $cpURLs = array('https://' . $host . ':2222', 'http://' . $host . ':2222');
-
-        foreach ($cpURLs as $cpURL) {
-            $response = wp_remote_get($cpURL, [
+        foreach ( $cpURLs as $cpURL ) {
+            $response = wp_remote_get( $cpURL, [
                 'headers'   => [
-                    'Connection' => 'close'
+                    'Connection' => 'close',
                 ],
                 'sslverify' => false,
-                'timeout' => 20
-            ]);
-
-            if (!is_wp_error($response)) {
-                $resCode = wp_remote_retrieve_response_code($response);
-
-                if ($resCode === 200) {
+                'timeout'   => 20,
+            ] );
+            if ( !is_wp_error( $response ) ) {
+                $resCode = wp_remote_retrieve_response_code( $response );
+                if ( $resCode === 200 ) {
                     //detected
-                    update_option('wple_have_directadmin', 1);
+                    update_option( 'wple_have_directadmin', 1 );
                     break;
                 }
             }
         }
-
         //siteground detect
-        if (false !== stripos(ABSPATH, 'home/customer')) { //SG
-            update_option('wple_have_siteground', 1);
+        if ( false !== stripos( ABSPATH, 'home/customer' ) ) {
+            //SG
+            update_option( 'wple_have_siteground', 1 );
         }
-
-        if ($cpanel) {
-            update_option('wple_have_cpanel', 1);
+        if ( $cpanel ) {
+            update_option( 'wple_have_cpanel', 1 );
         } else {
             // if (isset($_SERVER['GD_PHP_HANDLER'])) {
             //   if ($_SERVER['SERVER_SOFTWARE'] == 'Apache' && isset($_SERVER['GD_PHP_HANDLER']) && $_SERVER['DOCUMENT_ROOT'] == '/var/www') {
             //     ///update_option('wple_no_pricing', 1);
             //   }
             // }
-
-            update_option('wple_have_cpanel', 0);
+            update_option( 'wple_have_cpanel', 0 );
         }
-
-        if ($return) return $cpanel;
+        if ( $return ) {
+            return $cpanel;
+        }
     }
 
     // public static function wple_mx_support()
     // {
-
     //   $mxpost = wp_remote_post(site_url('/', 'https'), array(
     //     'headers' => 'Content-Type: application/csp-report'
     //   ));
-
     //   if (is_wp_error($mxpost) || (isset($mxpost['response']) && isset($mxpost['response']['code']) && $mxpost['response']['code'] != 200)) {
     //     update_option('wple_mx', 0);
     //   } else {
     //     update_option('wple_mx', 1);
     //   }
     // }
-
-    public static function wple_active_ssl_info()
-    {
+    public static function wple_active_ssl_info() {
         $html = '';
-
-        $sslinfo = SELF::wple_ssllabs_scan(false, false);
-
+        $sslinfo = SELF::wple_ssllabs_scan( false, false );
         // echo '<pre>';
         // print_r($sslinfo);
-
-        if (!$sslinfo) {
+        if ( !$sslinfo ) {
             $html = '<div class="wple-active-ssl">
       <br><strong>Unable to check SSL at this time, please try again after few minutes.</strong><br><br>
       </div>';
             return $html;
         }
-
-        if ($sslinfo['status'] == 'inprogress') {
+        if ( $sslinfo['status'] == 'inprogress' ) {
             $html = '<div class="wple-active-ssl">
-      <br><strong>SSL scan is in progess, Please check back in 5-10 minutes (' . esc_html($sslinfo['info']) . ').</strong><br><br>
+      <br><strong>SSL scan is in progess, Please check back in 5-10 minutes (' . esc_html( $sslinfo['info'] ) . ').</strong><br><br>
       </div>';
             return $html;
-        } else if ($sslinfo['status'] == 'error') {
-            $html = '<div class="wple-active-ssl">
-      <br><strong>SSL scan failed due to error: ' . esc_html($sslinfo['info']) . '.</strong><br><br>
+        } else {
+            if ( $sslinfo['status'] == 'error' ) {
+                $html = '<div class="wple-active-ssl">
+      <br><strong>SSL scan failed due to error: ' . esc_html( $sslinfo['info'] ) . '.</strong><br><br>
       </div>';
-            return $html;
+                return $html;
+            }
         }
-
         //ready
         $myssl = $sslinfo['info'];
-
-        $grade = (array_key_exists('endpoints', $myssl) && array_key_exists('grade', $myssl['endpoints'][0])) ? $myssl['endpoints'][0]['grade'] : '';
-        if ($grade == '' && isset($myssl['endpoints'][1])) {
-            $grade = array_key_exists('grade', $myssl['endpoints'][1]) ? $myssl['endpoints'][1]['grade'] : '';
+        $grade = ( array_key_exists( 'endpoints', $myssl ) && array_key_exists( 'grade', $myssl['endpoints'][0] ) ? $myssl['endpoints'][0]['grade'] : '' );
+        if ( $grade == '' && isset( $myssl['endpoints'][1] ) ) {
+            $grade = ( array_key_exists( 'grade', $myssl['endpoints'][1] ) ? $myssl['endpoints'][1]['grade'] : '' );
         }
-
-        if ($grade == '') { //unable to test
+        if ( $grade == '' ) {
+            //unable to test
             $grade = 'T';
         }
-
-        if ($grade == 'T' || $grade == 'M') {
-
+        if ( $grade == 'T' || $grade == 'M' ) {
             $html = '<div class="wple-active-ssl">
       <p>Details of <b>ACTIVE</b> SSL certificate installed & running on your site.</p>
       <div class="wple-sslgrade">
-        <span class="wple-grade-' . esc_attr($grade) . '">' . esc_html($grade) . '<small>GRADE</small></span>
+        <span class="wple-grade-' . esc_attr( $grade ) . '">' . esc_html( $grade ) . '<small>GRADE</small></span>
       </div>
       <p class="wple-ssl-invalid">Your site do not have a valid SSL certificate installed!.</p><br>';
-            $html .= '<a href="https://www.ssllabs.com/ssltest/analyze.html?d=' . esc_attr(SELF::get_root_domain()) . '" target="_blank" class="ssllabslink" rel="nofollow noopener">Full details&gt;&gt;</a><br>';
+            $html .= '<a href="https://www.ssllabs.com/ssltest/analyze.html?d=' . esc_attr( SELF::get_root_domain() ) . '" target="_blank" class="ssllabslink" rel="nofollow noopener">Full details&gt;&gt;</a><br>';
             $html .= '</div>';
-            $html .= '<a href="' . wp_nonce_url(admin_url('admin.php?page=wp_encryption_ssl_health'), 'wple_ssl', 'wple_ssl_check') . '" class="wple-sslcheck"><span class="dashicons dashicons-image-rotate"></span> Start Fresh Scan</a>';
-
+            $html .= '<a href="' . wp_nonce_url( admin_url( 'admin.php?page=wp_encryption_ssl_health' ), 'wple_ssl', 'wple_ssl_check' ) . '" class="wple-sslcheck"><span class="dashicons dashicons-image-rotate"></span> Start Fresh Scan</a>';
             return $html;
         }
-
         $validTo = $myssl['certs'][0]['notAfter'];
-        $to = date('d-m-Y', $validTo / 1000);
-        $tenDaysToExpiry = strtotime('-10 day', strtotime($to));
-
-        if (strtotime('now') < $tenDaysToExpiry) { //don't remove notice if we are already in last 10 days zone
-            delete_option('wple_show_reminder');
-
-            wp_clear_scheduled_hook('wple_ssl_reminder_notice');
-            wp_schedule_single_event($tenDaysToExpiry, 'wple_ssl_reminder_notice');
+        $to = date( 'd-m-Y', $validTo / 1000 );
+        $tenDaysToExpiry = strtotime( '-10 day', strtotime( $to ) );
+        if ( strtotime( 'now' ) < $tenDaysToExpiry ) {
+            //don't remove notice if we are already in last 10 days zone
+            delete_option( 'wple_show_reminder' );
+            wp_clear_scheduled_hook( 'wple_ssl_reminder_notice' );
+            wp_schedule_single_event( $tenDaysToExpiry, 'wple_ssl_reminder_notice' );
         }
-
-        $revoked = $myssl['certs'][0]['revocationStatus']; //1 - revoked
-
-
+        $revoked = $myssl['certs'][0]['revocationStatus'];
+        //1 - revoked
         $subjectCN = $myssl['certs'][0]['subject'];
         $issuer = $myssl['certs'][0]['issuerSubject'];
         $altnames = $myssl['certs'][0]['altNames'];
-
         $validFrom = $myssl['certs'][0]['notBefore'];
         $validTo = $myssl['certs'][0]['notAfter'];
-
-        $isSectigo = (false === stripos($issuer, 'sectigo')) ? false : true;
-        update_option('wple_sectigo', $isSectigo);
-
+        $isSectigo = ( false === stripos( $issuer, 'sectigo' ) ? false : true );
+        update_option( 'wple_sectigo', $isSectigo );
         $achieveAGrade = '';
-        if ($grade != 'A' && $grade != 'A+') {
+        if ( $grade != 'A' && $grade != 'A+' ) {
             $achieveAGrade = '<span style="text-align: center; display: block; background: #eee; padding: 5px;">Achieve <b>A/A+</b> Grade with <a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=scoregrade&utm_campaign=wpencryption#pricing" target="_blank">PRO</a> version</span><br />';
         }
-
         $html = '<div class="wple-active-ssl">
     <p>Details of <b>ACTIVE</b> SSL certificate installed & running on your site.</p>
     <div class="wple-sslgrade">
-      <span class="wple-grade-' . esc_attr($grade) . '">' . esc_html($grade) . '<small>GRADE</small></span>      
+      <span class="wple-grade-' . esc_attr( $grade ) . '">' . esc_html( $grade ) . '<small>GRADE</small></span>      
     </div>
     ' . $achieveAGrade . '
-    <b>Issued To</b>: ' . esc_html($subjectCN) . '<br><br>';
-        $html .= '<b>Issuer</b>: ' . esc_html($issuer) . '<br><br>';
+    <b>Issued To</b>: ' . esc_html( $subjectCN ) . '<br><br>';
+        $html .= '<b>Issuer</b>: ' . esc_html( $issuer ) . '<br><br>';
         $html .= '<b>Alternative Names Covered</b>: <br>';
-
-        foreach ($altnames as $domain) {
-            $html .= esc_html($domain) . '<br>';
+        foreach ( $altnames as $domain ) {
+            $html .= esc_html( $domain ) . '<br>';
         }
-
-        $from = date('d-m-Y', $validFrom / 1000);
-        $to = date('d-m-Y', $validTo / 1000);
-
+        $from = date( 'd-m-Y', $validFrom / 1000 );
+        $to = date( 'd-m-Y', $validTo / 1000 );
         //days left till expiry
         $timeleft = $validTo / 1000 - time();
-        $daysleft = round((($timeleft / 24) / 60) / 60);
-
-        $html .= '<br><b>Valid From</b>: ' . esc_html($from) . '<br><br>';
-        $html .= '<b>Valid Till</b>: ' . esc_html($to) . '<br><br>';
-
+        $daysleft = round( $timeleft / 24 / 60 / 60 );
+        $html .= '<br><b>Valid From</b>: ' . esc_html( $from ) . '<br><br>';
+        $html .= '<b>Valid Till</b>: ' . esc_html( $to ) . '<br><br>';
         $html .= '
         <div class="wple-sslhealth-daysleft">
-          <div class="progress--circle progress--' . esc_attr($daysleft) . '">
-            <div class="progress__number"><strong>' . esc_html($daysleft) . '</strong><br><small style="color:#777;">' . esc_html__('Days Left', 'wp-letsencrypt-ssl') . '</small></div>
+          <div class="progress--circle progress--' . esc_attr( $daysleft ) . '">
+            <div class="progress__number"><strong>' . esc_html( $daysleft ) . '</strong><br><small style="color:#777;">' . esc_html__( 'Days Left', 'wp-letsencrypt-ssl' ) . '</small></div>
           </div>
           <small>Visitors may see "<b>Not Secure</b>" warning if the SSL is not renewed in time. Switch to <a href="https://wpencryption.com/pricing/?utm_source=wordpress&utm_medium=scorerenew&utm_campaign=wpencryption#pricing" target="_blank">PRO</a> version for automatic SSL renewal and complete peace of mind.</small>
         </div>';
-
-        $html .= '<a href="https://www.ssllabs.com/ssltest/analyze.html?d=' . esc_attr(SELF::get_root_domain()) . '" target="_blank" class="ssllabslink" rel="nofollow noopener">Full details&gt;&gt;</a><br>';
-
-        if (!wp_next_scheduled('wple_ssl_expiry_update')) {
-            wp_schedule_event(strtotime('05:30:00'), 'daily', 'wple_ssl_expiry_update');
+        $html .= '<a href="https://www.ssllabs.com/ssltest/analyze.html?d=' . esc_attr( SELF::get_root_domain() ) . '" target="_blank" class="ssllabslink" rel="nofollow noopener">Full details&gt;&gt;</a><br>';
+        if ( !wp_next_scheduled( 'wple_ssl_expiry_update' ) ) {
+            wp_schedule_event( strtotime( '05:30:00' ), 'daily', 'wple_ssl_expiry_update' );
         }
-
         $html .= '</div>';
-
-        $html .= '<a href="' . wp_nonce_url(admin_url('admin.php?page=wp_encryption_ssl_health'), 'wple_ssl', 'wple_ssl_check') . '" class="wple-sslcheck"><span class="dashicons dashicons-image-rotate"></span> Start Fresh Scan</a>';
-
+        $html .= '<a href="' . wp_nonce_url( admin_url( 'admin.php?page=wp_encryption_ssl_health' ), 'wple_ssl', 'wple_ssl_check' ) . '" class="wple-sslcheck"><span class="dashicons dashicons-image-rotate"></span> Start Fresh Scan</a>';
         return $html;
     }
 
@@ -844,58 +726,58 @@ class WPLE_Trait
      * @since 5.7.16
      * @return boolean
      */
-    public static function wple_verify_dns_records($opts = array())
-    {
-
-        $toVerify = (count($opts) > 0) ? $opts : get_option('wple_opts');
-
-        if (array_key_exists('dns_challenges', $toVerify) && !empty($toVerify['dns_challenges'])) {
+    public static function wple_verify_dns_records( $opts = array() ) {
+        $toVerify = ( count( $opts ) > 0 ? $opts : get_option( 'wple_opts' ) );
+        if ( array_key_exists( 'dns_challenges', $toVerify ) && !empty( $toVerify['dns_challenges'] ) ) {
             $toVerify = $dnspendings = $toVerify['dns_challenges'];
             //array
-
-            foreach ($toVerify as $index => $item) {
-                $domain_code = explode('||', $item);
-                $acme = '_acme-challenge.' . esc_html($domain_code[0]);
-                $requestURL = 'https://dns.google.com/resolve?name=' . addslashes($acme) . '&type=TXT';
+            foreach ( $toVerify as $index => $item ) {
+                $domain_code = explode( '||', $item );
+                $acme = '_acme-challenge.' . esc_html( $domain_code[0] );
+                $requestURL = 'https://dns.google.com/resolve?name=' . addslashes( $acme ) . '&type=TXT';
                 $handle = curl_init();
-                curl_setopt($handle, CURLOPT_URL, $requestURL);
-                curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($handle, CURLOPT_FOLLOWLOCATION, true);
-                $response = json_decode(trim(curl_exec($handle)));
-
-                if ($response->Status === 0 && isset($response->Answer)) {
-
-                    //if ($answer->type == 16) {            
+                curl_setopt( $handle, CURLOPT_URL, $requestURL );
+                curl_setopt( $handle, CURLOPT_RETURNTRANSFER, true );
+                curl_setopt( $handle, CURLOPT_FOLLOWLOCATION, true );
+                $response = json_decode( trim( curl_exec( $handle ) ) );
+                if ( $response->Status === 0 && isset( $response->Answer ) ) {
+                    //if ($answer->type == 16) {
                     $found = 'Pending';
-                    foreach ($response->Answer as $answer) {
-                        $livecode = str_ireplace('"', '', $answer->data);
-                        if ($livecode == $domain_code[1]) {
+                    foreach ( $response->Answer as $answer ) {
+                        $livecode = str_ireplace( '"', '', $answer->data );
+                        if ( $livecode == $domain_code[1] ) {
                             unset($dnspendings[$index]);
                             $found = 'OK';
                         }
                     }
-
-                    WPLE_Trait::wple_logger("\nLocal Checking - " . esc_html($requestURL . ' should return ' . $domain_code[1] . ' -> ' . $found) . "\n");
+                    WPLE_Trait::wple_logger( "\nLocal Checking - " . esc_html( $requestURL . ' should return ' . $domain_code[1] . ' -> ' . $found ) . "\n" );
                 } else {
-
-                    WPLE_Trait::wple_logger("\nDNS records not found - Please wait few minutes for DNS to propagate.");
+                    WPLE_Trait::wple_logger( "\nDNS records not found - Please wait few minutes for DNS to propagate." );
                     return false;
                 }
             }
-
-            if (empty($dnspendings)) {
-                WPLE_Trait::wple_logger("Local check - All DNS challenges verified\n", 'success', 'a', false);
-
+            if ( empty( $dnspendings ) ) {
+                WPLE_Trait::wple_logger(
+                    "Local check - All DNS challenges verified\n",
+                    'success',
+                    'a',
+                    false
+                );
                 return true;
             } else {
                 return false;
             }
-        } else if (empty($toVerify['dns_challenges'])) {
-            WPLE_Trait::wple_logger("Local check - DNS challenges empty\n", 'success', 'a', false);
-
-            return false;
+        } else {
+            if ( empty( $toVerify['dns_challenges'] ) ) {
+                WPLE_Trait::wple_logger(
+                    "Local check - DNS challenges empty\n",
+                    'success',
+                    'a',
+                    false
+                );
+                return false;
+            }
         }
-
         return false;
     }
 
@@ -905,322 +787,168 @@ class WPLE_Trait
      * @since 5.8.5
      * @return html
      */
-    public static function wple_other_plugins($sslhealthpage = false)
-    {
-
+    public static function wple_other_plugins( $sslhealthpage = false ) {
         //disabled since 7.7.7
         return '';
-
-
         $action = 'install-plugin';
         $fastcsslug = 'fast-cookie-consent';
-        $fastcspluginstallURL = wp_nonce_url(
-            add_query_arg(
-                array(
-                    'action' => $action,
-                    'plugin' => $fastcsslug
-                ),
-                admin_url('update.php')
-            ),
-            $action . '_' . $fastcsslug
-        );
+        $fastcspluginstallURL = wp_nonce_url( add_query_arg( array(
+            'action' => $action,
+            'plugin' => $fastcsslug,
+        ), admin_url( 'update.php' ) ), $action . '_' . $fastcsslug );
         $cklsslug = 'cookieless-analytics';
-        $cklspluginstallURL = wp_nonce_url(
-            add_query_arg(
-                array(
-                    'action' => $action,
-                    'plugin' => $cklsslug
-                ),
-                admin_url('update.php')
-            ),
-            $action . '_' . $cklsslug
-        );
+        $cklspluginstallURL = wp_nonce_url( add_query_arg( array(
+            'action' => $action,
+            'plugin' => $cklsslug,
+        ), admin_url( 'update.php' ) ), $action . '_' . $cklsslug );
         $baboslug = 'backup-bolt';
-        $babopluginstallURL = wp_nonce_url(
-            add_query_arg(
-                array(
-                    'action' => $action,
-                    'plugin' => $baboslug
-                ),
-                admin_url('update.php')
-            ),
-            $action . '_' . $baboslug
-        );
-
+        $babopluginstallURL = wp_nonce_url( add_query_arg( array(
+            'action' => $action,
+            'plugin' => $baboslug,
+        ), admin_url( 'update.php' ) ), $action . '_' . $baboslug );
         $html = '<div id="wple-recommended">
         <div class="wple-recommend-tab">
         <img src="' . WPLE_URL . 'admin/assets/banner-plug.png"/> <strong>Recommended</strong>
         </div>
         <div class="wple-recommend-slide">
         <ul>
-            <li><a href="https://wordpress.org/plugins/fast-cookie-consent/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/fastcookieconsent.png"/>Fast Cookie Consent<br/><small>Quickly setup GDPR/CCPA compliant cookie consent banner</small></a><a href="' . esc_url($fastcspluginstallURL) . '">Install</a></li>
-            <li><a href="https://wordpress.org/plugins/backup-bolt/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/backup-bolt.png"/><br/><small>Backup your site within seconds</small></a><a href="' . esc_url($babopluginstallURL) . '">Install</a></li>
-            <li><a href="https://wordpress.org/plugins/cookieless-analytics/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/cookieless-analytics.png"/><br/><small>Privacy compliant statistics plugin without any use of cookies</small></a><a href="' . esc_url($cklspluginstallURL) . '">Install</a></li>
+            <li><a href="https://wordpress.org/plugins/fast-cookie-consent/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/fastcookieconsent.png"/>Fast Cookie Consent<br/><small>Quickly setup GDPR/CCPA compliant cookie consent banner</small></a><a href="' . esc_url( $fastcspluginstallURL ) . '">Install</a></li>
+            <li><a href="https://wordpress.org/plugins/backup-bolt/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/backup-bolt.png"/><br/><small>Backup your site within seconds</small></a><a href="' . esc_url( $babopluginstallURL ) . '">Install</a></li>
+            <li><a href="https://wordpress.org/plugins/cookieless-analytics/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/cookieless-analytics.png"/><br/><small>Privacy compliant statistics plugin without any use of cookies</small></a><a href="' . esc_url( $cklspluginstallURL ) . '">Install</a></li>
             <li><a href="https://oneclickplugins.com/go-viral/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/goviral-logo.png"/><br/><small>Reveal content only upon social share & boost social exposure</small></a></li>
         </ul>
         </div>
         </div>';
-
-
         //since 7.7.5
         return $html;
-
-
         //discontinued since 7.7.0
-
-        $utmsource = $sslhealthpage ? 'sslhealth' : 'footerlink';
-
+        $utmsource = ( $sslhealthpage ? 'sslhealth' : 'footerlink' );
         $html = '<div id="ourotherplugin">
     <h4>You\'ll <span class="dashicons dashicons-heart"></span> These <span class="dashicons dashicons-admin-plugins"></span>!!</h4>
     <ul>
-    <li><a href="https://wordpress.org/plugins/wordmagic-content-writer/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/wordmagic.png"/> - Most powerful GPT-3 AI content writer</a><span class="otherplugs"><a href="' . esc_url($wordmagicpluginstallURL) . '">Install Plugin</a></span></li>
-    <li><a href="https://wordpress.org/plugins/cookieless-analytics/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/cookieless-analytics.png"/> - Track your site visitors without any cookies</a><span class="otherplugs"><a href="' . esc_url($cklspluginstallURL) . '">Install Plugin</a></span></li>
+    <li><a href="https://wordpress.org/plugins/wordmagic-content-writer/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/wordmagic.png"/> - Most powerful GPT-3 AI content writer</a><span class="otherplugs"><a href="' . esc_url( $wordmagicpluginstallURL ) . '">Install Plugin</a></span></li>
+    <li><a href="https://wordpress.org/plugins/cookieless-analytics/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/cookieless-analytics.png"/> - Track your site visitors without any cookies</a><span class="otherplugs"><a href="' . esc_url( $cklspluginstallURL ) . '">Install Plugin</a></span></li>
     <li><a href="https://oneclickplugins.com/go-viral/?utc_campaign=wordpress&utm_source=' . $utmsource . '&utm_medium=wpadmin" target="_blank"><img src="' . WPLE_URL . 'admin/assets/goviral-logo.png"/> - Lock your content with social locker + ALL social tools</a><span class="otherplugs"><a href="https://oneclickplugins.com/go-viral/?utc_campaign=wordpress&utm_source=' . $utmsource . '&utm_medium=wpadmin" target="_blank">View details</a></span></li>    
-    <li><a href="https://wordpress.org/plugins/backup-bolt/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/backup-bolt.png"/> - One click backup and download your site</a><span class="otherplugs"><a href="' . esc_url($babopluginstallURL) . '">Install Plugin</a></span></li>
+    <li><a href="https://wordpress.org/plugins/backup-bolt/" target="_blank"><img src="' . WPLE_URL . 'admin/assets/backup-bolt.png"/> - One click backup and download your site</a><span class="otherplugs"><a href="' . esc_url( $babopluginstallURL ) . '">Install Plugin</a></span></li>
     </ul>
     </div>';
-
         return $html;
     }
 
-    public static function clear_all_renewal_crons($cpanelcron = false)
-    {
-        self::wple_logger('Clearing all renewal crons');
-
-        if (wp_next_scheduled('wple_ssl_renewal')) {
-            wp_clear_scheduled_hook('wple_ssl_renewal');
+    public static function clear_all_renewal_crons( $cpanelcron = false ) {
+        self::wple_logger( 'Clearing all renewal crons' );
+        if ( wp_next_scheduled( 'wple_ssl_renewal' ) ) {
+            wp_clear_scheduled_hook( 'wple_ssl_renewal' );
         }
-        if (wp_next_scheduled('wple_ssl_renewal', array('propagating'))) {
-            wp_clear_scheduled_hook('wple_ssl_renewal', array('propagating'));
+        if ( wp_next_scheduled( 'wple_ssl_renewal', array('propagating') ) ) {
+            wp_clear_scheduled_hook( 'wple_ssl_renewal', array('propagating') );
         }
-        if (wp_next_scheduled('wple_ssl_renewal_recheck')) {
-            wp_clear_scheduled_hook('wple_ssl_renewal_recheck');
+        if ( wp_next_scheduled( 'wple_ssl_renewal_recheck' ) ) {
+            wp_clear_scheduled_hook( 'wple_ssl_renewal_recheck' );
         }
-        if (wp_next_scheduled('wple_ssl_renewal_failed')) {
-            wp_clear_scheduled_hook('wple_ssl_renewal_failed');
+        if ( wp_next_scheduled( 'wple_ssl_renewal_failed' ) ) {
+            wp_clear_scheduled_hook( 'wple_ssl_renewal_failed' );
         }
-
-        if ($cpanelcron) {
+        if ( $cpanelcron ) {
             //if cpanel cron exists, leave it as it is.
         }
     }
 
-    public static function remove_wellknown_htaccess()
-    {
+    public static function remove_wellknown_htaccess() {
         $wk_htaccess = ABSPATH . '.well-known/.htaccess';
-        if (file_exists($wk_htaccess)) {
-            unlink($wk_htaccess);
+        if ( file_exists( $wk_htaccess ) ) {
+            unlink( $wk_htaccess );
         }
     }
 
-    public static function static_wellknown_htaccess()
-    {
+    public static function static_wellknown_htaccess() {
         //5.9.3
-        if (is_writable(ABSPATH . '.htaccess')) {
-            $htaccess = file_get_contents(ABSPATH . '.htaccess');
-
+        if ( is_writable( ABSPATH . '.htaccess' ) ) {
+            $htaccess = file_get_contents( ABSPATH . '.htaccess' );
             //remove older one
             $group = "/#\\s?BEGIN\\s?WP_Encryption_Well_Known.*?#\\s?END\\s?WP_Encryption_Well_Known/s";
-
-            if (preg_match($group, $htaccess)) {
-                $htaccess = preg_replace($group, "", $htaccess);
+            if ( preg_match( $group, $htaccess ) ) {
+                $htaccess = preg_replace( $group, "", $htaccess );
             }
-
             $rule = "\n" . "# BEGIN WP_Encryption_Well_Known\n";
             $rule .= "RewriteEngine On" . "\n";
-            $rule .= "RewriteCond %{REQUEST_URI} ^/\.well-known/ [NC]" . "\n";
-            $rule .= "RewriteRule ^(.*)$ - [L]" . "\n";
+            $rule .= "RewriteCond %{REQUEST_URI} ^/\\.well-known/ [NC]" . "\n";
+            $rule .= "RewriteRule ^(.*)\$ - [L]" . "\n";
             $rule .= "# END WP_Encryption_Well_Known" . "\n";
-
-            $finalrule = preg_replace("/\n+/", "\n", $rule);
-
+            $finalrule = preg_replace( "/\n+/", "\n", $rule );
             $newhtaccess = $finalrule . $htaccess;
-            file_put_contents(ABSPATH . '.htaccess', $newhtaccess);
+            file_put_contents( ABSPATH . '.htaccess', $newhtaccess );
         }
     }
 
-    public static function wple_pki_validation_check__premium_only()
-    {
-        $abspath = ABSPATH;
-
-        //if subdir site
-        $baredomain = str_ireplace(array('http://', 'https://'), array('', ''), site_url());
-        $slashposition = strpos($baredomain, '/');
-        if (false !== $slashposition) {
-            $abspath = dirname(ABSPATH); //remove last path so maps to parent dir
-            $baredomain = substr($baredomain, 0, $slashposition);
+    public static function wple_ssllabs_scan( $force_new = false, $gradeonly = true, $host = '' ) {
+        if ( function_exists( 'ignore_user_abort' ) ) {
+            ignore_user_abort( true );
         }
-
-        $pkipath = trailingslashit($abspath) . '.well-known/pki-validation/';
-
-        if (!file_exists($pkipath)) {
-            if (!mkdir($pkipath, 0775, true)) {
-                return false; //could not create dir
-            }
-        }
-
-        $txtfile = $pkipath . 'wpen-test.txt';
-        if (!file_put_contents($txtfile, 'pkitest')) return false;
-
-        //public test
-        $args = array(
-            'sslverify'   => false,
-        );
-
-        $remoteget = wp_remote_get('https://' . $baredomain . '/.well-known/pki-validation/wpen-test.txt', $args);
-        if (is_wp_error($remoteget)) {
-            return false;
-        } else {
-            $rsponse = trim(wp_remote_retrieve_body($remoteget)) === 'pkitest' ? true : false;
-            return $rsponse;
-        }
-
-        return false;
-    }
-
-    private static function wple_get_mapped_domain__premium_only()
-    {
-        if (!is_multisite()) {
-            return '';
-        }
-
-        global $wpdb;
-
-        switch_to_blog(1);
-        $tebel = $wpdb->prefix . 'domain_mapping';
-        restore_current_blog();
-
-        $res = $wpdb->get_row($wpdb->prepare("SELECT domain FROM $tebel WHERE blog_id=%d", get_current_blog_id()), ARRAY_A);
-
-        if (!empty($res) && FALSE !== $res && NULL !== $res && isset($res['domain'])) { //its a mu mapped
-            $this_domain = $res['domain'];
-            return $this_domain;
-        } else {
-
-            //native wp mapping
-            switch_to_blog(1);
-            $tebel = $wpdb->prefix . 'blogs';
-            restore_current_blog();
-
-            $res = $wpdb->get_row($wpdb->prepare("SELECT domain FROM $tebel WHERE blog_id=%d", get_current_blog_id()), ARRAY_A);
-
-            if (!empty($res) && FALSE !== $res && NULL !== $res && isset($res['domain'])) { //its a native mu mapped
-                $this_domain = $res['domain'];
-
-                return $this_domain;
-            } else {
-
-                return '';
-            }
-        }
-    }
-
-    public static function wple_backup_n_clear_keys__premium_only()
-    {
-        $keys = ABSPATH . 'keys/';
-
-        if (wple_fs()->can_use_premium_code__premium_only()) {
-            $opts = get_option('wple_opts');
-            if (is_multisite() && is_array($opts) && array_key_exists('domain', $opts)) {
-                $dmn = SELF::wple_get_mapped_domain__premium_only();
-                $keys = ABSPATH . 'keys/' . sanitize_text_field($dmn) . '/';
-            }
-        }
-
-        if (file_exists($keys . 'certificate.crt')) {
-            //we have some certificate in place
-            $toCopy = ['certificate.crt', 'private.pem'];
-
-            mkdir($keys . 'backp', 644);
-
-            foreach ($toCopy as $fyl) {
-                @copy($keys . $fyl, $keys . 'backp/' . $fyl);
-            }
-        }
-
-        $files = array(
-            $keys . 'public.pem',
-            $keys . 'private.pem',
-            $keys . 'order',
-            $keys . 'fullchain.crt',
-            $keys . 'certificate.crt',
-            $keys . '__account/private.pem',
-            $keys . '__account/public.pem'
-        );
-
-        SELF::wple_logger('Doing auto reset');
-
-        foreach ($files as $file) {
-            if (file_exists($file)) {
-                unlink($file);
-            }
-        }
-    }
-
-    public static function wple_ssllabs_scan($force_new = false, $gradeonly = true, $host = '')
-    {
-        if (function_exists('ignore_user_abort')) {
-            ignore_user_abort(true);
-        }
-
-        if (!$force_new) {
-            $stored_result = get_transient('wple_ssllabs');
-
-            if (false !== $stored_result) {
-
-                if ($gradeonly) {
-                    return ['status' => 'ready', 'info' => isset($stored_result['endpoints'][0]['grade']) ? $stored_result['endpoints'][0]['grade'] : ''];
+        if ( !$force_new ) {
+            $stored_result = get_transient( 'wple_ssllabs' );
+            if ( false !== $stored_result ) {
+                if ( $gradeonly ) {
+                    return [
+                        'status' => 'ready',
+                        'info'   => ( isset( $stored_result['endpoints'][0]['grade'] ) ? $stored_result['endpoints'][0]['grade'] : '' ),
+                    ];
                 } else {
-                    return ['status' => 'ready', 'info' => $stored_result];
+                    return [
+                        'status' => 'ready',
+                        'info'   => $stored_result,
+                    ];
                 }
             }
-
             //continue the request if transient not found
         } else {
             //delete transient when new scan
-            delete_transient('wple_ssllabs');
+            delete_transient( 'wple_ssllabs' );
         }
-
         $API = 'https://api.ssllabs.com/api/v3/analyze';
         $payload = array(
-            'host' => ($host == '') ? SELF::get_root_domain(true) : $host,
-            'startNew' => ($force_new == true) ? 'on' : 'off',
-            'all' => 'done'
+            'host'     => ( $host == '' ? SELF::get_root_domain( true ) : $host ),
+            'startNew' => ( $force_new == true ? 'on' : 'off' ),
+            'all'      => 'done',
         );
-
-        $laburl = $API . '?' . http_build_query($payload);
-
-        $result = wp_remote_get($laburl);
-
+        $laburl = $API . '?' . http_build_query( $payload );
+        $result = wp_remote_get( $laburl );
         // echo '<pre>';
         // print_r($result);
         // exit();
-
-        if (is_wp_error($result)) {
+        if ( is_wp_error( $result ) ) {
             return false;
         }
-
-        $res = wp_remote_retrieve_body($result);
-        $res = json_decode($res, true);
-
-        if (is_array($res) && array_key_exists('status', $res)) {
-
+        $res = wp_remote_retrieve_body( $result );
+        $res = json_decode( $res, true );
+        if ( is_array( $res ) && array_key_exists( 'status', $res ) ) {
             $status = $res['status'];
-
-            if ($status == 'READY') {
-                set_transient('wple_ssllabs', $res, DAY_IN_SECONDS);
-
-                if ($gradeonly) {
-                    return ['status' => 'ready', 'info' => array_key_exists('grade', $res['endpoints'][0]) ? $res['endpoints'][0]['grade'] : ''];
+            if ( $status == 'READY' ) {
+                set_transient( 'wple_ssllabs', $res, DAY_IN_SECONDS );
+                if ( $gradeonly ) {
+                    return [
+                        'status' => 'ready',
+                        'info'   => ( array_key_exists( 'grade', $res['endpoints'][0] ) ? $res['endpoints'][0]['grade'] : '' ),
+                    ];
                 } else {
-                    return ['status' => 'ready', 'info' => $res];
+                    return [
+                        'status' => 'ready',
+                        'info'   => $res,
+                    ];
                 }
-            } else if ($status == 'ERROR') {
-
-                return ['status' => 'error', 'info' => $res['statusMessage']];
-            } else { //in progress
-
-                return ['status' => 'inprogress', 'info' => array_key_exists('endpoints', $res) ? (isset($res['endpoints'][0]['statusDetailsMessage']) ? $res['endpoints'][0]['statusDetailsMessage'] : '') : ''];
+            } else {
+                if ( $status == 'ERROR' ) {
+                    return [
+                        'status' => 'error',
+                        'info'   => $res['statusMessage'],
+                    ];
+                } else {
+                    //in progress
+                    return [
+                        'status' => 'inprogress',
+                        'info'   => ( array_key_exists( 'endpoints', $res ) ? ( isset( $res['endpoints'][0]['statusDetailsMessage'] ) ? $res['endpoints'][0]['statusDetailsMessage'] : '' ) : '' ),
+                    ];
+                }
             }
         }
     }
@@ -1231,119 +959,100 @@ class WPLE_Trait
      * @since 7.5.1
      * @return void
      */
-    public static function wple_ssllabs_scan_daily($param = '')
-    {
-        if (function_exists('ignore_user_abort')) {
-            ignore_user_abort(true);
+    public static function wple_ssllabs_scan_daily( $param = '' ) {
+        if ( function_exists( 'ignore_user_abort' ) ) {
+            ignore_user_abort( true );
         }
-
         //init new scan
         $API = 'https://api.ssllabs.com/api/v3/analyze';
         $payload = array(
-            'host' => SELF::get_root_domain(true),
-            'startNew' => ($param == 'recheck_status') ? 'off' : 'on',
-            'all' => 'done'
+            'host'     => SELF::get_root_domain( true ),
+            'startNew' => ( $param == 'recheck_status' ? 'off' : 'on' ),
+            'all'      => 'done',
         );
-
-        $laburl = $API . '?' . http_build_query($payload);
-
-        $result = wp_remote_get($laburl);
-
+        $laburl = $API . '?' . http_build_query( $payload );
+        $result = wp_remote_get( $laburl );
         // echo '<pre>';
         // print_r($result);
         // exit();
-
-        if (is_wp_error($result)) {
+        if ( is_wp_error( $result ) ) {
             return false;
         }
-
-        $res = wp_remote_retrieve_body($result);
-        $res = json_decode($res, true);
-
-
-        if (is_array($res) && array_key_exists('status', $res)) {
-
+        $res = wp_remote_retrieve_body( $result );
+        $res = json_decode( $res, true );
+        if ( is_array( $res ) && array_key_exists( 'status', $res ) ) {
             $status = $res['status'];
-
-            if ($status == 'READY') {
-                set_transient('wple_ssllabs', $res, DAY_IN_SECONDS);
-
+            if ( $status == 'READY' ) {
+                set_transient( 'wple_ssllabs', $res, DAY_IN_SECONDS );
                 $validTo = $res['certs'][0]['notAfter'];
-                $to = date('d-m-Y', $validTo / 1000);
-
-                update_option('wple_ssllabs_expiry', strtotime($to)); //since 7.7.7 IMP
-
-                WPLE_Trait::ssl_expired_email($to); //since 7.8.5.2
-
-                $tenDaysToExpiry = strtotime('-10 day', strtotime($to));
-
-                if (strtotime('now') >= $tenDaysToExpiry) { //already in last 10 days to expiry
-
+                $to = date( 'd-m-Y', $validTo / 1000 );
+                update_option( 'wple_ssllabs_expiry', strtotime( $to ) );
+                //since 7.7.7 IMP
+                WPLE_Trait::ssl_expired_email( $to );
+                //since 7.8.5.2
+                $tenDaysToExpiry = strtotime( '-10 day', strtotime( $to ) );
+                if ( strtotime( 'now' ) >= $tenDaysToExpiry ) {
+                    //already in last 10 days to expiry
                     $wpcron_enabled = 'no';
-                    if (wp_next_scheduled('wple_ssl_renewal')) {
+                    if ( wp_next_scheduled( 'wple_ssl_renewal' ) ) {
                         $wpcron_enabled = 'yes';
                     }
-
-                    WPLE_Trait::wple_logger('**LAST 10 DAYS TO SSL EXPIRY** WP CRON - ' . $wpcron_enabled);
-
-                    if ($wpcron_enabled == 'no') { //lets enable wp cron & see if it helps
-                        wp_schedule_event(strtotime('05:00:00'), 'daily', 'wple_ssl_renewal');
+                    WPLE_Trait::wple_logger( '**LAST 10 DAYS TO SSL EXPIRY** WP CRON - ' . $wpcron_enabled );
+                    if ( $wpcron_enabled == 'no' ) {
+                        //lets enable wp cron & see if it helps
+                        wp_schedule_event( strtotime( '05:00:00' ), 'daily', 'wple_ssl_renewal' );
                     }
-                    update_option('wple_show_reminder', 1);
-                    update_option('wple_renewal_failed_notice', 1);
+                    update_option( 'wple_show_reminder', 1 );
+                    update_option( 'wple_renewal_failed_notice', 1 );
                 } else {
                     //remove notices
-                    delete_option('wple_show_reminder');
-                    delete_option('wple_renewal_failed_notice');
-
+                    delete_option( 'wple_show_reminder' );
+                    delete_option( 'wple_renewal_failed_notice' );
                     //reset reminder cron
-                    wp_clear_scheduled_hook('wple_ssl_reminder_notice');
-                    wp_schedule_single_event($tenDaysToExpiry, 'wple_ssl_reminder_notice');
+                    wp_clear_scheduled_hook( 'wple_ssl_reminder_notice' );
+                    wp_schedule_single_event( $tenDaysToExpiry, 'wple_ssl_reminder_notice' );
                 }
-            } else if ($status == 'ERROR') {
-                //ignore
-            } else { //in progress
-                //re-check status after 15mins
-                wp_schedule_single_event(time() + 900, 'wple_ssl_expiry_update', array('recheck_status'));
+            } else {
+                if ( $status == 'ERROR' ) {
+                    //ignore
+                } else {
+                    //in progress
+                    //re-check status after 15mins
+                    wp_schedule_single_event( time() + 900, 'wple_ssl_expiry_update', array('recheck_status') );
+                }
             }
         } else {
             //re-check status after 15mins
-            wp_schedule_single_event(time() + 900, 'wple_ssl_expiry_update', array('recheck_status'));
+            wp_schedule_single_event( time() + 900, 'wple_ssl_expiry_update', array('recheck_status') );
         }
     }
 
-    public static function ssl_expired_email($expiry_date)
-    {
-        if (!wple_fs()->can_use_premium_code__premium_only()) {
-            $expiry_timestamp = strtotime($expiry_date);
-            $current_timestamp = time();
-
-            $expired_past3days = strtotime('+3 days', $current_timestamp);
-
-            if ($current_timestamp >= $expiry_timestamp && $current_timestamp <= $expired_past3days) {
-
-                $opts = get_option('wple_opts');
-
-                $to = (isset($opts['email']) && !empty($opts['email'])) ? sanitize_email($opts['email']) : get_option('admin_email');
-
-                $subject = sprintf(esc_html__('URGENT: SSL Certificate for %s Has Expired', 'wp-letsencrypt-ssl'), str_ireplace(array('https://', 'http://'), array('', ''), site_url()));
-                $headers = array('Content-Type: text/html; charset=UTF-8');
-
-                $body = 'Hello,<br /><br />';
-
-                $body .= '<p>SSL certificate for your site ' . esc_html(site_url()) . ' has expired, causing your site to show an INSECURE warning. Act fast and renew your SSL before losing potential traffic. Here\'s how you can instantly renew SSL with a click of button using PRO version:</p><br /><br />';
-
-                $body .= '<ol>';
-                $body .= '<li>Upgrade and activate PRO version via <a href="' . admin_url('/admin.php?page=wp_encryption-pricing&billing_cycle=lifetime') . '">Upgrade Page</a> (Clicking on <b>Advanced > Proceed to insecure site</b> option shown on your browser)</li>';
-                $body .= '<li>If HSTS prevents access, try a different browser or device to reach wp-admin.</li>';
-                $body .= '<li>Once PRO is active, go to the <b>Install SSL</b> page and run the install SSL form.</li>';
-                $body .= '<li>Our plugin handles domain verification and SSL installation automatically.</li>';
-                $body .= '<li>Your site will be secure again in minutes — with <b>auto-renewal enabled</b> going forward.</li>';
-                $body .= '</ol><br />';
-
-                $body .= '<p>Kind regards,<br/>WP Encryption Team</p><br /><br />';
-
-                if (function_exists('wp_mail')) wp_mail($to, $subject, $body, $headers);
+    public static function ssl_expired_email( $expiry_date ) {
+        $expiry_timestamp = strtotime( $expiry_date );
+        $current_timestamp = time();
+        $expired_past3days = strtotime( '+3 days', $current_timestamp );
+        if ( $current_timestamp >= $expiry_timestamp && $current_timestamp <= $expired_past3days ) {
+            $opts = get_option( 'wple_opts' );
+            $to = ( isset( $opts['email'] ) && !empty( $opts['email'] ) ? sanitize_email( $opts['email'] ) : get_option( 'admin_email' ) );
+            $subject = sprintf( esc_html__( 'URGENT: SSL Certificate for %s Has Expired', 'wp-letsencrypt-ssl' ), str_ireplace( array('https://', 'http://'), array('', ''), site_url() ) );
+            $headers = array('Content-Type: text/html; charset=UTF-8');
+            $body = 'Hello,<br /><br />';
+            $body .= '<p>SSL certificate for your site ' . esc_html( site_url() ) . ' has expired, causing your site to show an INSECURE warning. Act fast and renew your SSL before losing potential traffic. Here\'s how you can instantly renew SSL with a click of button using PRO version:</p><br /><br />';
+            $body .= '<ol>';
+            $body .= '<li>Upgrade and activate PRO version via <a href="' . admin_url( '/admin.php?page=wp_encryption-pricing&billing_cycle=lifetime' ) . '">Upgrade Page</a> (Clicking on <b>Advanced > Proceed to insecure site</b> option shown on your browser)</li>';
+            $body .= '<li>If HSTS prevents access, try a different browser or device to reach wp-admin.</li>';
+            $body .= '<li>Once PRO is active, go to the <b>Install SSL</b> page and run the install SSL form.</li>';
+            $body .= '<li>Our plugin handles domain verification and SSL installation automatically.</li>';
+            $body .= '<li>Your site will be secure again in minutes — with <b>auto-renewal enabled</b> going forward.</li>';
+            $body .= '</ol><br />';
+            $body .= '<p>Kind regards,<br/>WP Encryption Team</p><br /><br />';
+            if ( function_exists( 'wp_mail' ) ) {
+                wp_mail(
+                    $to,
+                    $subject,
+                    $body,
+                    $headers
+                );
             }
         }
     }
@@ -1354,32 +1063,22 @@ class WPLE_Trait
      * #TODO: MU mapped domain test
      * @since 7.0.0
      */
-    public static function wple_cert_directory()
-    {
-
-        if (get_option('wple_parent_reachable')) {
-            $dir = dirname(ABSPATH, 1) . '/ssl/' . sanitize_file_name(WPLE_Trait::get_root_domain()) . '/';
+    public static function wple_cert_directory() {
+        if ( get_option( 'wple_parent_reachable' ) ) {
+            $dir = dirname( ABSPATH, 1 ) . '/ssl/' . sanitize_file_name( WPLE_Trait::get_root_domain() ) . '/';
         } else {
             $dir = ABSPATH . 'keys/';
         }
-
-        if (wple_fs()->is__premium_only()) {
-            //always return previously used ABSPATH in premium
-            $dir = ABSPATH . 'keys/';
-        }
-
         return $dir;
     }
 
-    public static function wple_get_private_key()
-    {
+    public static function wple_get_private_key() {
         $keypath = WPLE_Trait::wple_cert_directory();
-        $pkey = get_option('wple_priv_key');
-
-        if (file_exists($keypath . 'private.pem')) {
-            return file_get_contents($keypath . 'private.pem');
-        } elseif ($pkey !== false) {
-            return preg_replace('#<br\s*/?>#i', "", $pkey);
+        $pkey = get_option( 'wple_priv_key' );
+        if ( file_exists( $keypath . 'private.pem' ) ) {
+            return file_get_contents( $keypath . 'private.pem' );
+        } elseif ( $pkey !== false ) {
+            return preg_replace( '#<br\\s*/?>#i', "", $pkey );
         } else {
             return '';
         }
@@ -1392,45 +1091,50 @@ class WPLE_Trait
      * @since 7.2.0
      * @return bool
      */
-    public static function wple_ssl_recheck_expiry()
-    {
-
-        $g = stream_context_create(array("ssl" => array("capture_peer_cert" => true)));
-        $r = @fopen(str_ireplace('http://', 'https://', site_url()), "rb", false, $g);
-
-        if (!$r) { //ssllabs
-            $ssllabs = SELF::wple_ssllabs_scan(false, false);
-            sleep(10);
-            if (isset($ssllabs['status']) && $ssllabs['status'] == 'ready') {
+    public static function wple_ssl_recheck_expiry() {
+        $g = stream_context_create( array(
+            "ssl" => array(
+                "capture_peer_cert" => true,
+            ),
+        ) );
+        $r = @fopen(
+            str_ireplace( 'http://', 'https://', site_url() ),
+            "rb",
+            false,
+            $g
+        );
+        if ( !$r ) {
+            //ssllabs
+            $ssllabs = SELF::wple_ssllabs_scan( false, false );
+            sleep( 10 );
+            if ( isset( $ssllabs['status'] ) && $ssllabs['status'] == 'ready' ) {
                 $myssl = $ssllabs['info'];
                 $validTo = $myssl['certs'][0]['notAfter'];
-                $to = date('d-m-Y', $validTo / 1000);
-                $tenDaysToExpiry = strtotime('-10 day', strtotime($to));
-
-                if (strtotime('now') > $tenDaysToExpiry) {
+                $to = date( 'd-m-Y', $validTo / 1000 );
+                $tenDaysToExpiry = strtotime( '-10 day', strtotime( $to ) );
+                if ( strtotime( 'now' ) > $tenDaysToExpiry ) {
                     return true;
                 } else {
                     //reset reminder cron
-                    wp_clear_scheduled_hook('wple_ssl_reminder_notice');
-                    wp_schedule_single_event($tenDaysToExpiry, 'wple_ssl_reminder_notice');
+                    wp_clear_scheduled_hook( 'wple_ssl_reminder_notice' );
+                    wp_schedule_single_event( $tenDaysToExpiry, 'wple_ssl_reminder_notice' );
                     return false;
                 }
             } else {
-                return true; //we couldnt check
+                return true;
+                //we couldnt check
             }
         } else {
-            $cont = stream_context_get_params($r);
+            $cont = stream_context_get_params( $r );
             $activecert = $cont["options"]["ssl"]["peer_certificate"];
-
-            $ret = openssl_x509_parse($activecert, true);
-            $activecertexpirytime = strtotime('-10 day', $ret['validTo_time_t']);
-
-            if (strtotime('now') > $activecertexpirytime) {
+            $ret = openssl_x509_parse( $activecert, true );
+            $activecertexpirytime = strtotime( '-10 day', $ret['validTo_time_t'] );
+            if ( strtotime( 'now' ) > $activecertexpirytime ) {
                 return true;
             } else {
                 //reset reminder cron
-                wp_clear_scheduled_hook('wple_ssl_reminder_notice');
-                wp_schedule_single_event($activecertexpirytime, 'wple_ssl_reminder_notice');
+                wp_clear_scheduled_hook( 'wple_ssl_reminder_notice' );
+                wp_schedule_single_event( $activecertexpirytime, 'wple_ssl_reminder_notice' );
                 return false;
             }
         }
@@ -1441,28 +1145,18 @@ class WPLE_Trait
      * 
      * @return boolean
      */
-    public static function wple_has_valid_ssl()
-    {
-
-        if (is_ssl()) {
+    public static function wple_has_valid_ssl() {
+        if ( is_ssl() ) {
             return true;
         }
-
         // Cloudflare / reverse proxy support
-        if (
-            ! empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
-            $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'
-        ) {
+        if ( !empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
             return true;
         }
-
-        if (
-            ! empty($_SERVER['HTTP_CF_VISITOR']) &&
-            strpos($_SERVER['HTTP_CF_VISITOR'], 'https') !== false
-        ) {
+        if ( !empty( $_SERVER['HTTP_CF_VISITOR'] ) && strpos( $_SERVER['HTTP_CF_VISITOR'], 'https' ) !== false ) {
             return true;
         }
-
         return false;
     }
+
 }
