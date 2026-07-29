@@ -3,9 +3,9 @@ Contributors: gowebsmarty, gwsharsha
 Tags: free ssl,ssl,https,https redirect,force https
 Requires at least: 5.4
 License: GPL3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.0
-Stable tag: 7.8.6.7
+Stable tag: 7.8.7.0
 
 Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, HTTPS headers, Login Security & Passkey.
 
@@ -181,6 +181,15 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.7.0 =
+* php 8.4 support
+* Moved freemius init to top
+* removed an admin notice
+* undefined variable fix
+
+= 7.8.6.8 =
+* Pki validation security improved - Applicable for PRO only
 
 = 7.8.6.7 =
 * Composer autoload update

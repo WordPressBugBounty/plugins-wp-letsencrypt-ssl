@@ -117,6 +117,7 @@ class LEClient
         }
 
         if (is_string($accountKeys)) {
+            $certificateKeysDir = $certificateKeys;
             $accountKeys = $certificateKeysDir . '/' . $accountKeys;
 
             if (!file_exists($accountKeys)) {

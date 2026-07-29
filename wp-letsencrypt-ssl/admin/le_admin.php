@@ -93,10 +93,9 @@ class WPLE_Admin {
         //         add_action('admin_notices', [$this, 'wple_woosecurity_notice']);
         //     }
         // } //removed since 7.8.6.5
-        if ( !get_transient( 'wple_monitor_remindlater' ) && FALSE === get_option( 'wple_notice_disabled_monitor' ) ) {
-            //since 5.3.12
-            add_action( 'admin_notices', [$this, 'wple_monitor_notice'] );
-        }
+        // if (!get_transient('wple_monitor_remindlater') && FALSE === get_option('wple_notice_disabled_monitor')) { //since 5.3.12
+        //     add_action('admin_notices', [$this, 'wple_monitor_notice']);
+        // } //removed since 7.8.6.9
         /** Admin Notices End */
         add_action( 'wple_show_reviewrequest', array($this, 'wple_set_review_flag') );
         add_action( 'wple_show_mxalert', array($this, 'wple_set_mxerror_flag') );
@@ -204,15 +203,15 @@ class WPLE_Admin {
             delete_option( 'wple_plan_choose' );
             update_option( 'wple_version', WPLE_PLUGIN_VER );
         } else {
-            if ( version_compare( get_option( 'wple_version' ), '7.8.6.4', '<=' ) ) {
+            if ( version_compare( get_option( 'wple_version' ), '7.8.6.6', '<=' ) ) {
                 delete_option( 'wple_plan_choose' );
                 update_option( 'wple_version', WPLE_PLUGIN_VER );
             }
         }
         ///if (array_key_exists('SERVER_ADDR', $_SERVER)) update_option('wple_sourceip', $_SERVER['SERVER_ADDR']); //Used later for LE requests
-        //show trial prom
+        //show trial prom after a day
         if ( $activated = get_option( 'wple_activate' ) ) {
-            $after3days = strtotime( '+3 day', $activated );
+            $after3days = strtotime( '+1 day', $activated );
             if ( time() >= $after3days ) {
                 if ( FALSE === get_option( 'wple_notice_disabled_trial' ) && !wp_next_scheduled( 'wple_remindlater_trial' ) ) {
                     update_option( 'wple_notice_trial', true );
@@ -1391,12 +1390,22 @@ class WPLE_Admin {
     }
 
     public function wple_trial_promo_notice() {
-        $upgradebutton = '<a class="wple-lets-review wplerevbtn" href="' . network_admin_url( '/plugin-install.php?fs_allow_updater_and_dialog=true&tab=plugin-information&parent_plugin_id=5090&plugin=wpen-certpanel&section=description' ) . '" target="_blank">' . esc_html__( 'View Details', 'wp-letsencrypt-ssl' ) . '</a>';
+        $upgradebutton = '<a class="wple-lets-review wplerevbtn" href="https://checkout.freemius.com/plugin/5090/plan/38759/?trial=paid" target="_blank">' . esc_html__( 'Claim Free Trial', 'wp-letsencrypt-ssl' ) . '</a>';
         $html = '<div class="notice notice-info wple-admin-review wple-notice-trial">
         <div class="wple-review-box">
             <img src="' . WPLE_URL . 'admin/assets/symbol.png"/>
-            <span><strong>Secure Your Website with a Premium SSL Certificate - Try It Free for 7 Days!</strong>
-            <p>We truly appreciate your unwavering support as a loyal user of our WordPress plugin! To express our gratitude, we\'re excited to offer you an <b>exclusive 7-day free trial</b> of our premium SSL add-on through which you can generate premium SSL certificate and install it on your hosting server.</p></span>
+            <span><strong>Discover PRO with our 14 Days Free Trial!</strong>
+            <p>We truly appreciate your unwavering support as a loyal user of WP Encryption! To express our gratitude, we\'re excited to offer you an <b>Exclusive 14-days free trial</b> of WP Encryption Pro in which you can discover all the premium features including:</p>
+            <ul>
+                <li>Automatic Domain Verification</li>
+                <li>Automatic SSL Installation</li>
+                <li>Automatic SSL Renewal</li>
+                <li>Wildcard SSL Support</li>
+                <li>SSL for Multisite Network</li>
+                <li>Advanced Security Headers</li>
+                <li>Much More!</li>
+            </ul>
+            </span>
         </div>
         ' . $upgradebutton . '
         <a class="wple-dont-show-btn" data-context="trial" href="#">' . esc_html__( "Don't show again", 'wp-letsencrypt-ssl' ) . '</a>

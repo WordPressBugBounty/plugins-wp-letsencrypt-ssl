@@ -13,7 +13,7 @@ class Credential_Repository
     {
         global $wpdb;
 
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        require_once trailingslashit(ABSPATH) . 'wp-admin/includes/upgrade.php';
 
         $table_name = $wpdb->prefix . 'wpen_credentials';
         $charset_collate = $wpdb->get_charset_collate();

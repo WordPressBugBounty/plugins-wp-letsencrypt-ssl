@@ -924,7 +924,27 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                 $output .= '</li>';
             }
             $output .= '<li class="wple-setting-error"><label>' . __( 'You must have a valid SSL certificate installed on your site before enabling this feature', 'wp-letsencrypt-ssl' ) . '!.</label></li>
-    <li class="wple-sec-scanner"><a href="https://scan.wpencryption.com/?domain=' . esc_attr( site_url() ) . '" target="_blank">Security Header Scanner <span class="dashicons dashicons-external"></span></a></li>';
+    <li class="wple-sec-scanner"><a href="https://scan.wpencryption.com/?domain=' . esc_attr( site_url() ) . '" target="_blank">Security Header Scanner - FREE <span class="dashicons dashicons-external"></span></a></li>';
+            $output .= '<li class="wple-ssl-monitor">
+    <h3>WP Encryption Monitor</h3>
+    <p>Browsers now enforce a max 199-day SSL certificate limit. Keeping track manually across multiple sites isn\'t an option anymore. One missed renewal takes your site offline. WP Encryption Monitor gives you a single place to monitor SSL and domain expiry dates with instant notifications — Absolutely free.</p>
+    <a href="https://monitor.wpencryption.com" target="_blank">Launch Monitor <span class="dashicons dashicons-external"></span></a>
+    </li>';
+            $output .= '<li class="wple-ssl-monitor wple-pro-trial">
+    <h3>Discover PRO with our 14 Days Free Trial!</h3>
+    <p>Leverage the power of WP Encryption Pro & achieve maximum SSL / Security score with our 14-day free trial! Discover all premium features, including:</p>
+    <ul>
+                <li>Automatic Domain Verification</li>
+                <li>Automatic SSL Installation</li>
+                <li>Automatic SSL Renewal</li>
+                <li>Wildcard SSL Support</li>
+                <li>SSL for Multisite Network</li>
+                <li>Advanced SSL Health features</li>
+                <li>Advanced Security features</li>
+                <li>Much More!</li>
+            </ul>
+    <a href="https://checkout.freemius.com/plugin/5090/plan/38759/?trial=paid" target="_blank">Claim Free Trial <span class="dashicons dashicons-external"></span></a>
+    </li>';
             $output .= '</ul>';
             $output .= '</div>';
             return $output;
