@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 7.1
 Requires PHP: 7.0
-Stable tag: 7.8.7.0
+Stable tag: 7.8.7.1
 
 Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, HTTPS headers, Login Security & Passkey.
 

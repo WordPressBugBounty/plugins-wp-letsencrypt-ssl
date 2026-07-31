@@ -768,7 +768,8 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
             }
             set_transient( 'wple_alternate_headers', $viaAlternateMethod, 60 * 60 );
             //1 hour
-            $featurelist .= '<br /><li class="wplenote note-info"><strong>Recommended:</strong> Run Insecure content scanner & make sure no issue exists (<a href="/wp-admin/admin.php?page=wp_encryption_mixed_scanner">Scan now</a>)</li>';
+            $featurelist .= '<br /><li class="wplenote note-info"><strong>Recommended:</strong> Someone could be spoofing your email by sending fake messages that appear to come from your @' . esc_html( WPLE_Trait::get_root_domain( true ) ) . ' address (<a href="https://spoofing.wpencryption.com/" target="_blank">Check Email Spoofing</a>)</li>';
+            $featurelist .= '<li class="wplenote note-info"><strong>Recommended:</strong> Run the insecure content scanner and make sure no issues remain (<a href="/wp-admin/admin.php?page=wp_encryption_mixed_scanner">Scan now</a>)</li>';
             //5.7.0
             $plugin = false;
             if ( defined( 'rsssl_plugin' ) ) {
@@ -931,20 +932,20 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
     <a href="https://monitor.wpencryption.com" target="_blank">Launch Monitor <span class="dashicons dashicons-external"></span></a>
     </li>';
             $output .= '<li class="wple-ssl-monitor wple-pro-trial">
-    <h3>Discover PRO with our 14 Days Free Trial!</h3>
-    <p>Leverage the power of WP Encryption Pro & achieve maximum SSL / Security score with our 14-day free trial! Discover all premium features, including:</p>
-    <ul>
-                <li>Automatic Domain Verification</li>
-                <li>Automatic SSL Installation</li>
-                <li>Automatic SSL Renewal</li>
-                <li>Wildcard SSL Support</li>
-                <li>SSL for Multisite Network</li>
-                <li>Advanced SSL Health features</li>
-                <li>Advanced Security features</li>
-                <li>Much More!</li>
-            </ul>
-    <a href="https://checkout.freemius.com/plugin/5090/plan/38759/?trial=paid" target="_blank">Claim Free Trial <span class="dashicons dashicons-external"></span></a>
-    </li>';
+        <h3>Discover PRO with our 14 Days Free Trial!</h3>
+        <p>Leverage the power of WP Encryption Pro & achieve maximum SSL / Security score with our 14-day free trial! Discover all premium features, including:</p>
+        <ul>
+                    <li>Automatic Domain Verification</li>
+                    <li>Automatic SSL Installation</li>
+                    <li>Automatic SSL Renewal</li>
+                    <li>Wildcard SSL Support</li>
+                    <li>SSL for Multisite Network</li>
+                    <li>Advanced SSL Health features</li>
+                    <li>Advanced Security features</li>
+                    <li>Much More!</li>
+                </ul>
+        <a href="https://checkout.freemius.com/plugin/5090/plan/38759/?trial=paid" target="_blank">Claim Free Trial <span class="dashicons dashicons-external"></span></a>
+        </li>';
             $output .= '</ul>';
             $output .= '</div>';
             return $output;
