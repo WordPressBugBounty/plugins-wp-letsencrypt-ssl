@@ -293,22 +293,24 @@ if ( !class_exists( 'WPLE_Security' ) ) {
          */
         public static function wple_security_score() {
             $scorecard = array(
-                'https_enforced'           => 20,
-                'critical_issues'          => 10,
-                'disable_register'         => 10,
-                'disable_directory'        => 10,
-                'latest_vulnerability'     => 20,
-                'daily_vulnerability_scan' => 10,
-                'daily_malware_scan'       => 20,
+                'https_enforced'            => 20,
+                'critical_issues'           => 10,
+                'disable_register'          => 10,
+                'disable_directory'         => 10,
+                'daily_vulnerability_scan'  => 10,
+                'daily_malware_scan'        => 10,
+                'notify_vulnerability_scan' => 20,
+                'notify_malware_scan'       => 10,
             );
             $scoredefinitions = array(
-                'https_enforced'           => 'Valid SSL certificate installed and HTTPS enforced',
-                'critical_issues'          => 'Make sure no critical issues exists in <a href="' . admin_url( '/site-health.php' ) . '">site health</a>',
-                'disable_register'         => 'Disable "anyone can register"',
-                'disable_directory'        => 'Disable directory listing',
-                'latest_vulnerability'     => 'Latest vulnerability scan was performed within last 7 days',
-                'daily_vulnerability_scan' => 'Enable daily vulnerability scanning (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=security&utm_campaign=wpencryption#pricing">Premium</a>)',
-                'daily_malware_scan'       => 'Enable daily malware scanning (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=security&utm_campaign=wpencryption#pricing">Premium</a>)',
+                'https_enforced'            => 'Valid SSL certificate installed and HTTPS enforced',
+                'critical_issues'           => 'Make sure no critical issues exists in <a href="' . admin_url( '/site-health.php' ) . '">site health</a>',
+                'disable_register'          => 'Disable "anyone can register"',
+                'disable_directory'         => 'Disable directory listing',
+                'daily_vulnerability_scan'  => 'Enable daily vulnerability scanning',
+                'daily_malware_scan'        => 'Enable daily malware scanning',
+                'notify_vulnerability_scan' => 'Enable instant vulnerability notifications (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=security&utm_campaign=wpencryption#pricing">Premium</a>)',
+                'notify_malware_scan'       => 'Enable instant malware notifications (<a href="https://wpencryption.com/?utm_source=wordpress&utm_medium=security&utm_campaign=wpencryption#pricing">Premium</a>)',
             );
             $score = 0;
             $featurelist = '<ul>';
@@ -343,16 +345,18 @@ if ( !class_exists( 'WPLE_Security' ) ) {
                                     $isenabled = true;
                                 }
                             } else {
-                                if ( $key == 'latest_vulnerability' ) {
-                                    if ( $lastscan = get_option( 'wple_vulnerability_lastscan' ) ) {
-                                        $sevenDaysFromScan = $lastscan + 7 * 24 * 60 * 60;
-                                        if ( time() < $sevenDaysFromScan ) {
-                                            //last scan was within last 7 days
-                                            $isenabled = true;
-                                        }
+                                if ( $key == 'daily_vulnerability_scan' || $key == 'daily_malware_scan' ) {
+                                    // if ($lastscan = get_option('wple_vulnerability_lastscan')) {
+                                    //     $sevenDaysFromScan = $lastscan + (7 * 24 * 60 * 60);
+                                    //     if (time() < $sevenDaysFromScan) { //last scan was within last 7 days
+                                    //         $isenabled = true;
+                                    //     }
+                                    // }
+                                    if ( get_option( 'wple_' . $key ) ) {
+                                        $isenabled = true;
                                     }
                                 } else {
-                                    if ( $key == 'daily_vulnerability_scan' || $key == 'daily_malware_scan' ) {
+                                    if ( $key == 'notify_vulnerability_scan' || $key == 'notify_malware_scan' ) {
                                     }
                                 }
                             }

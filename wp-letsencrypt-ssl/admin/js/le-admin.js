@@ -1,38 +1,38 @@
 (function ($) {
-  'use strict';
+  "use strict";
 
-  $('.le-section-title').click(function () {
-    var scn = $(this).attr('data-section');
-    $('.le-section-title').removeClass('active');
-    $(this).addClass('active');
+  $(".le-section-title").click(function () {
+    var scn = $(this).attr("data-section");
+    $(".le-section-title").removeClass("active");
+    $(this).addClass("active");
 
-    localStorage.setItem('le-state', scn);
+    localStorage.setItem("le-state", scn);
 
-    $('.le-section.active')
-      .fadeOut('fast')
-      .removeClass('active')
+    $(".le-section.active")
+      .fadeOut("fast")
+      .removeClass("active")
       .promise()
       .done(function () {
-        $('.' + scn)
-          .fadeIn('fast')
-          .addClass('active');
+        $("." + scn)
+          .fadeIn("fast")
+          .addClass("active");
       });
   });
 
   //restore last tab
-  if (localStorage.getItem('le-state') !== null) {
-    var section = localStorage.getItem('le-state');
+  if (localStorage.getItem("le-state") !== null) {
+    var section = localStorage.getItem("le-state");
 
-    $('.le-section-title[data-section=' + section + ']').click();
+    $(".le-section-title[data-section=" + section + "]").click();
   }
 
   // Since 2.5.0
-  $('.wple-tooltip').each(function () {
+  $(".wple-tooltip").each(function () {
     var $this = $(this);
 
-    tippy('.wple-tooltip:not(.bottom)', {
+    tippy(".wple-tooltip:not(.bottom)", {
       //content: $this.attr('data-content'),
-      placement: 'top',
+      placement: "top",
       onShow(instance) {
         instance.popper.hidden = instance.reference.dataset.tippy
           ? false
@@ -42,9 +42,9 @@
       //arrow: false
     });
 
-    tippy('.wple-tooltip.bottom', {
+    tippy(".wple-tooltip.bottom", {
       //content: $this.attr('data-content'),
-      placement: 'bottom',
+      placement: "bottom",
       onShow(instance) {
         instance.popper.hidden = instance.reference.dataset.tippy
           ? false
@@ -55,52 +55,52 @@
     });
   });
 
-  $('.toggle-debugger').click(function () {
-    $(this).find('span').toggleClass('rotate');
+  $(".toggle-debugger").click(function () {
+    $(this).find("span").toggleClass("rotate");
 
-    $('.le-debugger').slideToggle('fast');
+    $(".le-debugger").slideToggle("fast");
   });
 
   //since 4.6.0
-  $('#admin-verify-dns').submit(function (e) {
+  $("#admin-verify-dns").submit(function (e) {
     e.preventDefault();
 
     var $this = $(this);
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_admin_dnsverify',
-        nc: $('#checkdns').val(),
+        action: "wple_admin_dnsverify",
+        nc: $("#checkdns").val(),
       },
       beforeSend: function () {
-        $('.dns-notvalid').removeClass('active');
-        $this.addClass('buttonrotate');
-        $this.find('button').attr('disabled', true);
+        $(".dns-notvalid").removeClass("active");
+        $this.addClass("buttonrotate");
+        $this.find("button").attr("disabled", true);
       },
       error: function () {
-        $('.dns-notvalid').removeClass('active');
-        $this.removeClass('buttonrotate');
-        $this.find('button').removeAttr('disabled');
-        alert('Something went wrong! Please try again');
+        $(".dns-notvalid").removeClass("active");
+        $this.removeClass("buttonrotate");
+        $this.find("button").removeAttr("disabled");
+        alert("Something went wrong! Please try again");
       },
       success: function (response) {
-        $this.removeClass('buttonrotate');
-        $this.find('button').removeAttr('disabled');
+        $this.removeClass("buttonrotate");
+        $this.find("button").removeAttr("disabled");
 
-        if (response === '1') {
-          $this.find('button').text('Verified');
+        if (response === "1") {
+          $this.find("button").text("Verified");
           setTimeout(function () {
-            window.location.href = window.location.href + '&wpleauto=dns';
+            window.location.href = window.location.href + "&wpleauto=dns";
             exit();
           }, 1000);
 
           // } else if (response !== 'fail') {
           //   alert("Partially verified. Could not verify " + String(response));
         } else {
-          $('.dns-notvalid').addClass('active');
+          $(".dns-notvalid").addClass("active");
         }
       },
     });
@@ -109,44 +109,44 @@
   });
 
   //since 4.7.0
-  $('#verify-subdns').click(function (e) {
+  $("#verify-subdns").click(function (e) {
     e.preventDefault();
 
     var $this = $(this);
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_admin_dnsverify',
+        action: "wple_admin_dnsverify",
         nc: $this.prev().val(),
       },
       beforeSend: function () {
-        $('.dns-notvalid').removeClass('active');
-        $this.addClass('buttonrotate');
-        $this.attr('disabled', true);
-        $('#wple-letsdebug').html('');
+        $(".dns-notvalid").removeClass("active");
+        $this.addClass("buttonrotate");
+        $this.attr("disabled", true);
+        $("#wple-letsdebug").html("");
       },
       error: function () {
-        $('.dns-notvalid').removeClass('active');
-        $this.removeClass('buttonrotate');
-        $this.removeAttr('disabled');
-        alert('Something went wrong! Please try again');
+        $(".dns-notvalid").removeClass("active");
+        $this.removeClass("buttonrotate");
+        $this.removeAttr("disabled");
+        alert("Something went wrong! Please try again");
       },
       success: function (response) {
-        $this.removeClass('buttonrotate');
-        $this.removeAttr('disabled');
+        $this.removeClass("buttonrotate");
+        $this.removeAttr("disabled");
 
-        if (response === '1') {
-          $this.text('Verified');
-          $('#wple-error-popper .wple-error').hide();
-          $('#wple-error-popper').fadeIn('fast');
-          $('#wple-error-popper .wple-flex img').show();
+        if (response === "1") {
+          $this.text("Verified");
+          $("#wple-error-popper .wple-error").hide();
+          $("#wple-error-popper").fadeIn("fast");
+          $("#wple-error-popper .wple-flex img").show();
 
           setTimeout(function () {
             window.location.href =
-              window.location.href + '&subdir=1&wpleauto=dns';
+              window.location.href + "&subdir=1&wpleauto=dns";
             exit();
           }, 1000);
 
@@ -154,11 +154,11 @@
           //   alert("Partially verified. Could not verify " + String(response));
         } else {
           //fail
-          if (response.indexOf('ul') >= 0) {
-            $('#wple-letsdebug').html(response);
+          if (response.indexOf("ul") >= 0) {
+            $("#wple-letsdebug").html(response);
           }
 
-          $('.dns-notvalid').addClass('active');
+          $(".dns-notvalid").addClass("active");
         }
       },
     });
@@ -166,59 +166,59 @@
     return false;
   });
 
-  $('#verify-subhttp').click(function (e) {
+  $("#verify-subhttp").click(function (e) {
     e.preventDefault();
 
     var $this = $(this);
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_admin_httpverify',
+        action: "wple_admin_httpverify",
         nc: $this.prev().val(),
       },
       beforeSend: function () {
-        $('.http-notvalid').removeClass('active');
-        $this.addClass('buttonrotate');
-        $this.attr('disabled', true);
-        $('#wple-letsdebug').html('');
+        $(".http-notvalid").removeClass("active");
+        $this.addClass("buttonrotate");
+        $this.attr("disabled", true);
+        $("#wple-letsdebug").html("");
       },
       error: function () {
-        $('.http-notvalid').removeClass('active');
-        $this.removeClass('buttonrotate');
-        $this.removeAttr('disabled');
-        alert('Something went wrong! Please try again');
+        $(".http-notvalid").removeClass("active");
+        $this.removeClass("buttonrotate");
+        $this.removeAttr("disabled");
+        alert("Something went wrong! Please try again");
       },
       success: function (response) {
-        $this.removeClass('buttonrotate');
-        $this.removeAttr('disabled');
+        $this.removeClass("buttonrotate");
+        $this.removeAttr("disabled");
 
-        if (response == 'empty') {
-          alert('HTTP challenges empty. Please use RESET once and try again.');
-        } else if (response == 'not_possible') {
+        if (response == "empty") {
+          alert("HTTP challenges empty. Please use RESET once and try again.");
+        } else if (response == "not_possible") {
           //deprecated
-          $('.http-notvalid-blocked').addClass('active');
-        } else if (response === '1') {
-          $this.text('Verified');
-          $('#wple-error-popper .wple-error').hide();
-          $('#wple-error-popper').fadeIn('fast');
-          $('#wple-error-popper .wple-flex img').show();
+          $(".http-notvalid-blocked").addClass("active");
+        } else if (response === "1") {
+          $this.text("Verified");
+          $("#wple-error-popper .wple-error").hide();
+          $("#wple-error-popper").fadeIn("fast");
+          $("#wple-error-popper .wple-flex img").show();
 
           setTimeout(function () {
             window.location.href =
-              window.location.href + '&subdir=1&wpleauto=http';
+              window.location.href + "&subdir=1&wpleauto=http";
             return false;
           }, 1000);
         } else {
           //fail
 
-          if (response.indexOf('ul') >= 0) {
-            $('#wple-letsdebug').html(response);
+          if (response.indexOf("ul") >= 0) {
+            $("#wple-letsdebug").html(response);
           }
 
-          $('.http-notvalid').addClass('active');
+          $(".http-notvalid").addClass("active");
         }
       },
     });
@@ -227,31 +227,31 @@
   });
 
   //since 4.7.1
-  $('#singledvssl').click(function (e) {
+  $("#singledvssl").click(function (e) {
     //e.preventDefault();
 
     var flag = 0;
-    if ($('input.wple_email').val() == '') {
+    if ($("input.wple_email").val() == "") {
       flag = 1;
-      $('#wple-error-popper .wple-error').text('Email address is required');
-      $('#wple-error-popper').fadeIn('slow');
+      $("#wple-error-popper .wple-error").text("Email address is required");
+      $("#wple-error-popper").fadeIn("slow");
     } else if (
-      !$('input.wple_agree_le').is(':checked') ||
-      !$('input.wple_agree_gws').is(':checked')
+      !$("input.wple_agree_le").is(":checked") ||
+      !$("input.wple_agree_gws").is(":checked")
     ) {
       flag = 1;
-      $('#wple-error-popper .wple-error').text('Agree to TOS required');
-      $('#wple-error-popper').fadeIn('slow');
+      $("#wple-error-popper .wple-error").text("Agree to TOS required");
+      $("#wple-error-popper").fadeIn("slow");
     }
 
     if (flag == 0) {
-      $('#wple-error-popper .wple-error').hide();
-      $('#wple-error-popper').fadeIn('fast');
-      $('#wple-error-popper .wple-flex img').show();
+      $("#wple-error-popper .wple-error").hide();
+      $("#wple-error-popper").fadeIn("fast");
+      $("#wple-error-popper .wple-flex img").show();
       //$(this).closest(".le-genform").submit();
     } else {
       setTimeout(function () {
-        $('#wple-error-popper').fadeOut(500);
+        $("#wple-error-popper").fadeOut(500);
       }, 2000);
       return false;
     }
@@ -259,133 +259,133 @@
 
   
 
-  $('.wple_include_www').change(function () {
-    if ($(this).is(':checked')) {
+  $(".wple_include_www").change(function () {
+    if ($(this).is(":checked")) {
       var $this = $(this);
 
       $.ajax({
-        type: 'GET',
+        type: "GET",
         url: ajaxurl,
         async: true,
-        dataType: 'text',
+        dataType: "text",
         data: {
-          action: 'wple_include_www',
-          nc: $('#letsencrypt').attr('value'),
+          action: "wple_include_www",
+          nc: $("#letsencrypt").attr("value"),
         },
         beforeSend: function () {},
         error: function () {
-          alert('Something went wrong. Please re-try..');
+          alert("Something went wrong. Please re-try..");
         },
         success: function (response) {
-          if (response != 1 && response != '1') {
-            $this.removeAttr('checked');
+          if (response != 1 && response != "1") {
+            $this.removeAttr("checked");
 
-            if (response == 'www') {
+            if (response == "www") {
               alert(
-                'Your www domain is not reachable, so this option cannot be enabled.',
+                "Your www domain is not reachable, so this option cannot be enabled.",
               );
-            } else if (response == 'nonwww') {
+            } else if (response == "nonwww") {
               alert(
-                'Your non-www domain is not reachable, so this option cannot be enabled.',
+                "Your non-www domain is not reachable, so this option cannot be enabled.",
               );
             } else {
-              alert('Authentication failure! Please try again');
+              alert("Authentication failure! Please try again");
             }
           } else {
-            $('.wple-www').addClass('active');
+            $(".wple-www").addClass("active");
           }
         },
       });
     } else {
-      $('.wple-www').removeClass('active');
+      $(".wple-www").removeClass("active");
     }
   });
 
-  $('.single-wildcard-switch').change(function () {
-    if ($(this).is(':checked')) {
-      $('.single-genform').fadeOut('fast');
-      $('.wildcard-genform').fadeIn('fast');
-      $('.wple-wc').addClass('active');
+  $(".single-wildcard-switch").change(function () {
+    if ($(this).is(":checked")) {
+      $(".single-genform").fadeOut("fast");
+      $(".wildcard-genform").fadeIn("fast");
+      $(".wple-wc").addClass("active");
     } else {
-      $('.wildcard-genform').fadeOut('fast');
-      $('.single-genform').fadeIn('fast');
-      $('.wple-wc').removeClass('active');
+      $(".wildcard-genform").fadeOut("fast");
+      $(".single-genform").fadeIn("fast");
+      $(".wple-wc").removeClass("active");
     }
   });
 
-  $('.initplan-switch').change(function () {
-    if ($(this).is(':checked')) {
-      $('.wplepricingcol.proplan').removeClass('hiddenplan');
-      $('.wplepricingcol.firewallplan').addClass('hiddenplan');
+  $(".initplan-switch").change(function () {
+    if ($(this).is(":checked")) {
+      $(".wplepricingcol.proplan").removeClass("hiddenplan");
+      $(".wplepricingcol.firewallplan").addClass("hiddenplan");
     } else {
-      $('.wplepricingcol.proplan').addClass('hiddenplan');
-      $('.wplepricingcol.firewallplan').removeClass('hiddenplan');
+      $(".wplepricingcol.proplan").addClass("hiddenplan");
+      $(".wplepricingcol.firewallplan").removeClass("hiddenplan");
     }
   });
 
-  jQuery('.wple-scan').click(function () {
+  jQuery(".wple-scan").click(function () {
     var $button = $(this);
-    $('.wple-frameholder').html('');
-    $(this).text('SCANNING').attr('disabled', 'disabled');
+    $(".wple-frameholder").html("");
+    $(this).text("SCANNING").attr("disabled", "disabled");
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: SCAN.adminajax,
-      dataType: 'html',
+      dataType: "html",
       data: {
-        action: 'wple_start_scanner',
-        nc: $button.attr('data-nc'),
+        action: "wple_start_scanner",
+        nc: $button.attr("data-nc"),
       },
       beforeSend: function () {
-        $('.mxnossl').remove();
-        $('#wple-scanner-iframe').css('height', '510px');
+        $(".mxnossl").remove();
+        $("#wple-scanner-iframe").css("height", "510px");
 
-        var frm = document.createElement('iframe');
+        var frm = document.createElement("iframe");
 
         frm.src = SCAN.base;
         frm.width = 500;
         frm.height = 500;
-        frm.scrolling = 'no';
-        document.getElementsByClassName('wple-frameholder')[0].appendChild(frm);
+        frm.scrolling = "no";
+        document.getElementsByClassName("wple-frameholder")[0].appendChild(frm);
       },
       error: function () {
-        alert('Request failed! Please try again.');
-        $button.text('SCAN').removeAttr('disabled');
-        $('.wple-frameholder').slideUp('fast');
+        alert("Request failed! Please try again.");
+        $button.text("SCAN").removeAttr("disabled");
+        $(".wple-frameholder").slideUp("fast");
       },
       success: function (response) {
-        if (response == 'nossl') {
-          $button.text('START THE SCAN').removeAttr('disabled');
-          $('#wple-scanner-iframe').fadeOut('fast');
-          $('#wple-scanner').after(
+        if (response == "nossl") {
+          $button.text("START THE SCAN").removeAttr("disabled");
+          $("#wple-scanner-iframe").fadeOut("fast");
+          $("#wple-scanner").after(
             '<div class="mxnossl">Valid SSL Certificate could not be detected on your site! Please install SSL Certificate & force HTTPS before checking for mixed content issues.</div>',
           );
           return false;
         } else {
-          $('.wple-scanbar')
-            .css('animation', 'none')
-            .text('Populating Mixed Content Stats! Please wait...')
-            .addClass('complete');
+          $(".wple-scanbar")
+            .css("animation", "none")
+            .text("Populating Mixed Content Stats! Please wait...")
+            .addClass("complete");
 
-          if (response == 'success') {
-            $('.wple-scan').text('COMPLETED');
-            $('.wple-scanbar')
-              .text('All good! Mixed content issues not found.')
-              .addClass('success');
-            $('.wple-frameholder').slideUp('fast');
+          if (response == "success") {
+            $(".wple-scan").text("COMPLETED");
+            $(".wple-scanbar")
+              .text("All good! Mixed content issues not found.")
+              .addClass("success");
+            $(".wple-frameholder").slideUp("fast");
             return false;
           }
 
-          $('#wple-scanner-iframe').fadeOut('fast');
-          $('#wple-scanresults').html(response);
-          $('.wple-scan').text('COMPLETED');
+          $("#wple-scanner-iframe").fadeOut("fast");
+          $("#wple-scanresults").html(response);
+          $(".wple-scan").text("COMPLETED");
 
-          $('.wple-tooltip').each(function () {
+          $(".wple-tooltip").each(function () {
             var $this = $(this);
 
-            tippy('.wple-tooltip:not(.bottom)', {
+            tippy(".wple-tooltip:not(.bottom)", {
               //content: $this.attr('data-content'),
-              placement: 'top',
+              placement: "top",
               onShow(instance) {
                 instance.popper.hidden = instance.reference.dataset.tippy
                   ? false
@@ -404,267 +404,267 @@
    * v5.2.6
    */
 
-  $('.have-root-ssh').click(function () {
-    $(this).siblings().removeClass('active');
-    $(this).addClass('active');
+  $(".have-root-ssh").click(function () {
+    $(this).siblings().removeClass("active");
+    $(this).addClass("active");
 
-    $('.rootssh-check').fadeOut('fast');
-    $('.havessh').fadeIn('fast');
+    $(".rootssh-check").fadeOut("fast");
+    $(".havessh").fadeIn("fast");
   });
 
-  $('.no-root-ssh').click(function () {
-    $(this).siblings().removeClass('active');
-    $(this).addClass('active');
+  $(".no-root-ssh").click(function () {
+    $(this).siblings().removeClass("active");
+    $(this).addClass("active");
 
-    $('.rootssh-check').fadeOut('fast');
-    $('.nossh').fadeIn('fast');
+    $(".rootssh-check").fadeOut("fast");
+    $(".nossh").fadeIn("fast");
   });
 
-  $('.check-root-ssh li').click(function () {
-    $('.nocp-ssl-validation').show();
+  $(".check-root-ssh li").click(function () {
+    $(".nocp-ssl-validation").show();
   });
 
-  $('#validate-nocp-ssl').click(function () {
+  $("#validate-nocp-ssl").click(function () {
     var $this = $(this);
 
     jQuery.ajax({
-      method: 'GET',
+      method: "GET",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_validate_ssl',
+        action: "wple_validate_ssl",
       },
       beforeSend: function () {
-        $this.find('span').show();
-        $('.wple-validate-nossl').hide();
+        $this.find("span").show();
+        $(".wple-validate-nossl").hide();
       },
       error: function () {
-        $this.find('span').hide();
-        alert('Could not validate SSL! Please try later.');
+        $this.find("span").hide();
+        alert("Could not validate SSL! Please try later.");
       },
       success: function (response) {
-        $this.find('span').hide();
+        $this.find("span").hide();
 
         if (response == 1) {
           var currenthref = window.location.href;
-          window.location.href = currenthref + '&success=1';
+          window.location.href = currenthref + "&success=1";
           return false;
         } else {
-          $('.wple-validate-nossl').fadeIn('fast');
+          $(".wple-validate-nossl").fadeIn("fast");
         }
       },
     });
   });
 
-  $('.email-certs-switch,.disable-spmode-switch,.force-spmode-switch').change(
+  $(".email-certs-switch,.disable-spmode-switch,.force-spmode-switch").change(
     function () {
       var $this = $(this);
 
       jQuery.ajax({
-        method: 'POST',
+        method: "POST",
         url: ajaxurl,
-        dataType: 'text',
+        dataType: "text",
         data: {
-          action: 'wple_email_certs',
-          emailcert: $('.email-certs-switch').is(':checked'),
-          spmode: $('.disable-spmode-switch').is(':checked'),
-          forcespmode: $('.force-spmode-switch').is(':checked'),
-          nc: $('.download-certs').attr('data-update'),
+          action: "wple_email_certs",
+          emailcert: $(".email-certs-switch").is(":checked"),
+          spmode: $(".disable-spmode-switch").is(":checked"),
+          forcespmode: $(".force-spmode-switch").is(":checked"),
+          nc: $(".download-certs").attr("data-update"),
         },
         beforeSend: function () {},
         error: function () {
-          alert('Failed to save opt! Please try again');
+          alert("Failed to save opt! Please try again");
         },
         success: function (response) {
-          if (response == 'failed') {
+          if (response == "failed") {
             alert("Couldn't save your settings! Please re-try.");
           } else {
-            alert('Settings Saved!');
+            alert("Settings Saved!");
           }
         },
       });
     },
   );
 
-  $('.wple-did-review,.wple-later-review').click(function (e) {
+  $(".wple-did-review,.wple-later-review").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_review_notice',
-        nc: $this.attr('data-nc'),
-        choice: $this.attr('data-action'),
+        action: "wple_review_notice",
+        nc: $this.attr("data-nc"),
+        choice: $this.attr("data-action"),
       },
       beforeSend: function () {},
       error: function () {
-        alert('Failed to save! Please try again');
+        alert("Failed to save! Please try again");
       },
       success: function (response) {
-        $('.wple-admin-review').fadeOut('slow');
+        $(".wple-admin-review").fadeOut("slow");
       },
     });
   });
 
-  $('.wple-mx-ignore').click(function (e) {
+  $(".wple-mx-ignore").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_mxerror_ignore',
-        remind: $this.hasClass('wple-hire-later'),
+        action: "wple_mxerror_ignore",
+        remind: $this.hasClass("wple-hire-later"),
       },
       beforeSend: function () {},
       error: function () {
         //alert("Failed to save! Please try again");
       },
       success: function (response) {
-        $('.wple-mx-prom').fadeOut('slow');
+        $(".wple-mx-prom").fadeOut("slow");
       },
     });
   });
 
   //since 7.8.1
-  $('.wple-notice-dismiss').click(function (e) {
+  $(".wple-notice-dismiss").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
-    var ctxt = $this.attr('data-context');
+    var ctxt = $this.attr("data-context");
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_dismiss_notice',
+        action: "wple_dismiss_notice",
         context: ctxt,
       },
       beforeSend: function () {},
       error: function () {
-        alert('Failed to save! Please try again');
+        alert("Failed to save! Please try again");
       },
       success: function (response) {
-        $('.notice-info.' + ctxt).fadeOut('slow');
+        $(".notice-info." + ctxt).fadeOut("slow");
       },
     });
   });
 
   function copycert(elem) {
     var element = document.querySelector(elem);
-    if (typeof element !== 'undefined') {
+    if (typeof element !== "undefined") {
       element.select();
       element.setSelectionRange(0, 9999999);
-      return document.execCommand('copy');
+      return document.execCommand("copy");
     } else {
       return false;
     }
   }
 
-  $('.copycert').click(function () {
+  $(".copycert").click(function () {
     var $this = $(this);
-    var ftype = $this.attr('data-type');
-    var txtarea = $('.crt-content textarea');
+    var ftype = $this.attr("data-type");
+    var txtarea = $(".crt-content textarea");
 
     jQuery.ajax({
-      method: 'GET',
+      method: "GET",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_getcert_for_copy',
-        nc: txtarea.attr('data-nc'),
+        action: "wple_getcert_for_copy",
+        nc: txtarea.attr("data-nc"),
         gettype: ftype,
       },
       beforeSend: function () {
-        txtarea.slideUp('fast');
+        txtarea.slideUp("fast");
       },
       error: function () {
-        alert('Something went wrong! Please try again');
+        alert("Something went wrong! Please try again");
       },
       success: function (response) {
-        txtarea.text(response).slideDown('fast');
-        $('.copied-success')
-          .fadeIn('fast')
+        txtarea.text(response).slideDown("fast");
+        $(".copied-success")
+          .fadeIn("fast")
           .delay(2000)
           .promise()
           .done(function () {
-            $('.copied-success').fadeOut('fast');
+            $(".copied-success").fadeOut("fast");
           });
-        copycert('.crt-content textarea');
+        copycert(".crt-content textarea");
       },
     });
   });
 
   /** 5.5.0 */
   function colorSwitch($new_score) {
-    var $scorebar = $('.wple-scorebar span');
+    var $scorebar = $(".wple-scorebar span");
 
     if ($new_score >= 30 && $new_score <= 70) {
-      $scorebar.css('background', '#e2d754');
+      $scorebar.css("background", "#e2d754");
     } else if ($new_score > 70) {
-      $scorebar.css('background', '#67d467');
+      $scorebar.css("background", "#67d467");
     } else {
-      $scorebar.css('background', '#ff5252');
+      $scorebar.css("background", "#ff5252");
     }
   }
 
-  $('.wple-setting').click(function () {
+  $(".wple-setting").click(function () {
     var $this = $(this);
-    var $opt = $this.attr('data-opt');
+    var $opt = $this.attr("data-opt");
     var $val = 0;
 
-    if ($this.is(':checked')) {
+    if ($this.is(":checked")) {
       $val = 1;
     }
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_update_settings',
+        action: "wple_update_settings",
         opt: $opt,
-        nc: $('.wple-ssl-settings').attr('data-update'),
+        nc: $(".wple-ssl-settings").attr("data-update"),
         val: $val,
       },
       beforeSend: function () {
-        $('li.wple-setting-error').fadeOut('fast');
+        $("li.wple-setting-error").fadeOut("fast");
       },
       error: function () {
-        alert('Could not update setting! Please try again.');
+        alert("Could not update setting! Please try again.");
       },
       success: function (response) {
-        var $scorebar = $('.wple-scorebar span');
-        var $existing_score = $scorebar.attr('data-width');
+        var $scorebar = $(".wple-scorebar span");
+        var $existing_score = $scorebar.attr("data-width");
         var $new_score;
 
-        if (response == '1') {
-          $this.removeAttr('checked');
-          $('.wple-setting-error').fadeIn('fast');
+        if (response == "1") {
+          $this.removeAttr("checked");
+          $(".wple-setting-error").fadeIn("fast");
           return false;
         } else if (response > 0) {
           $new_score = parseInt($existing_score) + 10;
 
           $scorebar.animate({
-            width: $new_score + '%',
+            width: $new_score + "%",
           });
 
-          $scorebar.attr('data-width', $new_score);
+          $scorebar.attr("data-width", $new_score);
 
-          $('li.' + $opt + ' span')
-            .removeClass('wple-no')
-            .addClass('wple-yes')
-            .text('Yes');
+          $("li." + $opt + " span")
+            .removeClass("wple-no")
+            .addClass("wple-yes")
+            .text("Yes");
           colorSwitch($new_score);
 
-          if ($new_score == 80 && !$('.score-prom').length) {
-            $('.wple-scorebar').after(
+          if ($new_score == 80 && !$(".score-prom").length) {
+            $(".wple-scorebar").after(
               "<h3 class='score-prom'>You still have major task pending!</h3>",
             );
           }
@@ -672,41 +672,41 @@
           $new_score = parseInt($existing_score) - 10;
 
           $scorebar.animate({
-            width: $new_score + '%',
+            width: $new_score + "%",
           });
 
-          $scorebar.attr('data-width', $new_score);
+          $scorebar.attr("data-width", $new_score);
 
-          $('li.' + $opt + ' span')
-            .removeClass('wple-yes')
-            .addClass('wple-no')
-            .text('No');
+          $("li." + $opt + " span")
+            .removeClass("wple-yes")
+            .addClass("wple-no")
+            .text("No");
           colorSwitch($new_score);
-        } else if (response == 'htaccessnotwritable') {
+        } else if (response == "htaccessnotwritable") {
           alert(
-            '.htaccess file not writable! Please change .htaccess file permission to 644 in order to implement security headers.',
+            ".htaccess file not writable! Please change .htaccess file permission to 644 in order to implement security headers.",
           );
-          $this.removeAttr('checked');
+          $this.removeAttr("checked");
           return false;
-        } else if (response == 'wpconfignotwritable') {
+        } else if (response == "wpconfignotwritable") {
           alert(
-            'wp-config.php file not writable! Please change wp-config file permission to 644 in order to implement HttpOnly cookies.',
+            "wp-config.php file not writable! Please change wp-config file permission to 644 in order to implement HttpOnly cookies.",
           );
-          $this.removeAttr('checked');
+          $this.removeAttr("checked");
           return false;
         }
 
-        if ($opt == 'vulnerability_scan') {
+        if ($opt == "vulnerability_scan") {
           if ($val == 1) {
-            $('#wple-vulnerability-scanner:not(.wple-malware-scanner)').show();
+            $("#wple-vulnerability-scanner:not(.wple-malware-scanner)").show();
           } else {
-            $('#wple-vulnerability-scanner:not(.wple-malware-scanner)').hide();
+            $("#wple-vulnerability-scanner:not(.wple-malware-scanner)").hide();
           }
         }
 
-        $('.wple-score').text($new_score);
+        $(".wple-score").text($new_score);
         //append html to sibiling label
-        var $label = $this.closest('li').children('label').first();
+        var $label = $this.closest("li").children("label").first();
         var $saved = $("<span class='wple-opt-saved'>Saved!</span>");
         $label.append($saved);
         $saved.delay(2000).fadeOut(400, function () {
@@ -717,156 +717,164 @@
   });
 
   /** 5.7.14 **/
-  $('.wple-backup-skip').click(function (e) {
+  $(".wple-backup-skip").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_backup_ignore',
+        action: "wple_backup_ignore",
       },
       beforeSend: function () {},
       error: function () {
         //alert("Failed to save! Please try again");
       },
       success: function (response) {
-        $('.le-powered').fadeOut('slow');
+        $(".le-powered").fadeOut("slow");
       },
     });
   });
 
-  $('#wple-security-settings input').change(function () {
-    var opts = $('#wple-security-settings').serializeArray();
-    var nc = $('#wple-security-settings').attr('data-update');
+  $("#wple-security-settings input").change(function () {
+    var $this = $(this);
+    var opts = $("#wple-security-settings").serializeArray();
+    var nc = $("#wple-security-settings").attr("data-update");
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_update_security',
+        action: "wple_update_security",
         opt: opts,
         nc: nc,
       },
       beforeSend: function () {},
       error: function () {
-        alert('Could not update setting! Please try again.');
+        alert("Could not update setting! Please try again.");
       },
       success: function (response) {
         if (response == 0) {
-          alert('Could not update setting! Please try again.');
+          alert("Could not update setting! Please try again.");
         } else {
-          console.log(response);
+          console.log(121 + " " + response);
+
+          var $label = $this.closest("li").children("label").first();
+          var $saved = $("<span class='wple-opt-saved'>Saved!</span>");
+          $label.append($saved);
+          $saved.delay(2000).fadeOut(400, function () {
+            $(this).remove();
+          });
         }
       },
     });
   });
 
   //since 7.7.0
-  $('.wple-ignore-btn').click(function (e) {
+  $(".wple-ignore-btn").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_global_ignore',
-        context: $this.attr('data-context'),
+        action: "wple_global_ignore",
+        context: $this.attr("data-context"),
       },
       beforeSend: function () {},
       error: function () {
         //alert("Failed to save! Please try again");
       },
       success: function (response) {
-        $('.wple-notice-' + $this.attr('data-context')).fadeOut('slow');
+        $(".wple-notice-" + $this.attr("data-context")).fadeOut("slow");
       },
     });
   });
 
-  $('.wple-dont-show-btn').click(function (e) {
+  $(".wple-dont-show-btn").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_global_dontshow',
-        context: $this.attr('data-context'),
+        action: "wple_global_dontshow",
+        context: $this.attr("data-context"),
       },
       beforeSend: function () {},
       error: function () {
         //alert("Failed to save! Please try again");
       },
       success: function (response) {
-        $('.wple-notice-' + $this.attr('data-context')).fadeOut('slow');
+        $(".wple-notice-" + $this.attr("data-context")).fadeOut("slow");
       },
     });
   });
 
   //since 7.8.0
-  $('.wple-mscan-ignorefile').click(function (e) {
+  $(".wple-mscan-ignorefile").click(function (e) {
     var $this = $(this);
     e.preventDefault();
 
-    var ky = $this.attr('data-key');
-    var filename = $this.attr('data-file');
-    var nc = $('#wple-mscan-table').attr('data-nc');
+    var ky = $this.attr("data-key");
+    var filename = $this.attr("data-file");
+    var nc = $("#wple-mscan-table").attr("data-nc");
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_mscan_ignorefile',
+        action: "wple_mscan_ignorefile",
         fyle: filename,
         nc: nc,
-        remove: $this.attr('data-remove'),
+        remove: $this.attr("data-remove"),
       },
       beforeSend: function () {
-        $this.text('Processing...');
+        $this.text("Processing...");
       },
       error: function () {
-        $this.text('Failed. Click to re-try..');
+        $this.text("Failed. Click to re-try..");
         //alert("Failed to save! Please try again");
       },
       success: function (response) {
         if (response == 1) {
-          $('tr.mscanfile-' + ky).fadeOut('fast');
+          $("tr.mscanfile-" + ky).fadeOut("fast");
         } else {
-          $this.text('Failed. Click to re-try..');
+          $this.text("Failed. Click to re-try..");
         }
       },
     });
   });
 
-  $('.wple-passkey-feature').change(function () {
+  $(".wple-passkey-feature").change(function () {
     var $this = $(this);
 
     jQuery.ajax({
-      method: 'POST',
+      method: "POST",
       url: ajaxurl,
-      dataType: 'text',
+      dataType: "text",
       data: {
-        action: 'wple_enable_passkey',
-        enabled: $('.wple-passkey-feature').is(':checked'),
+        action: "wple_enable_passkey",
+        enabled: $(".wple-passkey-feature").is(":checked"),
         nc: SCAN.nc,
       },
       beforeSend: function () {},
       error: function () {
-        alert('Failed to save opt! Please try again');
+        alert("Failed to save opt! Please try again");
       },
       success: function (response) {
-        if (response == 'failed') {
+        if (response == "failed") {
           alert("Couldn't save your settings! Please re-try.");
         } else {
-          alert('Settings Saved!');
+          alert("Settings Saved!");
         }
       },
     });
@@ -874,13 +882,13 @@
 })(jQuery);
 
 (function () {
-  const btn = document.getElementById('wple-register-passkey');
-  const msg = document.getElementById('wple-passkey-msg');
+  const btn = document.getElementById("wple-register-passkey");
+  const msg = document.getElementById("wple-passkey-msg");
 
   function showMessage(text, isError) {
     if (!msg) return;
     msg.textContent = text;
-    msg.style.color = isError ? 'red' : 'green';
+    msg.style.color = isError ? "red" : "green";
   }
 
   function base64ToUint8Array(base64) {
@@ -895,7 +903,7 @@
     const bytes =
       buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
     const chunkSize = 0x8000; // 32KB - avoids call stack / arg length limits
-    let binary = '';
+    let binary = "";
     for (let i = 0; i < bytes.length; i += chunkSize) {
       binary += String.fromCharCode.apply(
         null,
@@ -907,36 +915,36 @@
 
   function arrayBufferToBase64Url(buffer) {
     const b64 = arrayBufferToBase64(buffer);
-    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
 
   async function postForm(data) {
     const form = new URLSearchParams();
     for (const k in data) {
-      if (Array.isArray(data[k]) || typeof data[k] === 'object') {
+      if (Array.isArray(data[k]) || typeof data[k] === "object") {
         form.append(k, JSON.stringify(data[k]));
       } else {
         form.append(k, data[k]);
       }
     }
     const res = await fetch(SCAN.adminajax, {
-      method: 'POST',
-      credentials: 'same-origin',
+      method: "POST",
+      credentials: "same-origin",
       body: form,
     });
     return res.json();
   }
 
   async function registerPasskey() {
-    showMessage('', false);
+    showMessage("", false);
     btn.disabled = true;
     try {
       const optResp = await postForm({
-        action: 'wple_get_register_options',
+        action: "wple_get_register_options",
         nonce: SCAN.nc,
       });
       if (!optResp.success) {
-        showMessage(optResp.data || 'Failed to load options', true);
+        showMessage(optResp.data || "Failed to load options", true);
         btn.disabled = false;
         return;
       }
@@ -950,8 +958,8 @@
         // convert base64url -> base64 then to Uint8Array
         options.excludeCredentials = options.excludeCredentials.map((c) => {
           const b64u = c.id;
-          let b64 = b64u.replace(/-/g, '+').replace(/_/g, '/');
-          while (b64.length % 4) b64 += '=';
+          let b64 = b64u.replace(/-/g, "+").replace(/_/g, "/");
+          while (b64.length % 4) b64 += "=";
           return {
             ...c,
             id: base64ToUint8Array(b64),
@@ -963,14 +971,14 @@
 
       const cred = await navigator.credentials.create({ publicKey: options });
       if (!cred) {
-        showMessage('No credential created', true);
+        showMessage("No credential created", true);
         btn.disabled = false;
         return;
       }
 
       const response = cred.response;
       const payload = {
-        action: 'wple_register_passkey',
+        action: "wple_register_passkey",
         nonce: SCAN.nc,
         challenge: arrayBufferToBase64(optResp.data.challenge), // original base64 challenge from server
         id: cred.id,
@@ -987,10 +995,10 @@
 
       const reg = await postForm(payload);
       if (reg.success) {
-        showMessage(reg.data.message || 'Passkey registered', false);
+        showMessage(reg.data.message || "Passkey registered", false);
         const cleanUrl =
           window.location.protocol +
-          '//' +
+          "//" +
           window.location.host +
           window.location.pathname +
           window.location.hash;
@@ -998,18 +1006,18 @@
           window.location.replace(cleanUrl);
         }, 5000);
       } else {
-        showMessage(reg.data || 'Registration failed', true);
+        showMessage(reg.data || "Registration failed", true);
       }
     } catch (err) {
       console.error(err);
-      showMessage(err.message || 'Error', true);
+      showMessage(err.message || "Error", true);
     } finally {
       btn.disabled = false;
     }
   }
 
   if (btn) {
-    btn.addEventListener('click', function (e) {
+    btn.addEventListener("click", function (e) {
       e.preventDefault();
       registerPasskey();
     });

@@ -19,7 +19,7 @@
   },
   "scripts": {
     "test": "vendor/bin/phpunit --configuration phpunit.xml",
-    "compatibility": "phpcs --standard=PHPCompatibility --extensions=php --runtime-set testVersion 5.7 --warning-severity=0 . --ignore=node_modules",
+    "compatibility": "phpcs -d memory_limit=1G --standard=PHPCompatibility --extensions=php --runtime-set testVersion 5.6 --warning-severity=0 . --ignore=node_modules",
     "cs-check": "vendor/bin/phpcs --standard=WordPress --extensions=php classes admin lib",
     "cs-fix": "vendor/bin/phpcbf --standard=WordPress --extensions=php classes admin lib",
     "stan": "phpstan analyse -c phpstan.neon --memory-limit=3G",

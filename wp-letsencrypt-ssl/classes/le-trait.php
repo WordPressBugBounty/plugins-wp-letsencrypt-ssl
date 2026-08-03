@@ -519,32 +519,32 @@ class WPLE_Trait {
     }
 
     /**
-     * cPanel existence check
+     * cPanel existence DEEPER check
      * mx header support check
      *   
      * @source le-activator.php moved to le-trait
      *
      * @since 5.6.1
-     * @return void
      */
-    public static function wple_cpanel_identity( $return = false ) {
+    public static function wple_cpanel_identity() {
+        update_option( 'wple_panels_checked', true );
+        //7.8.7.2
         $host = SELF::get_root_domain( true );
-        $cpURLs = array('http://' . $host . '/cpanel', 'https://' . $host . ':2083', 'http://' . $host . ':2082');
-        $cpanel = false;
+        $cpURLs = array('https://' . $host . ':2083', 'http://' . $host . ':2082');
         foreach ( $cpURLs as $cpURL ) {
             $response = wp_remote_get( $cpURL, [
                 'headers'   => [
                     'Connection' => 'close',
                 ],
                 'sslverify' => false,
-                'timeout'   => 20,
+                'timeout'   => 5,
             ] );
             if ( !is_wp_error( $response ) ) {
                 $resCode = wp_remote_retrieve_response_code( $response );
                 if ( $resCode === 200 && false !== stripos( wp_remote_retrieve_body( $response ), 'cpanel' ) ) {
                     //detected
-                    $cpanel = true;
-                    break;
+                    update_option( 'wple_have_cpanel', 1 );
+                    return;
                 }
             }
         }
@@ -556,14 +556,14 @@ class WPLE_Trait {
                     'Connection' => 'close',
                 ],
                 'sslverify' => false,
-                'timeout'   => 20,
+                'timeout'   => 5,
             ] );
             if ( !is_wp_error( $response ) ) {
                 $resCode = wp_remote_retrieve_response_code( $response );
                 if ( $resCode === 200 ) {
                     //detected
                     update_option( 'wple_have_plesk', 1 );
-                    break;
+                    return;
                 }
             }
         }
@@ -575,14 +575,14 @@ class WPLE_Trait {
                     'Connection' => 'close',
                 ],
                 'sslverify' => false,
-                'timeout'   => 20,
+                'timeout'   => 5,
             ] );
             if ( !is_wp_error( $response ) ) {
                 $resCode = wp_remote_retrieve_response_code( $response );
                 if ( $resCode === 200 ) {
                     //detected
                     update_option( 'wple_have_directadmin', 1 );
-                    break;
+                    return;
                 }
             }
         }
@@ -590,20 +590,13 @@ class WPLE_Trait {
         if ( false !== stripos( ABSPATH, 'home/customer' ) ) {
             //SG
             update_option( 'wple_have_siteground', 1 );
+            return;
         }
-        if ( $cpanel ) {
-            update_option( 'wple_have_cpanel', 1 );
-        } else {
-            // if (isset($_SERVER['GD_PHP_HANDLER'])) {
-            //   if ($_SERVER['SERVER_SOFTWARE'] == 'Apache' && isset($_SERVER['GD_PHP_HANDLER']) && $_SERVER['DOCUMENT_ROOT'] == '/var/www') {
-            //     ///update_option('wple_no_pricing', 1);
-            //   }
-            // }
-            update_option( 'wple_have_cpanel', 0 );
-        }
-        if ( $return ) {
-            return $cpanel;
-        }
+        // if (isset($_SERVER['GD_PHP_HANDLER'])) {
+        //   if ($_SERVER['SERVER_SOFTWARE'] == 'Apache' && isset($_SERVER['GD_PHP_HANDLER']) && $_SERVER['DOCUMENT_ROOT'] == '/var/www') {
+        //     ///update_option('wple_no_pricing', 1);
+        //   }
+        // }
     }
 
     // public static function wple_mx_support()

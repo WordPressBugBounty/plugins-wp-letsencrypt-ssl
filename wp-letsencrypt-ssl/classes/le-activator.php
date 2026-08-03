@@ -35,12 +35,13 @@ class WPLE_Activator {
         update_option( 'wple_opts', $opts );
         update_option( 'wple_version', WPLE_PLUGIN_VER );
         update_option( 'wple_activate', time() );
-        WPLE_Trait::wple_cpanel_identity();
         if ( isset( $opts['expiry'] ) && $opts['expiry'] != '' ) {
             do_action( 'cert_expiry_updated' );
         }
-        wp_schedule_single_event( time() + 10, 'wple_init_ssllabs' );
-        //10sec
+        wp_schedule_single_event( time() + 5, 'wple_init_ssllabs' );
+        //5sec
+        wp_schedule_single_event( time() + 5, 'wple_init_panels_check' );
+        //background check - not applicable for init pricing table
         set_transient( 'wple_monitor_remindlater', true, 20 );
         //20sec
         //since 7.8.5.5

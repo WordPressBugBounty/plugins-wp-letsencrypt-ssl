@@ -103,6 +103,8 @@ class WPLE_Admin {
         //hide default pricing page for non-premium
         add_action( 'admin_head', [$this, 'wple_hide_default_pricing'] );
         add_action( 'wple_init_ssllabs', [$this, 'wple_initialize_ssllabs'] );
+        add_action( 'wple_init_panels_check', [$this, 'wple_deeper_check_panels'] );
+        //7.8.7.2
         add_action( 'wple_ssl_expiry_update', [$this, 'wple_update_expiry_ssllabs'] );
         //daily once cron
         add_action( 'wple_remindlater_trial', array($this, 'wple_show_trial_notice') );
@@ -1013,7 +1015,27 @@ class WPLE_Admin {
      * @return $html
      */
     public function wple_initial_quick_pricing( &$html ) {
-        $cpanel = WPLE_Trait::wple_cpanel_identity( true );
+        //quick check cpanel
+        $host = WPLE_Trait::get_root_domain( true );
+        $cpURLs = array('https://' . $host . ':2083', 'http://' . $host . ':2082');
+        $cpanel = false;
+        foreach ( $cpURLs as $cpURL ) {
+            $response = wp_remote_get( $cpURL, [
+                'headers'   => [
+                    'Connection' => 'close',
+                ],
+                'sslverify' => false,
+                'timeout'   => 4,
+            ] );
+            if ( !is_wp_error( $response ) ) {
+                $resCode = wp_remote_retrieve_response_code( $response );
+                if ( $resCode === 200 && false !== stripos( wp_remote_retrieve_body( $response ), 'cpanel' ) ) {
+                    //detected
+                    $cpanel = true;
+                    break;
+                }
+            }
+        }
         $html .= '<div id="wple-sslgen">';
         $cppricing = ( false !== stripos( ABSPATH, 'srv/htdocs' ) ? true : false );
         if ( $cpanel || $cppricing ) {
@@ -1036,7 +1058,6 @@ class WPLE_Admin {
      * Pricing table html
      *
      * @since 5.0.0
-     * @return $table
      */
     public function wple_cpanel_pricing_table( $cpanel = '' ) {
         ob_start();
@@ -1061,10 +1082,8 @@ class WPLE_Admin {
         <!-- <div class="plan-toggler" style="margin:60px 0 -20px !important">
         <span>Annual</span><label class="toggle">
           <input class="toggle-checkbox initplan-switch" type="checkbox" <?php 
-        // if ($cpanel == 1) {
-        //                                                                       echo 'checked';
-        //                                                                     }
-        ?>>
+        // if ($cpanel == 1) { echo 'checked'; }
+        ?> >
           <div class="toggle-switch"></div>
           <span class="toggle-label">Lifetime</span>
         </label>
@@ -1106,10 +1125,10 @@ class WPLE_Admin {
                     <li><strong>Automatic</strong> SSL renewal</li>
                     <li><strong>Wildcard</strong> SSL support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="One SSL certificate to cover all your sub-domains"></span></li>
                     <li><strong>Multisite</strong> mapped domains <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Install SSL for different domains mapped to your multisite network with MU domain mapping plugin"></span></li>
-                    <li><strong>DNS</strong> Automation <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automatic Domain verification with DNS if HTTP domain verification fails"></span></li>
+                    <!-- <li><strong>DNS</strong> Automation <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automatic Domain verification with DNS if HTTP domain verification fails"></span></li> -->
                     <li><strong>Woocommerce & Elementor</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="We will help resolve insecure padlock issues for Elementor & Woocommerce sites for free"></span></li>
-                    <li><strong>Vulnerability & Malware</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Automate daily scanning of your site for known vulnerabilities and get notified instantly"></span></li>
-                    <li><strong>Secure</strong> Passkey Login <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Passwordless MFA login with WebAuthn - Powered by your browser and protected by Face ID, Fingerprint or device PIN."></span></li>
+                    <li><strong>Vulnerability & Malware</strong> Scanner <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Instant notification when malware or vulnerability is found on site"></span></li>
+                    <li><strong>Secure</strong> Passkey Login <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Create unlimited passkeys per user and login without any password - Powered by your browser and protected by Face ID, Fingerprint or device PIN."></span></li>
                     <li><strong>Never</strong> expires <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="Never worry about SSL again - Your SSL certificate will be automatically renewed in background 30 days prior to its expiry dates"></span></li>
                     <li><strong>Priority</strong> support <span class="dashicons dashicons-editor-help wple-tooltip" data-tippy="support.wpencryption.com"></span></li>
                 </ul>
@@ -1554,6 +1573,16 @@ class WPLE_Admin {
         </div>';
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe because all dynamic data is escaped
         echo $html;
+    }
+
+    /**
+     * Run deeper checks for cPanel, plesk, directadmin panels upon each plugin activation
+     * once via cron. Otherwise ssl install will run it once.
+     *
+     * @return void
+     */
+    public function wple_deeper_check_panels() {
+        WPLE_Trait::wple_cpanel_identity();
     }
 
 }

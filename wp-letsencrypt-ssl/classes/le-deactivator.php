@@ -75,7 +75,8 @@ class WPLE_Deactivator {
             'wple_vulnerability_lastscan',
             'wple_malware_lastscan',
             'wple_mscan_integrity',
-            'wple_activate'
+            'wple_activate',
+            'wple_panels_checked'
         );
         foreach ( $opts_to_delete as $optname ) {
             delete_option( $optname );
@@ -88,6 +89,9 @@ class WPLE_Deactivator {
         //clear daily vuln scan
         if ( wp_next_scheduled( 'wple_init_vulnerability_scan' ) ) {
             wp_clear_scheduled_hook( 'wple_init_vulnerability_scan' );
+        }
+        if ( wp_next_scheduled( 'wple_init_malware_scan' ) ) {
+            wp_clear_scheduled_hook( 'wple_init_malware_scan' );
         }
         //clear daily ssl scan
         if ( wp_next_scheduled( 'wple_ssl_expiry_update' ) ) {

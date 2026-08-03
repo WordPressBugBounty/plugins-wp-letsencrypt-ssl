@@ -5,7 +5,7 @@ Requires at least: 5.4
 License: GPL3
 Tested up to: 7.1
 Requires PHP: 7.0
-Stable tag: 7.8.7.1
+Stable tag: 7.8.7.2
 
 Lifetime SSL solution - Free SSL certificate & HTTPS redirect, resolve insecure site, fix SSL errors, HTTPS headers, Login Security & Passkey.
 
@@ -181,6 +181,15 @@ Security is an important subject regarding SSL/TLS certificates, of course. It i
 7. Mixed Content Scanner to identify insecure contents on HTTPS site
 
 == Changelog ==
+
+= 7.8.7.2 =
+* Severity expansions & url correction for Site Health
+* Daily Vulnerability scan - free
+* Daily Malware scan - free
+* re-thought security scoring
+* Improved malware scanning
+* SSL & Security summary dashboard widget can be enabled via SSL health
+* Much improved plugin activation, ssl install performance
 
 = 7.8.7.0 =
 * php 8.4 support

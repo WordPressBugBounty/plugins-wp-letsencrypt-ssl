@@ -44,7 +44,7 @@ class WPLE_Mscan
         $failedFiles = [];
         $coreFiles = array_keys($checksums['checksums'][$version]);
 
-        $ignorePaths = ['themes', 'plugins', '.well-known', '.htaccess', 'wp-config.php'];
+        $ignorePaths = ['themes', 'plugins', '.well-known', '.htaccess', 'wp-config.php', 'uploads', 'languages'];
 
         // Check for modified or missing core files
         foreach ($checksums['checksums'][$version] as $file => $expectedHash) {

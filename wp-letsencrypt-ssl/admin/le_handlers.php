@@ -17,6 +17,8 @@ if ( class_exists( 'WPLE_Handler' ) ) {
 class WPLE_Handler {
     public function __construct() {
         add_action( 'admin_init', [$this, 'admin_init_handlers'], 1 );
+        add_action( 'wple_init_vulnerability_scan', [$this, 'wple_run_vulnerability_scan'] );
+        add_action( 'wple_init_malware_scan', [$this, 'wple_run_malware_scan'] );
         add_action( 'wp_ajax_wple_interests_survey', [$this, 'wple_interests_survey'] );
     }
 
@@ -70,7 +72,10 @@ class WPLE_Handler {
                 $leopts['domain'] = sanitize_text_field( $_POST['wple_domain'] );
             }
             update_option( 'wple_opts', $leopts );
-            WPLE_Trait::wple_cpanel_identity();
+            if ( get_option( 'wple_panels_checked' ) === FALSE ) {
+                WPLE_Trait::wple_cpanel_identity();
+            }
+            //else its already checked, no need to check again
             new WPLE_Core($leopts);
         }
     }
@@ -307,6 +312,15 @@ class WPLE_Handler {
             //run scan
             new WPLE_Mscan();
         }
+    }
+
+    public function wple_run_malware_scan() {
+        if ( function_exists( 'ignore_user_abort' ) ) {
+            ignore_user_abort( true );
+        }
+        update_option( 'wple_malware_lastscan', time() );
+        //run scan
+        new WPLE_Mscan();
     }
 
     /**

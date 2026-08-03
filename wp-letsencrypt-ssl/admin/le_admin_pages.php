@@ -768,7 +768,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
             }
             set_transient( 'wple_alternate_headers', $viaAlternateMethod, 60 * 60 );
             //1 hour
-            $featurelist .= '<br /><li class="wplenote note-info"><strong>Recommended:</strong> Someone could be spoofing your email by sending fake messages that appear to come from your @' . esc_html( WPLE_Trait::get_root_domain( true ) ) . ' address (<a href="https://spoofing.wpencryption.com/" target="_blank">Check Email Spoofing</a>)</li>';
+            $featurelist .= '<br /><li class="wplenote note-info"><strong>Recommended:</strong> Spammers could be spoofing your email by sending fake messages that appear to come from your <strong>@' . esc_html( WPLE_Trait::get_root_domain( true ) ) . '</strong> address (<a href="https://spoofing.wpencryption.com/" target="_blank">Check Email Spoofing</a>)</li>';
             $featurelist .= '<li class="wplenote note-info"><strong>Recommended:</strong> Run the insecure content scanner and make sure no issues remain (<a href="/wp-admin/admin.php?page=wp_encryption_mixed_scanner">Scan now</a>)</li>';
             //5.7.0
             $plugin = false;
@@ -829,6 +829,10 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
             $output .= '</div><!--wple-activessl-info-inner-->
     </div>';
             $sslopts = array(
+                'Enable Dashboard Widget'        => [
+                    'key'  => 'dashboard_widget',
+                    'desc' => 'Quickly shows SSL and security summary on WordPress dashboard',
+                ],
                 'Enable Mixed Content Fixer'     => [
                     'key'  => 'mixed_content_fixer',
                     'desc' => 'Fixes basic mixed content issues like images, urls, stylesheets, etc.,',
@@ -974,7 +978,8 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                 'notify_vulnerability_scan',
                 'autofix_vulnerability_scan',
                 'notify_malware_scan',
-                'daily_malware_scan'
+                'daily_malware_scan',
+                'dashboard_widget'
             );
             if ( !in_array( $opt, $allowed ) ) {
                 echo 0;
@@ -991,18 +996,21 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                 'upgrade_insecure',
                 'ssl_monitoring',
                 'vulnerability_scan',
-                'daily_vulnerability_scan',
                 'notify_vulnerability_scan',
-                'autofix_vulnerability_scan'
+                'autofix_vulnerability_scan',
+                'dashboard_widget'
             );
             $no_writing = array(
                 'ssl_monitoring',
                 'vulnerability_scan',
                 'daily_vulnerability_scan',
                 'notify_vulnerability_scan',
-                'autofix_vulnerability_scan'
+                'autofix_vulnerability_scan',
+                'daily_malware_scan',
+                'notify_malware_scan',
+                'dashboard_widget'
             );
-            //file writing not required
+            //htaccess writing not required
             $ssl_not_required = array(
                 'httponly_cookies',
                 'ssl_monitoring',
@@ -1013,12 +1021,18 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                 'vulnerability_scan',
                 'daily_vulnerability_scan',
                 'notify_vulnerability_scan',
-                'autofix_vulnerability_scan'
+                'autofix_vulnerability_scan',
+                'daily_malware_scan',
+                'notify_malware_scan',
+                'dashboard_widget'
             );
             if ( $val == 0 ) {
                 delete_option( "wple_" . $opt );
                 if ( $opt == 'daily_vulnerability_scan' ) {
                     wp_clear_scheduled_hook( 'wple_init_vulnerability_scan' );
+                }
+                if ( $opt == 'daily_malware_scan' ) {
+                    wp_clear_scheduled_hook( 'wple_init_malware_scan' );
                 }
                 if ( $opt == 'ssl_monitoring' ) {
                     wp_clear_scheduled_hook( 'wple_ssl_expiry_update' );
@@ -1038,6 +1052,9 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
             } else {
                 if ( $opt == 'daily_vulnerability_scan' ) {
                     wp_schedule_event( strtotime( 'now' ), 'daily', 'wple_init_vulnerability_scan' );
+                }
+                if ( $opt == 'daily_malware_scan' ) {
+                    wp_schedule_event( strtotime( 'now' ), 'daily', 'wple_init_malware_scan' );
                 }
                 if ( $opt == 'ssl_monitoring' ) {
                     if ( !wp_next_scheduled( 'wple_ssl_expiry_update' ) ) {
@@ -1128,7 +1145,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
             $notifications = ( FALSE !== $ecount ? '<span class="ab-label">' . (int) $ecount . '</span>' : '' );
             $admin_bar->add_menu( array(
                 'id'    => 'wple-ssl-health',
-                'title' => "SSL {$notifications}",
+                'title' => "HTTPS {$notifications}",
                 'href'  => admin_url( 'admin.php?page=wp_encryption_ssl_health' ),
                 'meta'  => array(
                     'title' => __( 'SSL Health', 'wp-letsencrypt-ssl' ),
@@ -1197,7 +1214,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                     'label' => 'Security',
                     'color' => 'red',
                 ),
-                'description' => '<p>' . esc_html( $desc ) . '</p><br><a href="' . admin_url( '/update-core.php' ) . '">Update WordPress Core</a><br><br><a href="' . admin_url( '/admin.php?page=wp_encryption_ssl_health' ) . '">View / Re-run vulnerablility scan</a>',
+                'description' => '<p>' . esc_html( $desc ) . '</p><br><a href="' . admin_url( '/update-core.php' ) . '">Update WordPress Core</a><br><br><a href="' . admin_url( '/admin.php?page=wp_encryption_security' ) . '">View / Re-run vulnerablility scan</a>',
                 'actions'     => '',
                 'test'        => 'wple_core_vulnerability',
             );
@@ -1216,7 +1233,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                     $table .= '<tr>
         <td>' . esc_html( $data['label'] ) . '</td>
         <td>' . esc_html( $data['desc'] ) . '</td>
-        <td>' . esc_html( strtoupper( $data['severity'] ) ) . '</td>
+        <td>' . esc_html( strtoupper( str_ireplace( ['m', 'h', 'c'], ['Medium', 'High', 'Critical'], $data['severity'] ) ) ) . '</td>
         <td>' . esc_url( $data['reference'] ) . '</td>
         </tr>';
                 }
@@ -1229,7 +1246,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                     'label' => 'Security',
                     'color' => 'red',
                 ),
-                'description' => '<p>' . $table . '</p><br><a href="' . admin_url( '/update-core.php' ) . '">Update Plugins</a><br><br><a href="' . admin_url( '/admin.php?page=wp_encryption_ssl_health' ) . '">View / Re-run vulnerablility scan</a>',
+                'description' => '<p>' . $table . '</p><br><a href="' . admin_url( '/update-core.php' ) . '">Update Plugins</a><br><br><a href="' . admin_url( '/admin.php?page=wp_encryption_security' ) . '">View / Re-run vulnerablility scan</a>',
                 'actions'     => '',
                 'test'        => 'wple_plugins_vulnerability',
             );
@@ -1248,7 +1265,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                     $table .= '<tr>
         <td>' . esc_html( $data['label'] ) . '</td>
         <td>' . esc_html( $data['desc'] ) . '</td>
-        <td>' . esc_html( strtoupper( $data['severity'] ) ) . '</td>
+        <td>' . esc_html( strtoupper( str_ireplace( ['m', 'h', 'c'], ['Medium', 'High', 'Critical'], $data['severity'] ) ) ) . '</td>
         <td>' . esc_url( $data['reference'] ) . '</td>
         </tr>';
                 }
@@ -1261,7 +1278,7 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                     'label' => 'Security',
                     'color' => 'red',
                 ),
-                'description' => '<p>' . $table . '</p><br><a href="' . admin_url( '/update-core.php' ) . '">Update Theme</a><br><br><a href="' . admin_url( '/admin.php?page=wp_encryption_ssl_health' ) . '">View / Re-run vulnerablility scan</a>',
+                'description' => '<p>' . $table . '</p><br><a href="' . admin_url( '/update-core.php' ) . '">Update Theme</a><br><br><a href="' . admin_url( '/admin.php?page=wp_encryption_security' ) . '">View / Re-run vulnerablility scan</a>',
                 'actions'     => '',
                 'test'        => 'wple_themes_vulnerability',
             );
@@ -1298,10 +1315,9 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
             <small>Scans your WordPress installation against original repo for core integrity changes and suspicious files (themes, plugins, .well-known directories are currently ignored).</small>
             <ul>';
             $vuln_headers = array(
-                'Enable Daily Scan (Premium)'           => [
-                    'key'     => 'daily_malware_scan',
-                    'desc'    => 'Automated daily scan of entire WordPress directory for malware & suspicious files.',
-                    'premium' => 1,
+                'Enable Daily Scan'                     => [
+                    'key'  => 'daily_malware_scan',
+                    'desc' => 'Automated daily scan of entire WordPress directory for malware & suspicious files.',
                 ],
                 'Enable Instant Notification (Premium)' => [
                     'key'     => 'notify_malware_scan',
@@ -1372,10 +1388,9 @@ if ( !class_exists( 'WPLE_SubAdmin' ) ) {
                     'desc'    => 'Scans installed versions of your WordPress core, plugins, themes for known vulnerabilities.',
                     'premium' => 0,
                 ],
-                'Enable Daily Scan (Premium)'                     => [
-                    'key'     => 'daily_vulnerability_scan',
-                    'desc'    => 'Automatically Scans installed versions of your WordPress core, plugins, themes for known vulnerabilities everyday.',
-                    'premium' => 1,
+                'Enable Daily Scan'                               => [
+                    'key'  => 'daily_vulnerability_scan',
+                    'desc' => 'Automatically Scans installed versions of your WordPress core, plugins, themes for known vulnerabilities everyday.',
                 ],
                 'Enable Instant Notification (Premium)'           => [
                     'key'     => 'notify_vulnerability_scan',
